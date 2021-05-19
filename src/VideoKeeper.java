@@ -1,11 +1,9 @@
 import java.util.LinkedList;
 import java.io.*;
-import java.nio.file.*;
 import java.util.Scanner;
 import java.awt.*;
 import javax.swing.JOptionPane;
 import java.net.URL;
-import java.awt.datatransfer.ClipboardOwner;
 import java.awt.datatransfer.StringSelection;
 import javax.swing.JFrame;
 
@@ -15,19 +13,19 @@ public class VideoKeeper
 	private Queue 			mainQueue;
 	private Queue 			addedQueue;
 	private Queue			skipQueue;
-	private String 		database;
+	private String 			database;
 	private VideoDataNode 	curr;
-	private JFrame 		frame;
-	private boolean		checkForDuplicates;
+	private JFrame 			frame;
+	private boolean			checkForDuplicates;
 	
 	public VideoKeeper(String database, JFrame frame) {
-		this.mainQueue 		= new Queue();	
+		this.mainQueue 			= new Queue();	
 		this.addedQueue 		= new Queue();
 		this.skipQueue			= new Queue();
 		this.database 			= database;
-		this.frame 			= frame;
-		this.curr 			= null;
-		this.checkForDuplicates 	= true;
+		this.frame 				= frame;
+		this.curr 				= null;
+		this.checkForDuplicates = true;
 		
 		populateQueue();
 	}

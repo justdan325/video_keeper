@@ -1,17 +1,9 @@
-import javax.swing.JOptionPane;
-import java.awt.datatransfer.ClipboardOwner;
-import java.awt.datatransfer.StringSelection;
-import java.net.URL;
-import java.awt.Desktop;
-import java.awt.EventQueue;
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.Toolkit;
-import java.awt.Component;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.FocusListener;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusAdapter;
 import java.awt.event.WindowListener;
@@ -24,32 +16,31 @@ import javax.swing.JPanel;
 import java.awt.BorderLayout;
 import java.awt.GridLayout;
 import java.awt.FlowLayout;
-import java.awt.event.WindowListener;
 import java.awt.Dimension;
 
 public class MainGui extends JFrame implements WindowListener {
-	public  static final String PROG_NAME 		= "Video Keeper";
-	public  static final String PROG_VER		= "2.0b2";
+	public  static final String PROG_NAME 			= "Video Keeper";
+	public  static final String PROG_VER			= "2.0a2";
 	
-	private static final String DATABASE 		= "database.txt";
-	private static final String PASTE_MESS 		= "<Paste URL Here>";
-	private static final String TITLE 			= "";
+	private static final String PASTE_MESS 			= "<Paste URL Here>";
+	private static final String TITLE 				= "";
 	private static final String NEXT_BUTTON_TXT 	= "Play Next";
 	private static final String PREV_BUTTON_TXT 	= "Play Prev.";
 	private static final String SKIP_BUTTON_TXT 	= "Skip Next";
-	private static final String ADD_BUTTON_TXT 	= "Add";
-	private static final String ADD_LABEL_TXT 	= "Add New Video";
-	private static final String PASTE_BUTTON_TXT = "Paste";
-	private static final String TO_WATCH_TXT 	= "Videos:";
-	private static final String UP_NEXT_TXT		= " -- Up Next -- ";
-	private static final String CHANNEL_PREFIX 	= "By: ";
-	private static final String FONT			= "Helvetica";
-	private static final int WIN_X 			= 600;
-	private static final int WIN_Y 			= 350;
-	private static final int URL_FIELD_X		= 450;
-	private static final int URL_FIELD_Y		= 40;
-	private static final int UP_NEXT_FONT_SIZE 	= 20;
-	private static final int VID_DATA_FONT_SIZE 	= 14;
+	private static final String SETT_BUTTON_TXT 	= "*";
+	private static final String ADD_BUTTON_TXT 		= "Add";
+	private static final String ADD_LABEL_TXT 		= "Add New Video";
+	private static final String PASTE_BUTTON_TXT 	= "Paste";
+	private static final String TO_WATCH_TXT 		= "Videos:";
+	private static final String UP_NEXT_TXT			= " -- Up Next -- ";
+	private static final String CHANNEL_PREFIX 		= "By: ";
+	private static final String FONT				= "Helvetica";
+	private static final int 	WIN_X 				= 600;
+	private static final int 	WIN_Y 				= 350;
+	private static final int 	URL_FIELD_X			= 450;
+	private static final int 	URL_FIELD_Y			= 40;
+	private static final int 	UP_NEXT_FONT_SIZE 	= 20;
+	private static final int 	VID_DATA_FONT_SIZE 	= 14;
 	
 	private VideoKeeper keeper;
 	private JButton nextButton;
@@ -57,6 +48,7 @@ public class MainGui extends JFrame implements WindowListener {
 	private JButton addButton;
 	private JButton pasteButton;
 	private JButton skipButton;
+	private JButton settButton;
 	private JLabel UP_NEXT_LABEL;
 	private JLabel counterLabel;
 	private JLabel titleLabel;
@@ -72,16 +64,13 @@ public class MainGui extends JFrame implements WindowListener {
 	private boolean ctrlPressed;
 	private boolean sPressed;
 	
-	public static void main(String[] args) {
-		new MainGui();
-	}
-	
-	public MainGui() {
-		this.keeper = new VideoKeeper(DATABASE, this);
+	public MainGui(String database) {
+		this.keeper = new VideoKeeper(database, this);
 		this.nextButton = new JButton(NEXT_BUTTON_TXT);
 		this.prevButton = new JButton(PREV_BUTTON_TXT);
 		this.addButton = new JButton(ADD_BUTTON_TXT);
 		this.skipButton = new JButton(SKIP_BUTTON_TXT);
+		this.settButton = new JButton(SETT_BUTTON_TXT);
 		this.pasteButton = new JButton(PASTE_BUTTON_TXT);
 		this.UP_NEXT_LABEL = new JLabel();
 		this.counterLabel = new JLabel("0");
@@ -145,12 +134,14 @@ public class MainGui extends JFrame implements WindowListener {
 		JLabel addLabel = new JLabel(ADD_LABEL_TXT);
 		
 		urlField.setPreferredSize(new Dimension(URL_FIELD_X, URL_FIELD_Y));
+		settButton.setPreferredSize(new Dimension(URL_FIELD_Y, URL_FIELD_Y));
 		addLabel.setFont(new Font(FONT, Font.PLAIN, VID_DATA_FONT_SIZE-2));
 		addLabel.setHorizontalAlignment(JLabel.CENTER);
 		
 		buttonPanel.add(pasteButton);
 		buttonPanel.add(addButton);
 		
+		urlPanel.add(settButton);
 		urlPanel.add(urlField);
 		urlPanel.add(buttonPanel);
 		
