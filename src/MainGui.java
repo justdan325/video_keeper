@@ -43,6 +43,7 @@ public class MainGui extends JFrame implements WindowListener {
 	private static final int 	VID_DATA_FONT_SIZE 	= 14;
 	
 	private VideoKeeper keeper;
+	private SettingsDialog settings;
 	private JButton nextButton;
 	private JButton prevButton;
 	private JButton addButton;
@@ -66,6 +67,7 @@ public class MainGui extends JFrame implements WindowListener {
 	
 	public MainGui(String database) {
 		this.keeper = new VideoKeeper(database, this);
+		this.settings = new SettingsDialog(this);
 		this.nextButton = new JButton(NEXT_BUTTON_TXT);
 		this.prevButton = new JButton(PREV_BUTTON_TXT);
 		this.addButton = new JButton(ADD_BUTTON_TXT);
@@ -193,6 +195,12 @@ public class MainGui extends JFrame implements WindowListener {
 		skipButton.addActionListener((new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				keeper.skipNext();
+			}
+		}));
+		
+		settButton.addActionListener((new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				settings.showDialog();
 			}
 		}));
 		
