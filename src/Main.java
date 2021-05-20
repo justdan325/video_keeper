@@ -9,12 +9,15 @@ public class Main {
 	private static final String PROP_FILE			= "videokeeper.properties";
 	
 	private PropsFileUtil props;
+	private DataModel model;
 	
 	public static void main(String[] args) {
 		new Main();
 	}
 	
 	public Main() {
+		this.model = new DataModel();
+		
 		try {
 			this.props = new PropsFileUtil(getOrCreatePropsFile());
 		} catch (Exception e) {
@@ -27,16 +30,21 @@ public class Main {
 	}
 	
 	private void init() {
+		String database = DEFAULT_DATABASE;
+		
 		if(!props.containsProp(PROP_KEY_DATABASE)) {
-			try {
-				props.set(PROP_KEY_DATABASE, DEFAULT_DATABASE);
-			} catch (IOException e) {
-				e.printStackTrace();
-				System.exit(-1);
+			props.set(PROP_KEY_DATABASE, database);
+		} else {
+			if(props.containsProp(PROP_KEY_DATABASE)) {
+				database = props.get(PROP_KEY_DATABASE);
+			} else {
+				props.set(PROP_KEY_DATABASE, database);
 			}
 		}
 		
-		new MainGui(DEFAULT_DATABASE);
+		model.setDatabaseFile(database);
+		
+		new MainGui(model);
 	}
 	
 	private File getOrCreatePropsFile() {

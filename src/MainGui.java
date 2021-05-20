@@ -42,6 +42,7 @@ public class MainGui extends JFrame implements WindowListener {
 	private static final int 	UP_NEXT_FONT_SIZE 	= 20;
 	private static final int 	VID_DATA_FONT_SIZE 	= 14;
 	
+	private DataModel model;
 	private VideoKeeper keeper;
 	private SettingsDialog settings;
 	private JButton nextButton;
@@ -59,8 +60,9 @@ public class MainGui extends JFrame implements WindowListener {
 	private JPanel mainPanel;
 	private int count;
 	
-	public MainGui(String database) {
-		this.keeper = new VideoKeeper(database, this);
+	public MainGui(DataModel model) {
+		this.model = model;
+		this.keeper = new VideoKeeper(model, this);
 		this.settings = new SettingsDialog(this);
 		this.nextButton = new JButton(NEXT_BUTTON_TXT);
 		this.prevButton = new JButton(PREV_BUTTON_TXT);

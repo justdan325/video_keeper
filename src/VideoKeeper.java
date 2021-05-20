@@ -10,19 +10,19 @@ import javax.swing.JFrame;
 
 public class VideoKeeper
 {
+	private DataModel		model;
 	private Queue 			mainQueue;
 	private Queue 			addedQueue;
 	private Queue			skipQueue;
-	private String 			database;
 	private VideoDataNode 	curr;
 	private JFrame 			frame;
 	private boolean			checkForDuplicates;
 	
-	public VideoKeeper(String database, JFrame frame) {
+	public VideoKeeper(DataModel model, JFrame frame) {
+		this.model				= model;
 		this.mainQueue 			= new Queue();	
 		this.addedQueue 		= new Queue();
 		this.skipQueue			= new Queue();
-		this.database 			= database;
 		this.frame 				= frame;
 		this.curr 				= null;
 		this.checkForDuplicates = true;
@@ -229,7 +229,7 @@ public class VideoKeeper
 		VideoDataNode hold;
 		mainQueue.clear();
 		
-		String[] list = readFile(database).split("\n");
+		String[] list = readFile(model.getDatabaseFile()).split("\n");
 		
 		for(int i = 0; i < list.length; i++) {
 			VideoDataNode node = new VideoDataNode(list[i]);
@@ -274,8 +274,8 @@ public class VideoKeeper
 			i++;
 		}
 		
-		clearFile(database);
-		writeFile(toWrite, database);
+		clearFile(model.getDatabaseFile());
+		writeFile(toWrite, model.getDatabaseFile());
 	}
 	
 	private void openWebpage(String s) {
