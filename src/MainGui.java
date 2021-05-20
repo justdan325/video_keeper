@@ -11,6 +11,7 @@ import java.awt.event.WindowEvent;
 import javax.swing.JTextField;
 import javax.swing.JButton;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import java.awt.BorderLayout;
@@ -315,7 +316,17 @@ public class MainGui extends JFrame implements WindowListener {
 	
 	@Override
 	public void windowClosing(WindowEvent e) {
-		keeper.save();
+		if (model.isAutoSaveOnExit()) {
+			keeper.save();
+		} else {
+			String mess = "Would you like to save the watch list?";
+			int option = JOptionPane.showOptionDialog(this, mess, PROG_NAME + " -- Save?", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, null, null);
+			
+			if(option == JOptionPane.YES_OPTION) {
+				keeper.save();
+			}
+		}
+		
 		System.exit(0);
 	}
 

@@ -288,7 +288,17 @@ public class VideoKeeper
 				for(;;) {
 					//if database changes, save and reload with new database
 					if(!database.equals(model.getDatabaseFile())) {
-						save();
+						if(model.isAutoSaveOnExit()) {
+							save();
+						} else {
+							String mess = "Would you like to save changes to \nthe current database before switching?";
+							int option = JOptionPane.showOptionDialog(frame, mess, MainGui.PROG_NAME + " -- Save?", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, null, null);
+							
+							if(option == JOptionPane.YES_OPTION) {
+								save();
+							}
+						}
+						
 						database = model.getDatabaseFile();
 						populateQueue();
 					}

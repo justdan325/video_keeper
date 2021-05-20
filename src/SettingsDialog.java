@@ -5,11 +5,14 @@ import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
 
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
@@ -18,13 +21,16 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 
 public class SettingsDialog extends JDialog {
-	private static final String DIA_TITLE = "Settings";
-	private static final int WIN_X = 400;
-	private static final int WIN_Y = 400;
+	private static final String DIA_TITLE 			= "Settings";
+	private static final String BROWSE_BTN_TITLE 	= "Browse";
+	private static final String AUTO_SAVE_TITLE		= "Auto Save upon Exit";
+	private static final int 	WIN_X 				= 500;
+	private static final int 	WIN_Y 				= 400;
 	
 	private JTextField dbFileTextField;
 	private JPanel mainPanel;
 	private JButton dbFileButton;
+	private JCheckBox autoSaveCheckbox;
 	private JFrame parent;
 	private DataModel model;
 	
@@ -34,13 +40,15 @@ public class SettingsDialog extends JDialog {
 
 	public SettingsDialog(JFrame parent, DataModel model) {
 		this.dbFileTextField = new JTextField();
-		this.dbFileButton = new JButton();
-		this.mainPanel = new JPanel(new BorderLayout(10, 20));
+		this.dbFileButton = new JButton(BROWSE_BTN_TITLE);
+		this.autoSaveCheckbox = new JCheckBox(AUTO_SAVE_TITLE);
+		this.mainPanel = new JPanel(new GridLayout(3, 1));
 		this.parent = parent;
 		this.model = model;
 		
-		mainPanel.add(makeTitleLabel(), BorderLayout.NORTH);
-		mainPanel.add(makeTextFieldPanel(), BorderLayout.CENTER);
+		mainPanel.add(makeTitleLabel());
+		mainPanel.add(makeTextFieldPanel());
+		mainPanel.add(makeCheckboxPanel());
 		
 		this.add(mainPanel);
 		
@@ -66,15 +74,16 @@ public class SettingsDialog extends JDialog {
 	}
 	
 	private JPanel makeTextFieldPanel() {
-		JPanel textFieldPanel = new JPanel(new GridLayout(8,1));
+		JPanel textFieldPanel = new JPanel(new GridLayout(2,1));
 		JPanel dbSubPanel = new JPanel(new FlowLayout());
 		JLabel dbFileLabel = new JLabel("Database File");
 		
-		dbFileTextField.setPreferredSize(new Dimension(300, 30));
+		dbFileTextField.setPreferredSize(new Dimension(350, 30));
 		dbFileTextField.setText(model.getDatabaseFile());
 		dbFileTextField.setEditable(false);
-		dbFileButton.setPreferredSize(new Dimension(20, 30));
+		dbFileButton.setPreferredSize(new Dimension(90, 30));
 		dbFileLabel.setHorizontalAlignment(JLabel.CENTER);
+		dbFileLabel.setFont(new Font(MainGui.FONT, Font.PLAIN, 12));
 		
 		dbSubPanel.add(dbFileTextField);
 		dbSubPanel.add(dbFileButton);
@@ -83,6 +92,22 @@ public class SettingsDialog extends JDialog {
 		textFieldPanel.add(dbSubPanel);
 		
 		return textFieldPanel;
+	}
+	
+	private JPanel makeCheckboxPanel() {
+		JPanel checkboxPanel = new JPanel(new GridLayout());
+		
+		autoSaveCheckbox.setHorizontalAlignment(JCheckBox.CENTER);
+		
+		if(model.isAutoSaveOnExit()) {
+			autoSaveCheckbox.setSelected(true);
+		} else {
+			autoSaveCheckbox.setSelected(false);
+		}
+		
+		checkboxPanel.add(autoSaveCheckbox);
+		
+		return checkboxPanel;
 	}
 	
 	private void addListeners() {
@@ -105,6 +130,17 @@ public class SettingsDialog extends JDialog {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				selectNewDatabaseFile();
+			}
+		});
+		
+		autoSaveCheckbox.addItemListener(new ItemListener() {
+			@Override
+			public void itemStateChanged(ItemEvent arg0) {
+				if(arg0.getStateChange() == ItemEvent.SELECTED) {
+					model.setAutoSaveOnExit(true);
+				} else if(arg0.getStateChange() == ItemEvent.DESELECTED) {
+					model.setAutoSaveOnExit(false);
+				}
 			}
 		});
 	}
