@@ -9,7 +9,7 @@ public class MetadataObtainer {
 	private static final String FETCH_ERROR_PREFIX 	= "ERROR FETCHING HTML: ";
 	private static final String YOUTUBE_PREFIX 		= "https://youtube.com/watch?v=";
 	private static final String YOUTUBE_PREFIX_W 	= "https://www.youtube.com/watch?v=";
-	private static final String YOUTUBE_PREFIX_ABBR 	= "https://youtu.be/";
+	private static final String YOUTUBE_PREFIX_ABBR = "https://youtu.be/";
 	private static final String TWITCH_PREFIX_W		= "https://www.twitch.tv/videos/";
 	private static final String TWITCH_PREFIX_MOB	= "https://m.twitch.tv/videos/";
 	
@@ -271,6 +271,7 @@ public class MetadataObtainer {
 		filtered = filtered.replaceAll("&amp;", "&");
 		filtered = filtered.replaceAll("&#39;", "'");
 		filtered = filtered.replaceAll("&#x27;", "'");
+		filtered = filtered.replaceAll("&quot;", "\"");
 		
 		return filtered;
 	}
