@@ -5,6 +5,7 @@ import java.util.Properties;
 public class PropsFileUtil {
 	private File propsFile;
 	private Properties props;
+	private FileOutputStream out;
 
 	public PropsFileUtil(File propsFile) throws Exception {
 		if(!propsFile.exists()) {
@@ -13,6 +14,7 @@ public class PropsFileUtil {
 
 		this.propsFile = propsFile;
 		this.props = setup(propsFile);
+		this.out = new FileOutputStream(propsFile);
 	}
 
 	private Properties setup(File propsFile) throws IOException {
@@ -31,26 +33,47 @@ public class PropsFileUtil {
 		return value;
 	}
 
-	public void set(String prop, String value) throws IOException {
+	public boolean set(String prop, String value) {
+		boolean success = true;
+		
 		props.setProperty(prop, value);
-		props.store(new FileOutputStream(propsFile), null);
+		
+		try {
+			props.store(out, null);
+		} catch (IOException e) {
+			success = false;
+		}
+		
+		return success;
 	}
 
-	public boolean remove(String prop) throws IOException {
+	public boolean remove(String prop) {
 		Object value = props.remove(prop);
 		boolean removed = false;
 
 		if(value != null) {
-			props.store(new FileOutputStream(propsFile), null);
-			removed = true;
+			try {
+				props.store(out, null);
+				removed = true;
+			} catch (IOException e) {
+			}
 		}
 
 		return removed;
 	}
 
-	public void clearAll() throws IOException {
+	public boolean clearAll() {
+		boolean cleared = true;
+		
 		props.clear();
-		props.store(new FileOutputStream(propsFile), null);
+		
+		try {
+			props.store(out, null);
+		} catch (IOException e) {
+			cleared = false;
+		}
+		
+		return cleared;
 	}
 
 	public String listAll() {
@@ -71,5 +94,17 @@ public class PropsFileUtil {
 
 	public int getNumProps() {
 		return props.size();
+	}
+	
+	public boolean close() {
+		boolean closed = true;
+		
+		try {
+			out.close();
+		} catch (IOException e) {
+			closed = false;
+		}
+		
+		return closed;
 	}
 }
