@@ -21,7 +21,7 @@ import java.awt.Dimension;
 
 public class MainGui extends JFrame implements WindowListener {
 	public  static final String PROG_NAME 			= "Video Keeper";
-	public  static final String PROG_VER			= "2.0a2";
+	public  static final String PROG_VER			= "2.0a3";
 	
 	private static final String PASTE_MESS 			= "<Paste URL Here>";
 	private static final String TITLE 				= "";
@@ -34,6 +34,7 @@ public class MainGui extends JFrame implements WindowListener {
 	private static final String PASTE_BUTTON_TXT 	= "Paste";
 	private static final String TO_WATCH_TXT 		= "Videos:";
 	private static final String UP_NEXT_TXT			= " -- Up Next -- ";
+	private static final String EMPTY_QUEUE_TXT		= "~ No Videos in Watch List ~";
 	private static final String CHANNEL_PREFIX 		= "By: ";
 	public  static final String FONT				= "Helvetica";
 	private static final int 	WIN_X 				= 600;
@@ -269,7 +270,7 @@ public class MainGui extends JFrame implements WindowListener {
 						}
 					} else {
 						nextButton.setEnabled(false);
-						UP_NEXT_LABEL.setText(" ");
+						UP_NEXT_LABEL.setText(EMPTY_QUEUE_TXT);
 						titleLabel.setText(" ");
 						dateLabel.setText(" ");
 						channelLabel.setText(" ");

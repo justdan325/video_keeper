@@ -45,10 +45,10 @@ public class VideoKeeper
 		boolean addItem = true;
 		
 		if(checkForDuplicates && mainQueue.contains(item)) {
-			int option = JOptionPane.showConfirmDialog(frame, "Link is already in watch queue. Add anyway?", MainGui.PROG_NAME,  JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
+			int option = JOptionPane.showConfirmDialog(frame, "Link is already in watch list. Add anyway?", MainGui.PROG_NAME + " -- Duplicate Video",  JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
 
 			if(option == JOptionPane.YES_OPTION) {
-				option = JOptionPane.showConfirmDialog(frame, "Check for duplicates going forward?", MainGui.PROG_NAME,  JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
+				option = JOptionPane.showConfirmDialog(frame, "Check for duplicates going forward?", MainGui.PROG_NAME + " -- Check for Duplicates?",  JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
 
 				if(option == JOptionPane.NO_OPTION) {
 					checkForDuplicates = false;
@@ -319,7 +319,7 @@ public class VideoKeeper
 			Desktop.getDesktop().browse(new URL(s).toURI());
 		} catch (Exception e) {
 			Toolkit.getDefaultToolkit().getSystemClipboard().setContents(new StringSelection(s), null);
-			JOptionPane.showMessageDialog(frame, "URL has been cached.", "URL Cached", 1);
+			JOptionPane.showMessageDialog(frame, "URL has been cached.", MainGui.PROG_NAME + " -- URL Cached", 1);
 		}
 	}
 	

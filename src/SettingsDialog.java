@@ -25,7 +25,7 @@ public class SettingsDialog extends JDialog {
 	private static final String BROWSE_BTN_TITLE 	= "Browse";
 	private static final String AUTO_SAVE_TITLE		= "Auto Save upon Exit";
 	private static final int 	WIN_X 				= 500;
-	private static final int 	WIN_Y 				= 400;
+	private static final int 	WIN_Y 				= 275;
 	
 	private JTextField dbFileTextField;
 	private JPanel mainPanel;
