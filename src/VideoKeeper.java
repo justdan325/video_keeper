@@ -181,6 +181,33 @@ public class VideoKeeper
 		thread.start();
 	}
 	
+	public void refreshAll() {
+		skipQueue.clear();
+		mainQueue.clear();
+		populateQueue();
+		
+		if(mainQueue.size() > 0) {
+			Queue tempQ = new Queue();
+
+			while(mainQueue.size() > 0) {
+				VideoDataNode temp = mainQueue.pop();
+				
+				if(!temp.isEmpty()) {
+					MetadataObtainer obtainer = new MetadataObtainer(temp.getUrl());
+					temp.setTitle(obtainer.getTitle());
+					temp.setDate(obtainer.getDate());
+					temp.setChannel(obtainer.getChannel());
+				}
+				
+				tempQ.push(temp);
+			}
+			
+			while(tempQ.size() > 0) {
+				mainQueue.push(tempQ.pop());
+			}
+		}
+	}
+	
 	public String getNextTitle() {
 		String nextTitle = "";
 
@@ -253,25 +280,27 @@ public class VideoKeeper
 		refreshNext();
 	}
 	
-	public void save() {
+	public synchronized void save() {
+		Queue skipCopy = skipQueue.duplicate();
+		Queue mainCopy = mainQueue.duplicate();
 		String toWrite = "";
 		int i = 0;
 		
-		while(skipQueue.size() > 0) {
+		while(skipCopy.size() > 0) {
 			if(i > 0) {
-				toWrite += "\n" + skipQueue.pop().toString();
+				toWrite += "\n" + skipCopy.pop().toString();
 			} else {
-				toWrite += skipQueue.pop().toString();
+				toWrite += skipCopy.pop().toString();
 			}
 			
 			i++;
 		}
 		
-		while(mainQueue.size() > 0) {
+		while(mainCopy.size() > 0) {
 			if(i > 0) {
-				toWrite += "\n" + mainQueue.pop().toString();
+				toWrite += "\n" + mainCopy.pop().toString();
 			} else {
-				toWrite += mainQueue.pop().toString();
+				toWrite += mainCopy.pop().toString();
 			}
 			
 			i++;
@@ -460,6 +489,16 @@ public class VideoKeeper
 			}
 			
 			return contains;
+		}
+		
+		public synchronized Queue duplicate() {
+			Queue copy = new Queue();
+			
+			for(VideoDataNode node : list) {
+				copy.push(node);
+			}
+			
+			return copy;
 		}
 	}
 }

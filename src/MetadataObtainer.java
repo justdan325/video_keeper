@@ -64,8 +64,7 @@ public class MetadataObtainer {
 				int end = html.indexOf(suffix, begin);
 				
 				title = html.substring(begin, end);
-				title = title.replaceAll("&amp;", "&");
-				title = title.replaceAll("&#39;", "'");
+				title = filterEscapeChars(title);
 			//YouTube Shortened Links
 			} else if(urlStr.startsWith(YOUTUBE_PREFIX_ABBR)) {
 				String prefix = "feature=youtu.be\"><title>";
@@ -74,8 +73,7 @@ public class MetadataObtainer {
 				int end = html.indexOf(suffix, begin);
 				
 				title = html.substring(begin, end);
-				title = title.replaceAll("&amp;", "&");
-				title = title.replaceAll("&#39;", "'");
+				title = filterEscapeChars(title);
 			//Twitch
 			} else if(urlStr.startsWith(TWITCH_PREFIX_MOB)) {
 				String prefix = "content=\"default\"/><title>";
@@ -131,8 +129,7 @@ public class MetadataObtainer {
 				}
 				
 				channel = html.substring(begin, end);
-				channel = channel.replaceAll("&amp;", "&");
-				channel = channel.replaceAll("&#39;", "'");
+				channel = filterEscapeChars(channel);
 				
 				channel += " on YouTube";
 			//Twitch

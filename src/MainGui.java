@@ -62,6 +62,7 @@ public class MainGui extends JFrame implements WindowListener {
 	private JTextField urlField;
 	private JPanel mainPanel;
 	private int count;
+	private boolean locked;
 	
 	public MainGui(DataModel model) {
 		this.model = model;
@@ -81,6 +82,7 @@ public class MainGui extends JFrame implements WindowListener {
 		this.urlField = new JTextField(PASTE_MESS);
 		this.mainPanel = new JPanel(new BorderLayout());
 		this.count = 0;
+		this.locked = false;
 		
 		mainPanel.add(makeNorthPanel(), BorderLayout.NORTH);
 		mainPanel.add(makeCenterPanel(), BorderLayout.CENTER);
@@ -255,6 +257,13 @@ public class MainGui extends JFrame implements WindowListener {
 			@Override
 			public void run() {
 				for(;;) {
+					while(locked) {
+						try {
+							Thread.sleep(10);
+						} catch (InterruptedException e) {
+						}
+					}
+					
 					count = keeper.getSize();
 					counterLabel.setText("" + count);
 
@@ -310,7 +319,21 @@ public class MainGui extends JFrame implements WindowListener {
         urlField.selectAll();
     }
 	
+	public void save() {
+		setLocked(true);
+		keeper.save();
+		setLocked(false);
+	}
+	
+	public void refresh() {
+		setLocked(true);
+		setLocked(true);
+		keeper.refreshAll();
+		setLocked(false);
+	}
+	
 	public void setLocked(boolean locked) {
+		this.locked = locked;
 		this.nextButton.setEnabled(!locked);
 		this.prevButton.setEnabled(!locked);
 		this.addButton.setEnabled(!locked);
@@ -333,13 +356,13 @@ public class MainGui extends JFrame implements WindowListener {
 	@Override
 	public void windowClosing(WindowEvent e) {
 		if (model.isAutoSaveOnExit()) {
-			keeper.save();
+			save();
 		} else {
 			String mess = "Would you like to save the watch list?";
 			int option = JOptionPane.showOptionDialog(this, mess, PROG_NAME + " -- Save?", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, null, null);
 			
 			if(option == JOptionPane.YES_OPTION) {
-				keeper.save();
+				save();
 			}
 		}
 		

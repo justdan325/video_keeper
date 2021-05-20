@@ -13,6 +13,7 @@ import javax.swing.JCheckBox;
 import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
@@ -20,12 +21,20 @@ public class SettingsDialog extends JDialog {
 	private static final String DIA_TITLE 			= "Settings";
 	private static final String BROWSE_BTN_TITLE 	= "Browse";
 	private static final String AUTO_SAVE_TITLE		= "Auto Save upon Exit";
+	private static final String SAVE_TITLE			= "Save";
+	private static final String EXPORT_TITLE		= "Export";
+	private static final String REFRESH_TITLE		= "Refresh";
 	private static final int 	WIN_X 				= 500;
-	private static final int 	WIN_Y 				= 275;
+	private static final int 	WIN_Y 				= 325;
+	private static final int	BTN_X				= 90;
+	private static final int	BTN_Y				= 30;
 	
 	private JTextField dbFileTextField;
 	private JPanel mainPanel;
 	private JButton dbFileButton;
+	private JButton saveButton;
+	private JButton exportButton;
+	private JButton refreshButton;
 	private JCheckBox autoSaveCheckbox;
 	private MainGui parent;
 	private DataModel model;
@@ -37,14 +46,18 @@ public class SettingsDialog extends JDialog {
 	public SettingsDialog(MainGui parent, DataModel model) {
 		this.dbFileTextField = new JTextField();
 		this.dbFileButton = new JButton(BROWSE_BTN_TITLE);
+		this.saveButton = new JButton(SAVE_TITLE);
+		this.exportButton = new JButton(EXPORT_TITLE);
+		this.refreshButton = new JButton(REFRESH_TITLE);
 		this.autoSaveCheckbox = new JCheckBox(AUTO_SAVE_TITLE);
-		this.mainPanel = new JPanel(new GridLayout(3, 1));
+		this.mainPanel = new JPanel(new GridLayout(4, 1));
 		this.parent = parent;
 		this.model = model;
 		
 		mainPanel.add(makeTitleLabel());
 		mainPanel.add(makeTextFieldPanel());
 		mainPanel.add(makeCheckboxPanel());
+		mainPanel.add(makeButtonPanel());
 		
 		this.add(mainPanel);
 		
@@ -77,7 +90,7 @@ public class SettingsDialog extends JDialog {
 		dbFileTextField.setPreferredSize(new Dimension(350, 30));
 		dbFileTextField.setText(model.getDatabaseFile());
 		dbFileTextField.setEditable(false);
-		dbFileButton.setPreferredSize(new Dimension(90, 30));
+		dbFileButton.setPreferredSize(new Dimension(BTN_X, BTN_Y));
 		dbFileLabel.setHorizontalAlignment(JLabel.CENTER);
 		dbFileLabel.setFont(new Font(MainGui.FONT, Font.PLAIN, 12));
 		
@@ -106,6 +119,20 @@ public class SettingsDialog extends JDialog {
 		return checkboxPanel;
 	}
 	
+	private JPanel makeButtonPanel() {
+		JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 30, 0));
+
+		saveButton.setPreferredSize(new Dimension(BTN_X, BTN_Y));
+		exportButton.setPreferredSize(new Dimension(BTN_X, BTN_Y));
+		refreshButton.setPreferredSize(new Dimension(BTN_X, BTN_Y));
+		
+		buttonPanel.add(saveButton);
+		buttonPanel.add(exportButton);
+		buttonPanel.add(refreshButton);
+		
+		return buttonPanel;
+	}
+	
 	private void addListeners() {
 //		this.addWindowListener(new WindowAdapter() {
 //            @Override
@@ -129,6 +156,27 @@ public class SettingsDialog extends JDialog {
 			}
 		});
 		
+		saveButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				parent.save();
+			}
+		});
+		
+		refreshButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				refresh();
+			}
+		});
+		
+		exportButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				System.out.println("TODO: Export the watch list...");
+			}
+		});
+		
 		autoSaveCheckbox.addItemListener(new ItemListener() {
 			@Override
 			public void itemStateChanged(ItemEvent arg0) {
@@ -139,6 +187,38 @@ public class SettingsDialog extends JDialog {
 				}
 			}
 		});
+	}
+	
+	private void refresh() {
+		Thread thread = new Thread(new Runnable() {
+			@Override
+			public void run() {
+				String mess = "Save changes to watch list before refreshing?";
+				int option = JOptionPane.showOptionDialog(parent.getSettingsDialog(), mess, MainGui.PROG_NAME + " -- Save?", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, null, null);
+				
+				if(option == JOptionPane.YES_OPTION) {
+					setLocked(true);
+					parent.save();
+					parent.refresh();
+					setLocked(false);
+				} else if(option == JOptionPane.NO_OPTION) {
+					setLocked(true);
+					parent.refresh();
+					setLocked(false);
+				}
+			}
+		});
+		
+		thread.start();
+	}
+	
+	private void setLocked(boolean locked) {
+		this.dbFileTextField.setEnabled(!locked);
+		this.dbFileButton.setEnabled(!locked);
+		this.saveButton.setEnabled(!locked);
+		this.exportButton.setEnabled(!locked);
+		this.refreshButton.setEnabled(!locked);
+		this.autoSaveCheckbox.setEnabled(!locked);
 	}
 	
 	private void selectNewDatabaseFile() {
