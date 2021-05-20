@@ -31,6 +31,7 @@ public class Main {
 	
 	private void init() {
 		String database = DEFAULT_DATABASE;
+		File databaseFile;
 		
 		if(!props.containsProp(PROP_KEY_DATABASE)) {
 			props.set(PROP_KEY_DATABASE, database);
@@ -42,7 +43,8 @@ public class Main {
 			}
 		}
 		
-		model.setDatabaseFile(database);
+		databaseFile = new File(database);
+		model.setDatabaseFile(databaseFile.getAbsolutePath());
 		
 		new MainGui(model);
 	}

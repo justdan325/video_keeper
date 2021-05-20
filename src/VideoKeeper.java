@@ -16,6 +16,7 @@ public class VideoKeeper
 	private Queue			skipQueue;
 	private VideoDataNode 	curr;
 	private JFrame 			frame;
+	private String			database;
 	private boolean			checkForDuplicates;
 	
 	public VideoKeeper(DataModel model, JFrame frame) {
@@ -25,9 +26,11 @@ public class VideoKeeper
 		this.skipQueue			= new Queue();
 		this.frame 				= frame;
 		this.curr 				= null;
+		this.database			= model.getDatabaseFile();
 		this.checkForDuplicates = true;
 		
 		populateQueue();
+		monitorDatabase();
 	}
 	
 	public int getSize() {
@@ -229,7 +232,7 @@ public class VideoKeeper
 		VideoDataNode hold;
 		mainQueue.clear();
 		
-		String[] list = readFile(model.getDatabaseFile()).split("\n");
+		String[] list = readFile(database).split("\n");
 		
 		for(int i = 0; i < list.length; i++) {
 			VideoDataNode node = new VideoDataNode(list[i]);
@@ -274,8 +277,31 @@ public class VideoKeeper
 			i++;
 		}
 		
-		clearFile(model.getDatabaseFile());
-		writeFile(toWrite, model.getDatabaseFile());
+		clearFile(database);
+		writeFile(toWrite, database);
+	}
+	
+	private void monitorDatabase() {
+		Thread thread = new Thread(new Runnable() {
+			@Override
+			public void run() {
+				for(;;) {
+					//if database changes, save and reload with new database
+					if(!database.equals(model.getDatabaseFile())) {
+						save();
+						database = model.getDatabaseFile();
+						populateQueue();
+					}
+					
+					try {
+						Thread.sleep(30);
+					} catch (InterruptedException e) {
+					}
+				}
+			}
+		});
+		
+		thread.start();
 	}
 	
 	private void openWebpage(String s) {

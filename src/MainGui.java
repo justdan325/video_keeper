@@ -63,7 +63,7 @@ public class MainGui extends JFrame implements WindowListener {
 	public MainGui(DataModel model) {
 		this.model = model;
 		this.keeper = new VideoKeeper(model, this);
-		this.settings = new SettingsDialog(this);
+		this.settings = new SettingsDialog(this, model);
 		this.nextButton = new JButton(NEXT_BUTTON_TXT);
 		this.prevButton = new JButton(PREV_BUTTON_TXT);
 		this.addButton = new JButton(ADD_BUTTON_TXT);
