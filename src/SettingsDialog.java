@@ -1,4 +1,3 @@
-import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
@@ -7,15 +6,12 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 import java.io.File;
 
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JDialog;
 import javax.swing.JFileChooser;
-import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
@@ -31,14 +27,14 @@ public class SettingsDialog extends JDialog {
 	private JPanel mainPanel;
 	private JButton dbFileButton;
 	private JCheckBox autoSaveCheckbox;
-	private JFrame parent;
+	private MainGui parent;
 	private DataModel model;
 	
 //	public static void main(String[] args) {
 //		new SettingsDialog(null);
 //	}
 
-	public SettingsDialog(JFrame parent, DataModel model) {
+	public SettingsDialog(MainGui parent, DataModel model) {
 		this.dbFileTextField = new JTextField();
 		this.dbFileButton = new JButton(BROWSE_BTN_TITLE);
 		this.autoSaveCheckbox = new JCheckBox(AUTO_SAVE_TITLE);
@@ -146,6 +142,9 @@ public class SettingsDialog extends JDialog {
 	}
 	
 	private void selectNewDatabaseFile() {
+		//disable UI elements to prevent race condition
+		parent.setLocked(true);
+		
 		File currDatabase = new File(model.getDatabaseFile());
 		JFileChooser chooser = new JFileChooser(currDatabase.getParent());
 		int option = chooser.showOpenDialog(this);
@@ -155,5 +154,8 @@ public class SettingsDialog extends JDialog {
 			model.setDatabaseFile(currDatabase.getAbsolutePath());
 			dbFileTextField.setText(currDatabase.getAbsolutePath());
 		}
+		
+		//re-enable UI elements
+		parent.setLocked(false);
 	}
 }

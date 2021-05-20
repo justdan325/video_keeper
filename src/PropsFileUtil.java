@@ -5,7 +5,19 @@ import java.util.Properties;
 public class PropsFileUtil {
 	private File propsFile;
 	private Properties props;
-	private FileOutputStream out;
+	
+//	public static void main(String[] args) {
+//		PropsFileUtil util = null;
+//		
+//		try {
+//			util = new PropsFileUtil(new File("videokeeper.properties"));
+//		} catch (Exception e) {
+//			e.printStackTrace();
+//		}
+//		
+//		util.set("database", "database.txt");
+//		util.set("database", "database2.txt");
+//	}
 
 	public PropsFileUtil(File propsFile) throws Exception {
 		if(!propsFile.exists()) {
@@ -14,7 +26,6 @@ public class PropsFileUtil {
 
 		this.propsFile = propsFile;
 		this.props = setup(propsFile);
-		this.out = new FileOutputStream(propsFile);
 	}
 
 	private Properties setup(File propsFile) throws IOException {
@@ -34,12 +45,15 @@ public class PropsFileUtil {
 	}
 
 	public boolean set(String prop, String value) {
+		FileOutputStream out = null;
 		boolean success = true;
 		
 		props.setProperty(prop, value);
 		
 		try {
+			out = new FileOutputStream(propsFile);
 			props.store(out, null);
+			out.close();
 		} catch (IOException e) {
 			success = false;
 		}
@@ -48,13 +62,16 @@ public class PropsFileUtil {
 	}
 
 	public boolean remove(String prop) {
+		FileOutputStream out = null;
 		Object value = props.remove(prop);
 		boolean removed = false;
 
 		if(value != null) {
 			try {
+				out = new FileOutputStream(propsFile);
 				props.store(out, null);
 				removed = true;
+				out.close();
 			} catch (IOException e) {
 			}
 		}
@@ -63,12 +80,15 @@ public class PropsFileUtil {
 	}
 
 	public boolean clearAll() {
+		FileOutputStream out = null;
 		boolean cleared = true;
 		
 		props.clear();
 		
 		try {
+			out = new FileOutputStream(propsFile);
 			props.store(out, null);
+			out.close();
 		} catch (IOException e) {
 			cleared = false;
 		}
@@ -94,17 +114,5 @@ public class PropsFileUtil {
 
 	public int getNumProps() {
 		return props.size();
-	}
-	
-	public boolean close() {
-		boolean closed = true;
-		
-		try {
-			out.close();
-		} catch (IOException e) {
-			closed = false;
-		}
-		
-		return closed;
 	}
 }

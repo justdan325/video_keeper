@@ -15,16 +15,16 @@ public class VideoKeeper
 	private Queue 			addedQueue;
 	private Queue			skipQueue;
 	private VideoDataNode 	curr;
-	private JFrame 			frame;
+	private MainGui 		mainGui;
 	private String			database;
 	private boolean			checkForDuplicates;
 	
-	public VideoKeeper(DataModel model, JFrame frame) {
+	public VideoKeeper(DataModel model, MainGui mainGui) {
 		this.model				= model;
 		this.mainQueue 			= new Queue();	
 		this.addedQueue 		= new Queue();
 		this.skipQueue			= new Queue();
-		this.frame 				= frame;
+		this.mainGui 			= mainGui;
 		this.curr 				= null;
 		this.database			= model.getDatabaseFile();
 		this.checkForDuplicates = true;
@@ -45,10 +45,10 @@ public class VideoKeeper
 		boolean addItem = true;
 		
 		if(checkForDuplicates && mainQueue.contains(item)) {
-			int option = JOptionPane.showConfirmDialog(frame, "Link is already in watch list. Add anyway?", MainGui.PROG_NAME + " -- Duplicate Video",  JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
+			int option = JOptionPane.showConfirmDialog(mainGui, "Link is already in watch list. Add anyway?", MainGui.PROG_NAME + " -- Duplicate Video",  JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
 
 			if(option == JOptionPane.YES_OPTION) {
-				option = JOptionPane.showConfirmDialog(frame, "Check for duplicates going forward?", MainGui.PROG_NAME + " -- Check for Duplicates?",  JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
+				option = JOptionPane.showConfirmDialog(mainGui, "Check for duplicates going forward?", MainGui.PROG_NAME + " -- Check for Duplicates?",  JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
 
 				if(option == JOptionPane.NO_OPTION) {
 					checkForDuplicates = false;
@@ -292,7 +292,7 @@ public class VideoKeeper
 							save();
 						} else {
 							String mess = "Would you like to save changes to \nthe current database before switching?";
-							int option = JOptionPane.showOptionDialog(frame, mess, MainGui.PROG_NAME + " -- Save?", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, null, null);
+							int option = JOptionPane.showOptionDialog(mainGui.getSettingsDialog(), mess, MainGui.PROG_NAME + " -- Save?", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, null, null);
 							
 							if(option == JOptionPane.YES_OPTION) {
 								save();
@@ -319,7 +319,7 @@ public class VideoKeeper
 			Desktop.getDesktop().browse(new URL(s).toURI());
 		} catch (Exception e) {
 			Toolkit.getDefaultToolkit().getSystemClipboard().setContents(new StringSelection(s), null);
-			JOptionPane.showMessageDialog(frame, "URL has been cached.", MainGui.PROG_NAME + " -- URL Cached", 1);
+			JOptionPane.showMessageDialog(mainGui, "URL has been cached.", MainGui.PROG_NAME + " -- URL Cached", 1);
 		}
 	}
 	

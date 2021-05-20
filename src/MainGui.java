@@ -10,6 +10,7 @@ import java.awt.event.WindowListener;
 import java.awt.event.WindowEvent;
 import javax.swing.JTextField;
 import javax.swing.JButton;
+import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JFrame;
@@ -308,6 +309,20 @@ public class MainGui extends JFrame implements WindowListener {
 	private void urlFieldFocusGained(final FocusEvent focusEvent) {
         urlField.selectAll();
     }
+	
+	public void setLocked(boolean locked) {
+		this.nextButton.setEnabled(!locked);
+		this.prevButton.setEnabled(!locked);
+		this.addButton.setEnabled(!locked);
+		this.skipButton.setEnabled(!locked);
+		this.settButton.setEnabled(!locked);
+		this.pasteButton.setEnabled(!locked);
+		this.urlField.setEnabled(!locked);
+	}
+	
+	protected JDialog getSettingsDialog() {
+		return settings;
+	}
 
 	@Override
 	public void windowActivated(WindowEvent e) {}
