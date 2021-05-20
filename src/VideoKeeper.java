@@ -1,3 +1,4 @@
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.io.*;
 import java.util.Scanner;
@@ -310,6 +311,30 @@ public class VideoKeeper
 		writeFile(toWrite, database);
 	}
 	
+	public boolean exportUrls(String destination) {
+		String urls = "";
+		Queue tempQ = skipQueue.duplicate();
+		boolean success = true;
+		
+		while(tempQ.size() > 0) {
+			urls += tempQ.pop().getUrl() + "\n";
+		}
+		
+		tempQ = mainQueue.duplicate();
+		
+		while(tempQ.size() > 0) {
+			urls += tempQ.pop().getUrl() + "\n";
+		}
+		
+		if (urls.length() > 7) {
+			success = writeFile(urls, destination);
+		} else {
+			success = false;
+		}
+		
+		return success;
+	}
+	
 	private void monitorDatabase() {
 		Thread thread = new Thread(new Runnable() {
 			@Override
@@ -389,33 +414,43 @@ public class VideoKeeper
 		return str;
 	}
 
-	private static void writeFile(String fileStr, String destination) {
+	private static boolean writeFile(String fileStr, String destination) {
 		final long LENGTH = fileStr.length();
+		boolean success = true;
 		File file = new File(destination);
-		PrintWriter outputFile;
+		PrintWriter outputFile = null;
 
 		if(LENGTH > 0) {
 			try {
-				outputFile = new PrintWriter(file);
-			} catch(FileNotFoundException e) {
-				System.out.println("File " + destination + " could not be found...\n");
-				e.printStackTrace();
-				
-				return;
-			}
-
-			for(int i = 0; i < LENGTH; i++) {
-				if(fileStr.substring(i,i+1).equals("\n")) {
-					outputFile.println();
-				} else if(fileStr.substring(i,i+1).equals("\t")) {
-					outputFile.write("\t");
-				} else {
-					outputFile.append(fileStr.charAt(i));
+				if(!file.exists()) {
+					success = file.createNewFile();
 				}
+				
+				if(success) {
+					outputFile = new PrintWriter(file);
+				}
+			} catch(Exception e) {
+				success = false;
 			}
 
-			outputFile.close();
+			if (success && outputFile != null) {
+				for (int i = 0; i < LENGTH; i++) {
+					if (fileStr.substring(i, i + 1).equals("\n")) {
+						outputFile.println();
+					} else if (fileStr.substring(i, i + 1).equals("\t")) {
+						outputFile.write("\t");
+					} else {
+						outputFile.append(fileStr.charAt(i));
+					}
+				}
+
+				outputFile.close();
+			} else {
+				success = false;
+			}
 		}
+		
+		return success;
 	}
 	
 	private static void clearFile(String fileName) {

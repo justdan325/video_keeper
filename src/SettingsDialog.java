@@ -173,7 +173,7 @@ public class SettingsDialog extends JDialog {
 		exportButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
-				System.out.println("TODO: Export the watch list...");
+				export();
 			}
 		});
 		
@@ -187,6 +187,23 @@ public class SettingsDialog extends JDialog {
 				}
 			}
 		});
+	}
+	
+	private void export() {
+		String destination = JOptionPane.showInputDialog(parent.getSettingsDialog(), "Enter destination file to export to.", "urls.txt");
+		boolean success = false;
+		
+		setLocked(true);
+		success = parent.export(destination);
+		setLocked(false);
+		
+		if(success) {
+			String mess = "URLs have been exported!";
+			JOptionPane.showMessageDialog(parent.getSettingsDialog(), mess, MainGui.PROG_NAME + " -- Export Success", JOptionPane.INFORMATION_MESSAGE);
+		} else {
+			String mess = "Could not export to specified file.";
+			JOptionPane.showMessageDialog(parent.getSettingsDialog(), mess, MainGui.PROG_NAME + " -- Export Failure", JOptionPane.ERROR_MESSAGE);
+		}
 	}
 	
 	private void refresh() {

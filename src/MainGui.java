@@ -22,7 +22,7 @@ import java.awt.Dimension;
 
 public class MainGui extends JFrame implements WindowListener {
 	public  static final String PROG_NAME 			= "Video Keeper";
-	public  static final String PROG_VER			= "2.0a3";
+	public  static final String PROG_VER			= "2.0a4";
 	
 	private static final String PASTE_MESS 			= "<Paste URL Here>";
 	private static final String TITLE 				= "";
@@ -323,6 +323,16 @@ public class MainGui extends JFrame implements WindowListener {
 		setLocked(true);
 		keeper.save();
 		setLocked(false);
+	}
+	
+	public boolean export(String destination) {
+		boolean success = false;
+		
+		setLocked(true);
+		success = keeper.exportUrls(destination);
+		setLocked(false);
+		
+		return success;
 	}
 	
 	public void refresh() {
