@@ -34,7 +34,7 @@ public class MainGui extends JFrame implements WindowListener {
 	private static final String TO_WATCH_TXT 		= "Videos:";
 	private static final String UP_NEXT_TXT			= " -- Up Next -- ";
 	private static final String CHANNEL_PREFIX 		= "By: ";
-	private static final String FONT				= "Helvetica";
+	public  static final String FONT				= "Helvetica";
 	private static final int 	WIN_X 				= 600;
 	private static final int 	WIN_Y 				= 350;
 	private static final int 	URL_FIELD_X			= 450;
