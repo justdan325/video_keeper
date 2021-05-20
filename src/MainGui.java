@@ -57,13 +57,7 @@ public class MainGui extends JFrame implements WindowListener {
 	private JLabel channelLabel;
 	private JTextField urlField;
 	private JPanel mainPanel;
-	private JPanel northPanel;
-	private JPanel southPanel;
-	private JPanel centerPanel;
-	private String toAdd;
 	private int count;
-	private boolean ctrlPressed;
-	private boolean sPressed;
 	
 	public MainGui(String database) {
 		this.keeper = new VideoKeeper(database, this);
@@ -81,10 +75,7 @@ public class MainGui extends JFrame implements WindowListener {
 		this.channelLabel = new JLabel();
 		this.urlField = new JTextField(PASTE_MESS);
 		this.mainPanel = new JPanel(new BorderLayout());
-		this.toAdd = "";
 		this.count = 0;
-		this.ctrlPressed = false;
-		this.sPressed = false;
 		
 		mainPanel.add(makeNorthPanel(), BorderLayout.NORTH);
 		mainPanel.add(makeCenterPanel(), BorderLayout.CENTER);
