@@ -319,10 +319,14 @@ public class MainGui extends JFrame implements WindowListener {
         urlField.selectAll();
     }
 	
-	public void save() {
+	public boolean save() {
+		boolean saved = false;
+		
 		setLocked(true);
-		keeper.save();
+		saved = keeper.save();
 		setLocked(false);
+		
+		return saved;
 	}
 	
 	public boolean export(String destination) {
@@ -355,6 +359,10 @@ public class MainGui extends JFrame implements WindowListener {
 	
 	protected JDialog getSettingsDialog() {
 		return settings;
+	}
+	
+	public int getCount() {
+		return count;
 	}
 
 	@Override

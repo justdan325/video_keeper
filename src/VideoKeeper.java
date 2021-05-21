@@ -281,10 +281,11 @@ public class VideoKeeper
 		refreshNext();
 	}
 	
-	public synchronized void save() {
+	public synchronized boolean save() {
 		Queue skipCopy = skipQueue.duplicate();
 		Queue mainCopy = mainQueue.duplicate();
 		String toWrite = "";
+		boolean saved = false;
 		int i = 0;
 		
 		while(skipCopy.size() > 0) {
@@ -308,7 +309,10 @@ public class VideoKeeper
 		}
 		
 		clearFile(database);
-		writeFile(toWrite, database);
+		
+		saved = writeFile(toWrite, database);
+		
+		return saved;
 	}
 	
 	public boolean exportUrls(String destination) {

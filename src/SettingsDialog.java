@@ -38,6 +38,7 @@ public class SettingsDialog extends JDialog {
 	private JCheckBox autoSaveCheckbox;
 	private MainGui parent;
 	private DataModel model;
+	private boolean locked;
 	
 //	public static void main(String[] args) {
 //		new SettingsDialog(null);
@@ -53,6 +54,7 @@ public class SettingsDialog extends JDialog {
 		this.mainPanel = new JPanel(new GridLayout(4, 1));
 		this.parent = parent;
 		this.model = model;
+		this.locked = false;
 		
 		mainPanel.add(makeTitleLabel());
 		mainPanel.add(makeTextFieldPanel());
@@ -62,6 +64,7 @@ public class SettingsDialog extends JDialog {
 		this.add(mainPanel);
 		
 		addListeners();
+		monitor();
 		
 		this.setTitle(MainGui.PROG_NAME + " -- Settings");
 		this.setSize(new Dimension(WIN_X, WIN_Y));
@@ -159,7 +162,7 @@ public class SettingsDialog extends JDialog {
 		saveButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
-				parent.save();
+				save();
 			}
 		});
 		
@@ -189,21 +192,52 @@ public class SettingsDialog extends JDialog {
 		});
 	}
 	
+	private void save() {
+		Thread thread = new Thread(new Runnable() {
+			@Override
+			public void run() {
+				boolean saved = false;
+				
+				setLocked(true);
+				saved = parent.save();
+				
+				if(saved) {
+					String mess = "Watch list has been saved to database file!";
+					JOptionPane.showMessageDialog(parent.getSettingsDialog(), mess, MainGui.PROG_NAME + " -- Watch List Saved", JOptionPane.INFORMATION_MESSAGE);
+				} else {
+					String mess = "Watch list could not be saved to database file.";
+					JOptionPane.showMessageDialog(parent.getSettingsDialog(), mess, MainGui.PROG_NAME + " -- Save Failure", JOptionPane.ERROR_MESSAGE);
+				}
+				
+				setLocked(false);
+			}
+		});
+		
+		thread.start();
+	}
+	
 	private void export() {
-		String destination = JOptionPane.showInputDialog(parent.getSettingsDialog(), "Enter destination file to export to.", "urls.txt");
-		boolean success = false;
+		Thread thread = new Thread(new Runnable() {
+			@Override
+			public void run() {
+				String destination = JOptionPane.showInputDialog(parent.getSettingsDialog(), "Enter destination file to export to.", "urls.txt");
+				boolean success = false;
+				
+				setLocked(true);
+				success = parent.export(destination);
+				setLocked(false);
+				
+				if(success) {
+					String mess = "URLs have been exported!";
+					JOptionPane.showMessageDialog(parent.getSettingsDialog(), mess, MainGui.PROG_NAME + " -- Export Success", JOptionPane.INFORMATION_MESSAGE);
+				} else {
+					String mess = "Could not export to specified file.";
+					JOptionPane.showMessageDialog(parent.getSettingsDialog(), mess, MainGui.PROG_NAME + " -- Export Failure", JOptionPane.ERROR_MESSAGE);
+				}
+			}
+		});
 		
-		setLocked(true);
-		success = parent.export(destination);
-		setLocked(false);
-		
-		if(success) {
-			String mess = "URLs have been exported!";
-			JOptionPane.showMessageDialog(parent.getSettingsDialog(), mess, MainGui.PROG_NAME + " -- Export Success", JOptionPane.INFORMATION_MESSAGE);
-		} else {
-			String mess = "Could not export to specified file.";
-			JOptionPane.showMessageDialog(parent.getSettingsDialog(), mess, MainGui.PROG_NAME + " -- Export Failure", JOptionPane.ERROR_MESSAGE);
-		}
+		thread.start();
 	}
 	
 	private void refresh() {
@@ -229,7 +263,34 @@ public class SettingsDialog extends JDialog {
 		thread.start();
 	}
 	
+	private void monitor() {
+		Thread thread = new Thread(new Runnable() {
+			@Override
+			public void run() {
+				for(;;) {
+					while(locked) {
+						try {
+							Thread.sleep(10);
+						} catch (InterruptedException e) {
+						}
+					}
+					
+					if(parent.getCount() > 0) {
+						exportButton.setEnabled(true);
+						refreshButton.setEnabled(true);
+					} else {
+						exportButton.setEnabled(false);
+						refreshButton.setEnabled(false);
+					}
+				}
+			}
+		});
+		
+		thread.start();
+	}
+	
 	private void setLocked(boolean locked) {
+		this.locked = locked;
 		this.dbFileTextField.setEnabled(!locked);
 		this.dbFileButton.setEnabled(!locked);
 		this.saveButton.setEnabled(!locked);
@@ -241,6 +302,7 @@ public class SettingsDialog extends JDialog {
 	private void selectNewDatabaseFile() {
 		//disable UI elements to prevent race condition
 		parent.setLocked(true);
+		setLocked(true);
 		
 		File currDatabase = new File(model.getDatabaseFile());
 		JFileChooser chooser = new JFileChooser(currDatabase.getParent());
@@ -254,5 +316,6 @@ public class SettingsDialog extends JDialog {
 		
 		//re-enable UI elements
 		parent.setLocked(false);
+		setLocked(false);
 	}
 }
