@@ -341,7 +341,6 @@ public class MainGui extends JFrame implements WindowListener {
 	
 	public void refresh() {
 		setLocked(true);
-		setLocked(true);
 		keeper.refreshAll();
 		setLocked(false);
 	}

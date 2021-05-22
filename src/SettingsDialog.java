@@ -282,6 +282,11 @@ public class SettingsDialog extends JDialog {
 						exportButton.setEnabled(false);
 						refreshButton.setEnabled(false);
 					}
+					
+					try {
+						Thread.sleep(10);
+					} catch (InterruptedException e) {
+					}
 				}
 			}
 		});
