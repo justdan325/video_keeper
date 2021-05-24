@@ -22,7 +22,7 @@ import java.awt.Dimension;
 
 public class MainGui extends JFrame implements WindowListener {
 	public  static final String PROG_NAME 			= "Video Keeper";
-	public  static final String PROG_VER			= "2.0a4";
+	public  static final String PROG_VER			= "2.0a5";
 	
 	private static final String PASTE_MESS 			= "<Paste URL Here>";
 	private static final String TITLE 				= "";

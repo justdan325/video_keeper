@@ -259,6 +259,7 @@ public class VideoKeeper
 		Queue temp = new Queue();
 		VideoDataNode hold;
 		mainQueue.clear();
+		skipQueue.clear();
 		
 		String[] list = readFile(database).split("\n");
 		
