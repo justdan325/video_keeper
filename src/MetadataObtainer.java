@@ -15,14 +15,16 @@ public class MetadataObtainer {
 	
 	private String urlStr;
 	private String html;
+	private boolean isSupported;
 	
 	public MetadataObtainer(String urlStr) {
 		this.urlStr = sanitize(urlStr);
 		this.html = fetchHtml(this.urlStr);
+		this.isSupported = isSupported(urlStr);
 	}
 	
 	public static void main(String[] args){
-		MetadataObtainer o = new MetadataObtainer("https://www.twitch.tv/videos/997396590");
+//		MetadataObtainer o = new MetadataObtainer("https://www.twitch.tv/videos/997396590");
 //		System.out.println(o.getTitle());
 //		System.out.println(o.getDate());
 //		System.out.println(o.getChannel());
@@ -40,6 +42,10 @@ public class MetadataObtainer {
 		}
 		
 		return supported;
+	}
+	
+	public boolean isSupported() {
+		return isSupported;
 	}
 	
 	public boolean isUrlError() {
