@@ -279,35 +279,36 @@ public class MetadataObtainer {
 		return filtered;
 	}
 	
-	private static String determineDateOnTwitch(String input) {
-		Calendar cal = Calendar.getInstance();
-		int date = cal.get(Calendar.DAY_OF_MONTH);
-		String output = "";
-		
-		if(input.endsWith(" days ago")) {
-			int thisMonth = cal.get(Calendar.MONTH);
-			int daysAgo = Integer.parseInt(input.substring(0, input.indexOf(" days ago")));
-			int diff = date - daysAgo;
-			
-			if(diff < 1) {
-				int lastMonth = cal.get(Calendar.MONTH);
-				YearMonth yearMonthObject = YearMonth.of(cal.get(Calendar.YEAR), lastMonth);
-				int daysInLastMonth = yearMonthObject.lengthOfMonth();
-				
-				diff = Math.abs(diff);
-				output = new DateFormatSymbols().getMonths()[lastMonth-1];
-				output += " " + (daysInLastMonth - diff);
-				output += ", " + cal.get(Calendar.YEAR);
-				
-			} else {
-				output = new DateFormatSymbols().getMonths()[thisMonth];
-				output += " " + diff;
-				output += ", " + cal.get(Calendar.YEAR);
-			}
-		} else {
-			output = input + " [FIX ME]";
-		}
-		
-		return output;
-	}
+	//This method does not work reliably.
+//	private static String determineDateOnTwitch(String input) {
+//		Calendar cal = Calendar.getInstance();
+//		int date = cal.get(Calendar.DAY_OF_MONTH);
+//		String output = "";
+//		
+//		if(input.endsWith(" days ago")) {
+//			int thisMonth = cal.get(Calendar.MONTH);
+//			int daysAgo = Integer.parseInt(input.substring(0, input.indexOf(" days ago")));
+//			int diff = date - daysAgo;
+//			
+//			if(diff < 1) {
+//				int lastMonth = cal.get(Calendar.MONTH);
+//				YearMonth yearMonthObject = YearMonth.of(cal.get(Calendar.YEAR), lastMonth);
+//				int daysInLastMonth = yearMonthObject.lengthOfMonth();
+//				
+//				diff = Math.abs(diff);
+//				output = new DateFormatSymbols().getMonths()[lastMonth-1];
+//				output += " " + (daysInLastMonth - diff);
+//				output += ", " + cal.get(Calendar.YEAR);
+//				
+//			} else {
+//				output = new DateFormatSymbols().getMonths()[thisMonth];
+//				output += " " + diff;
+//				output += ", " + cal.get(Calendar.YEAR);
+//			}
+//		} else {
+//			output = input + " [FIX ME]";
+//		}
+//		
+//		return output;
+//	}
 }
