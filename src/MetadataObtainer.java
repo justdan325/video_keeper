@@ -22,11 +22,11 @@ public class MetadataObtainer {
 	}
 	
 	public static void main(String[] args){
-		//MetadataObtainer o = new MetadataObtainer("https://www.twitch.tv/videos/997396590");
-		//System.out.println(o.getTitle());
-		//System.out.println(o.getDate());
-		//System.out.println(o.getChannel());
-		//System.out.println(MetadataObtainer.determineDateOnTwitch("3 days ago"));
+		MetadataObtainer o = new MetadataObtainer("https://www.twitch.tv/videos/997396590");
+//		System.out.println(o.getTitle());
+//		System.out.println(o.getDate());
+//		System.out.println(o.getChannel());
+//		System.out.println(MetadataObtainer.determineDateOnTwitch("3 days ago"));
 	}
 	
 	public static boolean isSupported(String urlStr) {
@@ -244,7 +244,12 @@ public class MetadataObtainer {
 		
 		//remove playlist data
 		if(urlStr.contains("&list=")) {
-			sanitized = urlStr.substring(0, urlStr.indexOf("&list="));
+			sanitized = sanitized.substring(0, sanitized.indexOf("&list="));
+		}
+		
+		//remove polymer disable
+		if(urlStr.contains("&disable_polymer=1")) {
+			sanitized = sanitized.replaceAll("&disable_polymer=1", "");
 		}
 		
 		return sanitized;
@@ -266,6 +271,7 @@ public class MetadataObtainer {
 		String filtered = raw;
 		
 		filtered = filtered.replaceAll("&amp;", "&");
+		filtered = filtered.replaceAll("\\\\u0026", "&");
 		filtered = filtered.replaceAll("&#39;", "'");
 		filtered = filtered.replaceAll("&#x27;", "'");
 		filtered = filtered.replaceAll("&quot;", "\"");
