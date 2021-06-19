@@ -85,7 +85,7 @@ public class VideoKeeper
 			
 			thread.start();
 			
-			addedQueue.push(item);
+//			addedQueue.push(item);
 			mainQueue.push(item);
 		}
 	}
@@ -256,8 +256,8 @@ public class VideoKeeper
 	}
 	
 	public void populateQueue() {
-		Queue temp = new Queue();
-		VideoDataNode hold;
+//		Queue temp = new Queue();
+//		VideoDataNode hold;
 		mainQueue.clear();
 		skipQueue.clear();
 		
@@ -271,13 +271,15 @@ public class VideoKeeper
 			}
 		}
 		
-		while(addedQueue.size() > 0) {
-			hold = addedQueue.pop();
-			mainQueue.push(hold);
-			temp.push(hold);
-		}
-		
-		addedQueue = temp;
+		//I have no clue why I had added this, but all it was doing was cross-contaminating databases.
+		//Leaving it in case I remember what it does.
+//		while(addedQueue.size() > 0) {
+//			hold = addedQueue.pop();
+//			mainQueue.push(hold);
+//			temp.push(hold);
+//		}
+//		
+//		addedQueue = temp;
 		
 		refreshNext();
 	}
