@@ -223,16 +223,18 @@ public class SettingsDialog extends JDialog {
 				String destination = JOptionPane.showInputDialog(parent.getSettingsDialog(), "Enter destination file to export to.", "urls.txt");
 				boolean success = false;
 				
-				setLocked(true);
-				success = parent.export(destination);
-				setLocked(false);
-				
-				if(success) {
-					String mess = "URLs have been exported!";
-					JOptionPane.showMessageDialog(parent.getSettingsDialog(), mess, MainGui.PROG_NAME + " -- Export Success", JOptionPane.INFORMATION_MESSAGE);
-				} else {
-					String mess = "Could not export to specified file.";
-					JOptionPane.showMessageDialog(parent.getSettingsDialog(), mess, MainGui.PROG_NAME + " -- Export Failure", JOptionPane.ERROR_MESSAGE);
+				if (destination != null) {
+					setLocked(true);
+					success = parent.export(destination);
+					setLocked(false);
+
+					if (success) {
+						String mess = "URLs have been exported!";
+						JOptionPane.showMessageDialog(parent.getSettingsDialog(), mess, MainGui.PROG_NAME + " -- Export Success", JOptionPane.INFORMATION_MESSAGE);
+					} else {
+						String mess = "Could not export to specified file.";
+						JOptionPane.showMessageDialog(parent.getSettingsDialog(), mess, MainGui.PROG_NAME + " -- Export Failure", JOptionPane.ERROR_MESSAGE);
+					}
 				}
 			}
 		});
