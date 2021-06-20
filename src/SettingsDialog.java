@@ -264,7 +264,7 @@ public class SettingsDialog extends JDialog {
 		Thread thread = new Thread(new Runnable() {
 			@Override
 			public void run() {
-				//need to wait here for the models to populate
+				//need to wait here for the keeper to populate
 				try {
 					Thread.sleep(500);
 				} catch (InterruptedException e) {
