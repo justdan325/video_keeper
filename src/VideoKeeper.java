@@ -143,10 +143,6 @@ public class VideoKeeper
 		}
 		
 		finalTotal = mainQueue.size() + skipQueue.size();
-		
-		if(finalTotal != total) {
-			System.out.println("ya fucked up: " + total + " " + finalTotal);
-		}
 	}
 	
 	public void refreshNext() {

@@ -143,21 +143,6 @@ public class SettingsDialog extends JDialog {
 	}
 	
 	private void addListeners() {
-//		this.addWindowListener(new WindowAdapter() {
-//            @Override
-//            public void windowClosing(WindowEvent e) {
-//                System.out.println("TODO: Save settings...");
-//                //do something...
-//            }
-//        });
-		
-//		dbFileTextField.addActionListener(new ActionListener() {
-//			@Override
-//			public void actionPerformed(ActionEvent arg0) {
-//				System.out.println("TODO: Update database file...");
-//			}
-//		});
-		
 		dbFileButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
@@ -286,7 +271,6 @@ public class SettingsDialog extends JDialog {
 				}
 				
 				int size = parent.getCount();
-				System.out.println(size);
 				saveButton.setEnabled(false);
 				
 				for(;;) {
@@ -299,7 +283,6 @@ public class SettingsDialog extends JDialog {
 					
 					if(parent.getCount() != size) {
 						size = parent.getCount();
-						System.out.println(size);
 						saveButton.setEnabled(true);
 					}
 					
