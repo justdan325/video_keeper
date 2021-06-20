@@ -68,8 +68,7 @@ public class Main {
 			@Override
 			public void run() {
 				for(;;) {
-					//check to see if model data differes from props
-					//if so, save the props
+					//Check to see if model data differs from props. If so, save the props.
 					if(strToBool(props.get(PROP_KEY_AUTO_SAVE)) != model.isAutoSaveOnExit()) {
 						props.set(PROP_KEY_AUTO_SAVE, boolToStr(model.isAutoSaveOnExit()));
 					}
@@ -81,7 +80,6 @@ public class Main {
 					try {
 						Thread.sleep(30);
 					} catch (InterruptedException e) {
-						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
 				}

@@ -1,4 +1,3 @@
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.io.*;
 import java.util.Scanner;
@@ -6,14 +5,13 @@ import java.awt.*;
 import javax.swing.JOptionPane;
 import java.net.URL;
 import java.awt.datatransfer.StringSelection;
-import javax.swing.JFrame;
 
 
 public class VideoKeeper
 {
 	private DataModel		model;
 	private Queue 			mainQueue;
-	private Queue 			addedQueue;
+//	private Queue 			addedQueue;
 	private Queue			skipQueue;
 	private VideoDataNode 	curr;
 	private MainGui 		mainGui;
@@ -23,7 +21,7 @@ public class VideoKeeper
 	public VideoKeeper(DataModel model, MainGui mainGui) {
 		this.model				= model;
 		this.mainQueue 			= new Queue();	
-		this.addedQueue 		= new Queue();
+//		this.addedQueue 		= new Queue();
 		this.skipQueue			= new Queue();
 		this.mainGui 			= mainGui;
 		this.curr 				= null;

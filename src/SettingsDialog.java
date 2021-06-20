@@ -210,6 +210,10 @@ public class SettingsDialog extends JDialog {
 				}
 				
 				setLocked(false);
+				
+				if(saved) {
+					saveButton.setEnabled(false);
+				}
 			}
 		});
 		
@@ -269,6 +273,16 @@ public class SettingsDialog extends JDialog {
 		Thread thread = new Thread(new Runnable() {
 			@Override
 			public void run() {
+				//need to wait here for the models to populate
+				try {
+					Thread.sleep(500);
+				} catch (InterruptedException e) {
+				}
+				
+				int size = parent.getCount();
+				System.out.println(size);
+				saveButton.setEnabled(false);
+				
 				for(;;) {
 					while(locked) {
 						try {
@@ -277,7 +291,13 @@ public class SettingsDialog extends JDialog {
 						}
 					}
 					
-					if(parent.getCount() > 0) {
+					if(parent.getCount() != size) {
+						size = parent.getCount();
+						System.out.println(size);
+						saveButton.setEnabled(true);
+					}
+					
+					if(size > 0) {
 						exportButton.setEnabled(true);
 						refreshButton.setEnabled(true);
 					} else {
