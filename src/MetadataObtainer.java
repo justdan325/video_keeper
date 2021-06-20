@@ -62,15 +62,17 @@ public class MetadataObtainer {
 		String title = "";
 		
 		if(!isUrlError()) {
-			//YouTube Regualr Links
+			//YouTube Regular Links
 			if(urlStr.startsWith(YOUTUBE_PREFIX) || urlStr.startsWith(YOUTUBE_PREFIX_W)) {
 				String prefix = "content=\"" + urlStr.trim() + "\"><meta property=\"og:title\" content=\"";
 				String suffix = "\"><meta property=\"og:image\" content=\"";
 				int begin = html.indexOf(prefix) + prefix.length();
 				int end = html.indexOf(suffix, begin);
 				
-				title = html.substring(begin, end);
-				title = filterEscapeChars(title);
+				if (begin != -1 && end != -1) {
+					title = html.substring(begin, end);
+					title = filterEscapeChars(title);
+				}
 			//YouTube Shortened Links
 			} else if(urlStr.startsWith(YOUTUBE_PREFIX_ABBR)) {
 				String prefix = "feature=youtu.be\"><title>";
@@ -78,8 +80,10 @@ public class MetadataObtainer {
 				int begin = html.indexOf(prefix) + prefix.length();
 				int end = html.indexOf(suffix, begin);
 				
-				title = html.substring(begin, end);
-				title = filterEscapeChars(title);
+				if (begin != -1 && end != -1) {
+					title = html.substring(begin, end);
+					title = filterEscapeChars(title);
+				}
 			//Twitch
 			} else if(urlStr.startsWith(TWITCH_PREFIX_MOB)) {
 				String prefix = "content=\"default\"/><title>";
@@ -87,8 +91,10 @@ public class MetadataObtainer {
 				int begin = html.indexOf(prefix) + prefix.length();
 				int end = html.indexOf(suffix, begin);
 				
-				title = html.substring(begin, end);
-				title = filterEscapeChars(title);
+				if (begin != -1 && end != -1) {
+					title = html.substring(begin, end);
+					title = filterEscapeChars(title);
+				}
 				
 				//title is first part
 				String[] strArr = title.split(" - ");
@@ -145,8 +151,10 @@ public class MetadataObtainer {
 				int begin = html.indexOf(prefix) + prefix.length();
 				int end = html.indexOf(suffix, begin);
 				
-				channel = html.substring(begin, end);
-				channel = filterEscapeChars(channel);
+				if (begin != -1 && end != -1) {
+					channel = html.substring(begin, end);
+					channel = filterEscapeChars(channel);
+				}
 				
 				//channel is second part
 				String[] strArr = channel.split(" - ");
@@ -177,7 +185,9 @@ public class MetadataObtainer {
 				int begin = html.indexOf(prefix) + prefix.length();
 				int end = html.indexOf(suffix, begin);
 				
-				date = html.substring(begin, end);
+				if (begin != -1 && end != -1) {
+					date = html.substring(begin, end);
+				}
 			}
 			/*//Twitch
 			} else if(urlStr.startsWith(TWITCH_PREFIX_MOB)) {
