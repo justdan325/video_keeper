@@ -55,6 +55,8 @@ public class VideoKeeper
 			} else {
 				addItem = false;
 			}
+		} else if((!item.getUrl().contains(".") && !item.getUrl().contains("/")) || item.getUrl().trim().length() < 3) {
+			addItem = false;
 		}
 
 		if(addItem) {
@@ -85,6 +87,8 @@ public class VideoKeeper
 			
 //			addedQueue.push(item);
 			mainQueue.push(item);
+		} else {
+			JOptionPane.showMessageDialog(mainGui, "Must enter a valid URL.", MainGui.PROG_NAME + " -- Invalid URL", JOptionPane.ERROR_MESSAGE);
 		}
 	}
 		
@@ -122,8 +126,6 @@ public class VideoKeeper
 	
 	private synchronized void addSkipped() {
 		Queue temp = new Queue();
-		int total = mainQueue.size() + skipQueue.size();
-		int finalTotal = -1;
 		
 		if(skipQueue.size() > 0) {
 			while(skipQueue.size() > 0) {
@@ -141,8 +143,6 @@ public class VideoKeeper
 				mainQueue.push(node);
 			}
 		}
-		
-		finalTotal = mainQueue.size() + skipQueue.size();
 	}
 	
 	public void refreshNext() {
