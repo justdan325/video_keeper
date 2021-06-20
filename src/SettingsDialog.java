@@ -24,6 +24,9 @@ public class SettingsDialog extends JDialog {
 	private static final String SAVE_TITLE			= "Save";
 	private static final String EXPORT_TITLE		= "Export";
 	private static final String REFRESH_TITLE		= "Refresh";
+	private static final String TOOLTIP_SAVE		= "Save changes to the watch list.";
+	private static final String TOOLTIP_EXPORT		= "Export watch list to text file of URLs.";
+	private static final String TOOLTIP_REFRESH		= "Reload the watch list and re-fetch video metadata.";
 	private static final int 	WIN_X 				= 500;
 	private static final int 	WIN_Y 				= 325;
 	private static final int	BTN_X				= 90;
@@ -126,8 +129,11 @@ public class SettingsDialog extends JDialog {
 		JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 30, 0));
 
 		saveButton.setPreferredSize(new Dimension(BTN_X, BTN_Y));
+		saveButton.setToolTipText(TOOLTIP_SAVE);
 		exportButton.setPreferredSize(new Dimension(BTN_X, BTN_Y));
+		exportButton.setToolTipText(TOOLTIP_EXPORT);
 		refreshButton.setPreferredSize(new Dimension(BTN_X, BTN_Y));
+		refreshButton.setToolTipText(TOOLTIP_REFRESH);
 		
 		buttonPanel.add(saveButton);
 		buttonPanel.add(exportButton);

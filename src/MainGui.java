@@ -36,6 +36,7 @@ public class MainGui extends JFrame implements WindowListener {
 	private static final String TO_WATCH_TXT 		= "Videos:";
 	private static final String UP_NEXT_TXT			= " -- Up Next -- ";
 	private static final String EMPTY_QUEUE_TXT		= "~ No Videos in Watch List ~";
+	private static final String TOOLTIP_SETTINGS	= "Settings";
 	private static final String CHANNEL_PREFIX 		= "By: ";
 	public  static final String FONT				= "Helvetica";
 	private static final int 	WIN_X 				= 600;
@@ -135,6 +136,7 @@ public class MainGui extends JFrame implements WindowListener {
 		
 		urlField.setPreferredSize(new Dimension(URL_FIELD_X, URL_FIELD_Y));
 		settButton.setPreferredSize(new Dimension(URL_FIELD_Y, URL_FIELD_Y));
+		settButton.setToolTipText(TOOLTIP_SETTINGS);
 		addLabel.setFont(new Font(FONT, Font.PLAIN, VID_DATA_FONT_SIZE-2));
 		addLabel.setHorizontalAlignment(JLabel.CENTER);
 		
