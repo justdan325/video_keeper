@@ -268,6 +268,11 @@ public class MetadataObtainer {
 			sanitized = sanitized.replaceAll("&disable_polymer=1", "");
 		}
 		
+		//remove time tags
+		if(urlStr.contains("&t=")) {
+			sanitized = sanitized.substring(0, sanitized.indexOf("&t="));
+		}
+		
 		return sanitized;
 	}
 
