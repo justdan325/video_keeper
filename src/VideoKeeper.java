@@ -57,6 +57,7 @@ public class VideoKeeper
 			}
 		} else if((!item.getUrl().contains(".") && !item.getUrl().contains("/")) || item.getUrl().trim().length() < 3) {
 			addItem = false;
+			JOptionPane.showMessageDialog(mainGui, "Must enter a valid URL.", MainGui.PROG_NAME + " -- Invalid URL", JOptionPane.ERROR_MESSAGE);
 		}
 
 		if(addItem) {
@@ -87,8 +88,6 @@ public class VideoKeeper
 			
 //			addedQueue.push(item);
 			mainQueue.push(item);
-		} else {
-			JOptionPane.showMessageDialog(mainGui, "Must enter a valid URL.", MainGui.PROG_NAME + " -- Invalid URL", JOptionPane.ERROR_MESSAGE);
 		}
 	}
 		
