@@ -105,7 +105,7 @@ public class MetadataObtainer {
 			}
 		}
 		
-		if(title.length() > 100) {
+		if(title.length() > 125) {
 			title = "";
 		}
 		
