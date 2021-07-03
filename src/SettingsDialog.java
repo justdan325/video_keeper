@@ -6,6 +6,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
 import java.io.File;
 
 import javax.swing.JButton;
@@ -17,7 +19,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
-public class SettingsDialog extends JDialog {
+public class SettingsDialog extends JDialog implements WindowListener{
 	private static final String DIA_TITLE 			= "Settings";
 	private static final String BROWSE_BTN_TITLE 	= "Browse";
 	private static final String AUTO_SAVE_TITLE		= "Auto Save upon Exit";
@@ -42,6 +44,7 @@ public class SettingsDialog extends JDialog {
 	private MainGui parent;
 	private DataModel model;
 	private boolean locked;
+	private boolean childDialogOpen;
 	
 //	public static void main(String[] args) {
 //		new SettingsDialog(null);
@@ -58,6 +61,7 @@ public class SettingsDialog extends JDialog {
 		this.parent = parent;
 		this.model = model;
 		this.locked = false;
+		this.childDialogOpen = false;
 		
 		mainPanel.add(makeTitleLabel());
 		mainPanel.add(makeTextFieldPanel());
@@ -72,6 +76,7 @@ public class SettingsDialog extends JDialog {
 		this.setTitle(MainGui.PROG_NAME + " -- Settings");
 		this.setSize(new Dimension(WIN_X, WIN_Y));
 		this.setResizable(false);
+		this.addWindowListener(this);
 	}
 	
 	public void showDialog() {
@@ -192,13 +197,18 @@ public class SettingsDialog extends JDialog {
 				setLocked(true);
 				saved = parent.save();
 				
-				if(saved) {
-					String mess = "Watch list has been saved to database file!";
-					JOptionPane.showMessageDialog(parent.getSettingsDialog(), mess, MainGui.PROG_NAME + " -- Watch List Saved", JOptionPane.INFORMATION_MESSAGE);
-				} else {
-					String mess = "Watch list could not be saved to database file.";
-					JOptionPane.showMessageDialog(parent.getSettingsDialog(), mess, MainGui.PROG_NAME + " -- Save Failure", JOptionPane.ERROR_MESSAGE);
-				}
+				//This pop-up is kind of a pain. Going to disable it for now.
+//				if(saved) {
+//					String mess = "Watch list has been saved to database file!";
+//					childDialogOpen = true;
+//					JOptionPane.showMessageDialog(parent.getSettingsDialog(), mess, MainGui.PROG_NAME + " -- Watch List Saved", JOptionPane.INFORMATION_MESSAGE);
+//					childDialogOpen = false;
+//				} else {
+//					String mess = "Watch list could not be saved to database file.";
+//					childDialogOpen = true;
+//					JOptionPane.showMessageDialog(parent.getSettingsDialog(), mess, MainGui.PROG_NAME + " -- Save Failure", JOptionPane.ERROR_MESSAGE);
+//					childDialogOpen = false;
+//				}
 				
 				setLocked(false);
 				
@@ -215,7 +225,9 @@ public class SettingsDialog extends JDialog {
 		Thread thread = new Thread(new Runnable() {
 			@Override
 			public void run() {
+				childDialogOpen = true;
 				String destination = JOptionPane.showInputDialog(parent.getSettingsDialog(), "Enter destination file to export to.", "urls.txt");
+				childDialogOpen = false;
 				boolean success = false;
 				
 				if (destination != null) {
@@ -225,10 +237,14 @@ public class SettingsDialog extends JDialog {
 
 					if (success) {
 						String mess = "URLs have been exported!";
+						childDialogOpen = true;
 						JOptionPane.showMessageDialog(parent.getSettingsDialog(), mess, MainGui.PROG_NAME + " -- Export Success", JOptionPane.INFORMATION_MESSAGE);
+						childDialogOpen = false;
 					} else {
+						childDialogOpen = true;
 						String mess = "Could not export to specified file.";
 						JOptionPane.showMessageDialog(parent.getSettingsDialog(), mess, MainGui.PROG_NAME + " -- Export Failure", JOptionPane.ERROR_MESSAGE);
+						childDialogOpen = false;
 					}
 				}
 			}
@@ -242,7 +258,9 @@ public class SettingsDialog extends JDialog {
 			@Override
 			public void run() {
 				String mess = "Save changes to watch list before refreshing?";
+				childDialogOpen = true;
 				int option = JOptionPane.showOptionDialog(parent.getSettingsDialog(), mess, MainGui.PROG_NAME + " -- Save?", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, null, null);
+				childDialogOpen = false;
 				
 				if(option == JOptionPane.YES_OPTION) {
 					setLocked(true);
@@ -322,7 +340,9 @@ public class SettingsDialog extends JDialog {
 		
 		File currDatabase = new File(model.getDatabaseFile());
 		JFileChooser chooser = new JFileChooser(currDatabase.getParent());
+		this.childDialogOpen = true;
 		int option = chooser.showOpenDialog(this);
+		this.childDialogOpen = false;
 		
 		if(option == JFileChooser.APPROVE_OPTION) {
 			currDatabase = chooser.getSelectedFile();
@@ -334,4 +354,31 @@ public class SettingsDialog extends JDialog {
 		parent.setLocked(false);
 		setLocked(false);
 	}
+
+	@Override
+	public void windowActivated(WindowEvent arg0) {}
+
+	@Override
+	public void windowClosed(WindowEvent arg0) {}
+
+	@Override
+	public void windowClosing(WindowEvent arg0) {
+		this.setVisible(false);
+	}
+
+	@Override
+	public void windowDeactivated(WindowEvent arg0) {
+		if (!childDialogOpen) {
+			this.setVisible(false);
+		}
+	}
+
+	@Override
+	public void windowDeiconified(WindowEvent arg0) {}
+
+	@Override
+	public void windowIconified(WindowEvent arg0) {}
+
+	@Override
+	public void windowOpened(WindowEvent arg0) {}
 }
