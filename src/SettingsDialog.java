@@ -197,18 +197,12 @@ public class SettingsDialog extends JDialog implements WindowListener{
 				setLocked(true);
 				saved = parent.save();
 				
-				//This pop-up is kind of a pain. Going to disable it for now.
-//				if(saved) {
-//					String mess = "Watch list has been saved to database file!";
-//					childDialogOpen = true;
-//					JOptionPane.showMessageDialog(parent.getSettingsDialog(), mess, MainGui.PROG_NAME + " -- Watch List Saved", JOptionPane.INFORMATION_MESSAGE);
-//					childDialogOpen = false;
-//				} else {
-//					String mess = "Watch list could not be saved to database file.";
-//					childDialogOpen = true;
-//					JOptionPane.showMessageDialog(parent.getSettingsDialog(), mess, MainGui.PROG_NAME + " -- Save Failure", JOptionPane.ERROR_MESSAGE);
-//					childDialogOpen = false;
-//				}
+				if(!saved) {
+					String mess = "Watch list could not be saved to database file.";
+					childDialogOpen = true;
+					JOptionPane.showMessageDialog(parent.getSettingsDialog(), mess, MainGui.PROG_NAME + " -- Save Failure", JOptionPane.ERROR_MESSAGE);
+					childDialogOpen = false;
+				}
 				
 				setLocked(false);
 				
