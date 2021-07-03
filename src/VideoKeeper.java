@@ -346,7 +346,9 @@ public class VideoKeeper
 							save();
 						} else {
 							String mess = "Would you like to save changes to \nthe current database before switching?";
+							((SettingsDialog) mainGui.getSettingsDialog()).setChildDialogOpen(true);
 							int option = JOptionPane.showOptionDialog(mainGui.getSettingsDialog(), mess, MainGui.PROG_NAME + " -- Save?", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, null, null);
+							((SettingsDialog) mainGui.getSettingsDialog()).setChildDialogOpen(false);
 							
 							if(option == JOptionPane.YES_OPTION) {
 								save();

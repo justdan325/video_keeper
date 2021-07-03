@@ -2,6 +2,8 @@ import java.io.File;
 import java.io.IOException;
 
 import javax.swing.JOptionPane;
+import javax.swing.UIManager;
+import javax.swing.UnsupportedLookAndFeelException;
 
 public class Main {
 	public  static final String DEFAULT_DATABASE 	= "database.txt";
@@ -19,6 +21,8 @@ public class Main {
 	public Main() {
 		this.model = new DataModel();
 		
+//		setLookAndFeel();
+		
 		try {
 			this.props = new PropsFileUtil(getOrCreatePropsFile());
 		} catch (Exception e) {
@@ -30,6 +34,21 @@ public class Main {
 		init();
 	}
 	
+	private void setLookAndFeel() {
+		try {
+			// Set cross-platform Java L&F (also called "Metal")
+			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+		} catch (UnsupportedLookAndFeelException e) {
+			System.out.println(e);
+		} catch (ClassNotFoundException e) {
+			System.out.println(e);
+		} catch (InstantiationException e) {
+			System.out.println(e);
+		} catch (IllegalAccessException e) {
+			System.out.println(e);
+		}
+	}
+
 	private void init() {
 		String database = DEFAULT_DATABASE;
 		String autoSave = "1";

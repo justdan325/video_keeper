@@ -63,6 +63,8 @@ public class SettingsDialog extends JDialog implements WindowListener{
 		this.locked = false;
 		this.childDialogOpen = false;
 		
+		mainPanel.setBackground(MainGui.PROG_COLOR_BKRND);
+		
 		mainPanel.add(makeTitleLabel());
 		mainPanel.add(makeTextFieldPanel());
 		mainPanel.add(makeCheckboxPanel());
@@ -73,6 +75,7 @@ public class SettingsDialog extends JDialog implements WindowListener{
 		addListeners();
 		monitor();
 		
+		this.getContentPane().setBackground(MainGui.PROG_COLOR_BKRND);
 		this.setTitle(MainGui.PROG_NAME + " -- Settings");
 		this.setSize(new Dimension(WIN_X, WIN_Y));
 		this.setResizable(false);
@@ -87,8 +90,10 @@ public class SettingsDialog extends JDialog implements WindowListener{
 	private JLabel makeTitleLabel() {
 		JLabel titleLabel = new JLabel(DIA_TITLE);
 		
+		titleLabel.setBackground(MainGui.PROG_COLOR_BKRND);
 		titleLabel.setHorizontalAlignment(JLabel.CENTER);
 		titleLabel.setFont(new Font(MainGui.FONT, Font.BOLD, 30));
+		titleLabel.setBackground(MainGui.PROG_COLOR_BKRND);
 		
 		return titleLabel;
 	}
@@ -102,6 +107,9 @@ public class SettingsDialog extends JDialog implements WindowListener{
 		dbFileTextField.setText(model.getDatabaseFile());
 		dbFileTextField.setEditable(false);
 		dbFileButton.setPreferredSize(new Dimension(BTN_X, BTN_Y));
+		dbFileButton.setBackground(MainGui.PROG_COLOR_BTN_EN);
+		textFieldPanel.setBackground(MainGui.PROG_COLOR_BKRND);
+		dbSubPanel.setBackground(MainGui.PROG_COLOR_BKRND);
 		dbFileLabel.setHorizontalAlignment(JLabel.CENTER);
 		dbFileLabel.setFont(new Font(MainGui.FONT, Font.PLAIN, 12));
 		
@@ -117,7 +125,9 @@ public class SettingsDialog extends JDialog implements WindowListener{
 	private JPanel makeCheckboxPanel() {
 		JPanel checkboxPanel = new JPanel(new GridLayout());
 		
+		checkboxPanel.setBackground(MainGui.PROG_COLOR_BKRND);
 		autoSaveCheckbox.setHorizontalAlignment(JCheckBox.CENTER);
+		autoSaveCheckbox.setBackground(MainGui.PROG_COLOR_BKRND);
 		
 		if(model.isAutoSaveOnExit()) {
 			autoSaveCheckbox.setSelected(true);
@@ -132,13 +142,18 @@ public class SettingsDialog extends JDialog implements WindowListener{
 	
 	private JPanel makeButtonPanel() {
 		JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 30, 0));
+		
+		buttonPanel.setBackground(MainGui.PROG_COLOR_BKRND);
 
 		saveButton.setPreferredSize(new Dimension(BTN_X, BTN_Y));
 		saveButton.setToolTipText(TOOLTIP_SAVE);
+		saveButton.setBackground(MainGui.PROG_COLOR_BTN_DIS);
 		exportButton.setPreferredSize(new Dimension(BTN_X, BTN_Y));
 		exportButton.setToolTipText(TOOLTIP_EXPORT);
+		exportButton.setBackground(MainGui.PROG_COLOR_BTN_EN);
 		refreshButton.setPreferredSize(new Dimension(BTN_X, BTN_Y));
 		refreshButton.setToolTipText(TOOLTIP_REFRESH);
+		refreshButton.setBackground(MainGui.PROG_COLOR_BTN_EN);
 		
 		buttonPanel.add(saveButton);
 		buttonPanel.add(exportButton);
@@ -208,6 +223,7 @@ public class SettingsDialog extends JDialog implements WindowListener{
 				
 				if(saved) {
 					saveButton.setEnabled(false);
+					saveButton.setBackground(MainGui.PROG_COLOR_BTN_DIS);
 				}
 			}
 		});
@@ -284,6 +300,7 @@ public class SettingsDialog extends JDialog implements WindowListener{
 				
 				int size = parent.getCount();
 				saveButton.setEnabled(false);
+				saveButton.setBackground(MainGui.PROG_COLOR_BTN_DIS);
 				
 				for(;;) {
 					while(locked) {
@@ -296,14 +313,19 @@ public class SettingsDialog extends JDialog implements WindowListener{
 					if(parent.getCount() != size) {
 						size = parent.getCount();
 						saveButton.setEnabled(true);
+						saveButton.setBackground(MainGui.PROG_COLOR_BTN_EN);
 					}
 					
 					if(size > 0) {
 						exportButton.setEnabled(true);
+						exportButton.setBackground(MainGui.PROG_COLOR_BTN_EN);
 						refreshButton.setEnabled(true);
+						refreshButton.setBackground(MainGui.PROG_COLOR_BTN_EN);
 					} else {
 						exportButton.setEnabled(false);
+						exportButton.setBackground(MainGui.PROG_COLOR_BTN_DIS);
 						refreshButton.setEnabled(false);
+						refreshButton.setBackground(MainGui.PROG_COLOR_BTN_DIS);
 					}
 					
 					try {
@@ -321,9 +343,13 @@ public class SettingsDialog extends JDialog implements WindowListener{
 		this.locked = locked;
 		this.dbFileTextField.setEnabled(!locked);
 		this.dbFileButton.setEnabled(!locked);
+		this.dbFileButton.setBackground(locked ? MainGui.PROG_COLOR_BTN_DIS : MainGui.PROG_COLOR_BTN_EN);
 		this.saveButton.setEnabled(!locked);
+		this.saveButton.setBackground(locked ? MainGui.PROG_COLOR_BTN_DIS : MainGui.PROG_COLOR_BTN_EN);
 		this.exportButton.setEnabled(!locked);
+		this.exportButton.setBackground(locked ? MainGui.PROG_COLOR_BTN_DIS : MainGui.PROG_COLOR_BTN_EN);
 		this.refreshButton.setEnabled(!locked);
+		this.refreshButton.setBackground(locked ? MainGui.PROG_COLOR_BTN_DIS : MainGui.PROG_COLOR_BTN_EN);
 		this.autoSaveCheckbox.setEnabled(!locked);
 	}
 	
@@ -347,6 +373,10 @@ public class SettingsDialog extends JDialog implements WindowListener{
 		//re-enable UI elements
 		parent.setLocked(false);
 		setLocked(false);
+	}
+	
+	public void setChildDialogOpen(boolean childDialogOpen) {
+		this.childDialogOpen = childDialogOpen;
 	}
 
 	@Override

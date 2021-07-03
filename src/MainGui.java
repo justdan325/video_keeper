@@ -16,6 +16,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.GridLayout;
 import java.awt.FlowLayout;
 import java.awt.Dimension;
@@ -23,9 +24,11 @@ import java.awt.Dimension;
 public class MainGui extends JFrame implements WindowListener {
 	public  static final String PROG_NAME 			= "Video Keeper";
 	public  static final String PROG_VER			= "2.0a7";
+	public	static final Color 	PROG_COLOR_BKRND	= new Color(10416127);
+	public	static final Color	PROG_COLOR_BTN_EN	= new Color(8421504);
+	public	static final Color	PROG_COLOR_BTN_DIS	= new Color(12632256);
 	
 	private static final String PASTE_MESS 			= "<Paste URL Here>";
-	private static final String TITLE 				= "";
 	private static final String NEXT_BUTTON_TXT 	= "Play Next";
 	private static final String PREV_BUTTON_TXT 	= "Play Prev.";
 	private static final String SKIP_BUTTON_TXT 	= "Skip Next";
@@ -92,6 +95,7 @@ public class MainGui extends JFrame implements WindowListener {
 		addListeners();
 		initKeeper();
 		
+		this.getContentPane().setBackground(PROG_COLOR_BKRND);
 		this.setTitle(PROG_NAME + " -- v" + PROG_VER);
 		this.setSize(new Dimension(WIN_X, WIN_Y));
 		this.add(mainPanel);
@@ -102,6 +106,8 @@ public class MainGui extends JFrame implements WindowListener {
 	
 	private JPanel makeNorthPanel() {
 		JPanel north = new JPanel(new GridLayout(5, 1));
+		
+		north.setBackground(new Color(15922175));
 		
 		UP_NEXT_LABEL.setFont(new Font(FONT, Font.BOLD, UP_NEXT_FONT_SIZE));
 		UP_NEXT_LABEL.setText(UP_NEXT_TXT);
@@ -134,11 +140,18 @@ public class MainGui extends JFrame implements WindowListener {
 		JPanel buttonPanel = new JPanel(layout);
 		JLabel addLabel = new JLabel(ADD_LABEL_TXT);
 		
+		center.setBackground(PROG_COLOR_BKRND);
+		urlPanel.setBackground(PROG_COLOR_BKRND);
+		buttonPanel.setBackground(PROG_COLOR_BKRND);
+		addLabel.setBackground(PROG_COLOR_BKRND);
 		urlField.setPreferredSize(new Dimension(URL_FIELD_X, URL_FIELD_Y));
 		settButton.setPreferredSize(new Dimension(URL_FIELD_Y, URL_FIELD_Y));
 		settButton.setToolTipText(TOOLTIP_SETTINGS);
+		settButton.setBackground(PROG_COLOR_BTN_EN);
 		addLabel.setFont(new Font(FONT, Font.PLAIN, VID_DATA_FONT_SIZE-2));
 		addLabel.setHorizontalAlignment(JLabel.CENTER);
+		pasteButton.setBackground(PROG_COLOR_BTN_EN);
+		addButton.setBackground(PROG_COLOR_BTN_EN);
 		
 		buttonPanel.add(pasteButton);
 		buttonPanel.add(addButton);
@@ -166,6 +179,14 @@ public class MainGui extends JFrame implements WindowListener {
 		JPanel buttonPanel = new JPanel(subLayout);
 		JPanel toWatchPanel = new JPanel(toWatchLayout);
 		JLabel toWatchLabel = new JLabel(TO_WATCH_TXT);
+		
+		south.setBackground(PROG_COLOR_BKRND);
+		buttonPanel.setBackground(PROG_COLOR_BKRND);
+		toWatchPanel.setBackground(PROG_COLOR_BKRND);
+		toWatchLabel.setBackground(PROG_COLOR_BKRND);
+		nextButton.setBackground(PROG_COLOR_BTN_EN);
+		skipButton.setBackground(PROG_COLOR_BTN_EN);
+		prevButton.setBackground(PROG_COLOR_BTN_EN);
 		
 		buttonPanel.add(nextButton);
 		buttonPanel.add(skipButton);
@@ -271,6 +292,7 @@ public class MainGui extends JFrame implements WindowListener {
 
 					if(count > 0) {
 						nextButton.setEnabled(true);
+						nextButton.setBackground(PROG_COLOR_BTN_EN);
 						UP_NEXT_LABEL.setText(UP_NEXT_TXT);
 						titleLabel.setText(keeper.getNextTitle());
 						dateLabel.setText(keeper.getNextDate());
@@ -282,6 +304,7 @@ public class MainGui extends JFrame implements WindowListener {
 						}
 					} else {
 						nextButton.setEnabled(false);
+						nextButton.setBackground(PROG_COLOR_BTN_DIS);
 						UP_NEXT_LABEL.setText(EMPTY_QUEUE_TXT);
 						titleLabel.setText(" ");
 						dateLabel.setText(" ");
@@ -290,14 +313,18 @@ public class MainGui extends JFrame implements WindowListener {
 					
 					if(count > 1) {
 						skipButton.setEnabled(true);
+						skipButton.setBackground(PROG_COLOR_BTN_EN);
 					} else {
 						skipButton.setEnabled(false);
+						skipButton.setBackground(PROG_COLOR_BTN_DIS);
 					}
 
 					if(keeper.getCurr() == null) {
 						prevButton.setEnabled(false);
+						prevButton.setBackground(PROG_COLOR_BTN_DIS);
 					} else {
 						prevButton.setEnabled(true);
+						prevButton.setBackground(PROG_COLOR_BTN_EN);
 						
 						if(keeper.getCurrTitle().length() > 0) {
 							prevButton.setToolTipText("Prev. Video: " + keeper.getCurrTitle());
@@ -350,11 +377,17 @@ public class MainGui extends JFrame implements WindowListener {
 	public void setLocked(boolean locked) {
 		this.locked = locked;
 		this.nextButton.setEnabled(!locked);
+		this.nextButton.setBackground(locked ? PROG_COLOR_BTN_DIS : PROG_COLOR_BTN_EN);
 		this.prevButton.setEnabled(!locked);
+		this.prevButton.setBackground(locked ? PROG_COLOR_BTN_DIS : PROG_COLOR_BTN_EN);
 		this.addButton.setEnabled(!locked);
+		this.addButton.setBackground(locked ? PROG_COLOR_BTN_DIS : PROG_COLOR_BTN_EN);
 		this.skipButton.setEnabled(!locked);
+		this.skipButton.setBackground(locked ? PROG_COLOR_BTN_DIS : PROG_COLOR_BTN_EN);
 		this.settButton.setEnabled(!locked);
+		this.settButton.setBackground(locked ? PROG_COLOR_BTN_DIS : PROG_COLOR_BTN_EN);
 		this.pasteButton.setEnabled(!locked);
+		this.pasteButton.setBackground(locked ? PROG_COLOR_BTN_DIS : PROG_COLOR_BTN_EN);
 		this.urlField.setEnabled(!locked);
 	}
 	
