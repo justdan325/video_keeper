@@ -91,9 +91,9 @@ public class SettingsDialog extends JDialog implements WindowListener{
 		JLabel titleLabel = new JLabel(DIA_TITLE);
 		
 		titleLabel.setBackground(MainGui.PROG_COLOR_BKRND);
+		titleLabel.setForeground(MainGui.PROG_COLOR_TXT_LT);
 		titleLabel.setHorizontalAlignment(JLabel.CENTER);
-		titleLabel.setFont(new Font(MainGui.FONT, Font.BOLD, 30));
-		titleLabel.setBackground(MainGui.PROG_COLOR_BKRND);
+		titleLabel.setFont(new Font(MainGui.PROG_FONT, Font.BOLD, 30));
 		
 		return titleLabel;
 	}
@@ -111,7 +111,8 @@ public class SettingsDialog extends JDialog implements WindowListener{
 		textFieldPanel.setBackground(MainGui.PROG_COLOR_BKRND);
 		dbSubPanel.setBackground(MainGui.PROG_COLOR_BKRND);
 		dbFileLabel.setHorizontalAlignment(JLabel.CENTER);
-		dbFileLabel.setFont(new Font(MainGui.FONT, Font.PLAIN, 12));
+		dbFileLabel.setFont(new Font(MainGui.PROG_FONT, Font.PLAIN, 12));
+		dbFileLabel.setForeground(MainGui.PROG_COLOR_TXT_LT);
 		
 		dbSubPanel.add(dbFileTextField);
 		dbSubPanel.add(dbFileButton);
@@ -126,8 +127,10 @@ public class SettingsDialog extends JDialog implements WindowListener{
 		JPanel checkboxPanel = new JPanel(new GridLayout());
 		
 		checkboxPanel.setBackground(MainGui.PROG_COLOR_BKRND);
+		checkboxPanel.setForeground(MainGui.PROG_COLOR_TXT_LT);
 		autoSaveCheckbox.setHorizontalAlignment(JCheckBox.CENTER);
 		autoSaveCheckbox.setBackground(MainGui.PROG_COLOR_BKRND);
+		autoSaveCheckbox.setForeground(MainGui.PROG_COLOR_TXT_LT);
 		
 		if(model.isAutoSaveOnExit()) {
 			autoSaveCheckbox.setSelected(true);

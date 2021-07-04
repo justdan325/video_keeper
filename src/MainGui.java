@@ -2,6 +2,7 @@ import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.Toolkit;
 import java.awt.Font;
+import java.awt.Graphics;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
@@ -10,6 +11,7 @@ import java.awt.event.WindowListener;
 import java.awt.event.WindowEvent;
 import javax.swing.JTextField;
 import javax.swing.WindowConstants;
+import javax.swing.border.Border;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
@@ -18,16 +20,21 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.GridLayout;
+import java.awt.Insets;
 import java.awt.FlowLayout;
 import java.awt.Dimension;
 
 public class MainGui extends JFrame implements WindowListener {
 	public  static final String PROG_NAME 			= "Video Keeper";
 	public  static final String PROG_VER			= "2.0a7";
-	public	static final Color 	PROG_COLOR_BKRND	= new Color(10416127);
-	public	static final Color	PROG_COLOR_BTN_EN	= new Color(8421504);
-	public	static final Color	PROG_COLOR_BTN_DIS	= new Color(12632256);
+	public  static final String PROG_FONT			= "Helvetica";
+	public	static final Color 	PROG_COLOR_BKRND	= new Color(3156004);
+	public	static final Color	PROG_COLOR_BTN_EN	= new Color(8388608);
+	public	static final Color	PROG_COLOR_BTN_DIS	= new Color(4013114);
+	public	static final Color	PROG_COLOR_TXT_LT	= Color.WHITE;
+	public	static final Color	PROG_COLOR_TXT_DRK	= Color.BLACK;
 	
 	private static final String PASTE_MESS 			= "<Paste URL Here>";
 	private static final String NEXT_BUTTON_TXT 	= "Play Next";
@@ -40,9 +47,10 @@ public class MainGui extends JFrame implements WindowListener {
 	private static final String TO_WATCH_TXT 		= "Videos:";
 	private static final String UP_NEXT_TXT			= " -- Up Next -- ";
 	private static final String EMPTY_QUEUE_TXT		= "~ No Videos in Watch List ~";
+	private static final String TOOLTIP_PASTE		= "Paste a URL from clip board.";
+	private static final String TOOLTIP_ADD			= "Add URL to watch list.";
 	private static final String TOOLTIP_SETTINGS	= "Settings";
 	private static final String CHANNEL_PREFIX 		= "By: ";
-	public  static final String FONT				= "Helvetica";
 	private static final int 	WIN_X 				= 600;
 	private static final int 	WIN_Y 				= 350;
 	private static final int 	URL_FIELD_X			= 450;
@@ -109,20 +117,24 @@ public class MainGui extends JFrame implements WindowListener {
 	private JPanel makeNorthPanel() {
 		JPanel north = new JPanel(new GridLayout(5, 1));
 		
-		north.setBackground(new Color(15922175));
+		north.setBackground(new Color(8617596));
 		
-		UP_NEXT_LABEL.setFont(new Font(FONT, Font.BOLD, UP_NEXT_FONT_SIZE));
+		UP_NEXT_LABEL.setFont(new Font(PROG_FONT, Font.BOLD, UP_NEXT_FONT_SIZE));
 		UP_NEXT_LABEL.setText(UP_NEXT_TXT);
 		UP_NEXT_LABEL.setHorizontalAlignment(JLabel.CENTER);
-		titleLabel.setFont(new Font(FONT, Font.TYPE1_FONT, VID_DATA_FONT_SIZE));
+		UP_NEXT_LABEL.setForeground(PROG_COLOR_TXT_DRK);
+		titleLabel.setFont(new Font(PROG_FONT, Font.TYPE1_FONT, VID_DATA_FONT_SIZE));
 		titleLabel.setText("Title: Test");
 		titleLabel.setHorizontalAlignment(JLabel.CENTER);
-		dateLabel.setFont(new Font(FONT, Font.ITALIC, VID_DATA_FONT_SIZE));
+		titleLabel.setForeground(PROG_COLOR_TXT_DRK);
+		dateLabel.setFont(new Font(PROG_FONT, Font.ITALIC, VID_DATA_FONT_SIZE));
 		dateLabel.setText("Date: Test");
 		dateLabel.setHorizontalAlignment(JLabel.CENTER);
-		channelLabel.setFont(new Font(FONT, Font.TYPE1_FONT, VID_DATA_FONT_SIZE));
+		dateLabel.setForeground(PROG_COLOR_TXT_DRK);
+		channelLabel.setFont(new Font(PROG_FONT, Font.TYPE1_FONT, VID_DATA_FONT_SIZE));
 		channelLabel.setText("By: Test");
 		channelLabel.setHorizontalAlignment(JLabel.CENTER);
+		channelLabel.setForeground(PROG_COLOR_TXT_DRK);
 		
 		north.add(UP_NEXT_LABEL);
 		north.add(titleLabel);
@@ -150,10 +162,13 @@ public class MainGui extends JFrame implements WindowListener {
 		settButton.setPreferredSize(new Dimension(URL_FIELD_Y, URL_FIELD_Y));
 		settButton.setToolTipText(TOOLTIP_SETTINGS);
 		settButton.setBackground(PROG_COLOR_BTN_EN);
-		addLabel.setFont(new Font(FONT, Font.PLAIN, VID_DATA_FONT_SIZE-2));
+		addLabel.setFont(new Font(PROG_FONT, Font.PLAIN, VID_DATA_FONT_SIZE-2));
 		addLabel.setHorizontalAlignment(JLabel.CENTER);
+		addLabel.setForeground(PROG_COLOR_TXT_LT);
 		pasteButton.setBackground(PROG_COLOR_BTN_EN);
 		addButton.setBackground(PROG_COLOR_BTN_EN);
+		pasteButton.setToolTipText(TOOLTIP_PASTE);
+		addButton.setToolTipText(TOOLTIP_ADD);
 		
 		buttonPanel.add(pasteButton);
 		buttonPanel.add(addButton);
@@ -186,6 +201,8 @@ public class MainGui extends JFrame implements WindowListener {
 		buttonPanel.setBackground(PROG_COLOR_BKRND);
 		toWatchPanel.setBackground(PROG_COLOR_BKRND);
 		toWatchLabel.setBackground(PROG_COLOR_BKRND);
+		toWatchLabel.setForeground(PROG_COLOR_TXT_LT);
+		counterLabel.setForeground(PROG_COLOR_TXT_LT);
 		nextButton.setBackground(PROG_COLOR_BTN_EN);
 		skipButton.setBackground(PROG_COLOR_BTN_EN);
 		prevButton.setBackground(PROG_COLOR_BTN_EN);

@@ -1,3 +1,6 @@
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Container;
 import java.io.File;
 import java.io.IOException;
 
@@ -21,6 +24,7 @@ public class Main {
 	public Main() {
 		this.model = new DataModel();
 		
+		setUiColorScheme();
 //		setLookAndFeel();
 		
 		try {
@@ -47,6 +51,15 @@ public class Main {
 		} catch (IllegalAccessException e) {
 			System.out.println(e);
 		}
+	}
+	
+	private void setUiColorScheme() {
+		 UIManager UI = new UIManager();
+		 UI.put("OptionPane.messageForeground", MainGui.PROG_COLOR_TXT_LT);
+		 UI.put("OptionPane.background", MainGui.PROG_COLOR_BKRND);
+		 UI.put("Button.background", MainGui.PROG_COLOR_BTN_EN);
+		 UI.put("Button.foreground", MainGui.PROG_COLOR_TXT_LT);
+		 UI.put("Panel.background", MainGui.PROG_COLOR_BKRND);
 	}
 
 	private void init() {
