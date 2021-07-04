@@ -60,6 +60,7 @@ public class Main {
 		 UI.put("Button.background", MainGui.PROG_COLOR_BTN_EN);
 		 UI.put("Button.foreground", MainGui.PROG_COLOR_TXT_LT);
 		 UI.put("Panel.background", MainGui.PROG_COLOR_BKRND);
+		 UI.put("Label.foreground", MainGui.PROG_COLOR_TXT_LT);
 	}
 
 	private void init() {
