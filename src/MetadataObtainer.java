@@ -27,6 +27,8 @@ public class MetadataObtainer {
 	private static final String DAILYMOTION_PREFIX_W 	= "https://www.dailymotion.com/video/";
 	private static final String DAILYMOTION_PREFIX		= "https://dailymotion.com/video/";
 	private static final String DAILYMOTION_PREFIX_MOB 	= "https://m.dailymotion.com/video/";
+	private static final String BITCHUTE_PREFIX_W		= "https://www.bitchute.com/video/";
+	private static final String BITCHUTE_PREFIX			= "https://bitchute.com/video/";
 	
 	private String urlStr;
 	private String html;
@@ -34,12 +36,17 @@ public class MetadataObtainer {
 	
 	public MetadataObtainer(String urlStr) {
 		this.urlStr = sanitize(urlStr);
-		this.html = fetchHtml(this.urlStr);
 		this.isSupported = isSupported(urlStr);
+	
+		if (isSupported) {
+			this.html = fetchHtml(this.urlStr);
+		} else {
+			this.html = FETCH_ERROR_PREFIX;
+		}
 	}
 	
 	public static void main(String[] args){
-		MetadataObtainer o = new MetadataObtainer("https://www.dailymotion.com/video/x82d25n?playlist=x6lgtp");
+		MetadataObtainer o = new MetadataObtainer("https://www.bitchute.com/video/U6AyvloqMdCm/");
 		System.out.println(o.getTitle());
 		System.out.println(o.getDate());
 		System.out.println(o.getChannel());
@@ -52,7 +59,8 @@ public class MetadataObtainer {
 		   || urlStr.startsWith(YOUTUBE_PREFIX_ABBR) || urlStr.startsWith(TWITCH_PREFIX_W) 
 		   || urlStr.startsWith(TWITCH_PREFIX_MOB) || urlStr.startsWith(VIMEO_PREFIX)
 		   || urlStr.startsWith(ODYSEE_PREFIX) ||  urlStr.startsWith(DAILYMOTION_PREFIX_W)
-		   || urlStr.startsWith(DAILYMOTION_PREFIX) || urlStr.startsWith(DAILYMOTION_PREFIX_MOB)) {
+		   || urlStr.startsWith(DAILYMOTION_PREFIX) || urlStr.startsWith(DAILYMOTION_PREFIX_MOB)
+		   || urlStr.startsWith(BITCHUTE_PREFIX) || urlStr.startsWith(BITCHUTE_PREFIX_W)) {
 			
 			supported = true;
 		}
@@ -153,11 +161,24 @@ public class MetadataObtainer {
 					title = html.substring(begin, end);
 					title = filterEscapeChars(title);
 				}
+			//Bitchute
+			} else if(urlStr.startsWith(BITCHUTE_PREFIX) || urlStr.startsWith(BITCHUTE_PREFIX_W)) {
+				String prefix = "<title>";
+				String suffix = "</title>";
+				int begin = html.indexOf(prefix) + prefix.length();
+				int end = html.indexOf(suffix, begin);
+				
+				if (begin != -1 && end != -1) {
+					title = html.substring(begin, end);
+					title = filterEscapeChars(title);
+				}
 			}
 		}
 		
 		if(title.length() > 125) {
 			title = urlStr;
+		} else if(title.length() > 60) {
+			title = title.substring(0, 60) + ". . .";
 		}
 		
 		return title;
@@ -260,6 +281,19 @@ public class MetadataObtainer {
 				}
 				
 				channel += " on Dailymotion";
+			//Bitchute
+			} else if(urlStr.startsWith(BITCHUTE_PREFIX) || urlStr.startsWith(BITCHUTE_PREFIX_W)) {
+				String prefix = "<a href=\"/channel/";
+				String suffix = "/";
+				int begin = html.indexOf(prefix) + prefix.length();
+				int end = html.indexOf(suffix, begin);
+				
+				if (begin != -1 && end != -1) {
+					channel = html.substring(begin, end);
+					channel = filterEscapeChars(channel);
+				}
+				
+				channel += " on BITCHUTE";
 			}
 		}
 		
@@ -324,6 +358,17 @@ public class MetadataObtainer {
 				if (begin != -1 && end != -1) {
 					date = html.substring(begin, end);
 				}
+			//Bitchute
+			} else if(urlStr.startsWith(BITCHUTE_PREFIX) || urlStr.startsWith(BITCHUTE_PREFIX_W)) {
+				String prefix = "<div class=\"video-publish-date\">";
+				String suffix = "</div>";
+				int begin = html.indexOf(prefix) + prefix.length();
+				int end = html.indexOf(suffix, begin);
+				
+				if (begin != -1 && end != -1) {
+					date = html.substring(begin, end);
+					date = date.replaceAll("\n", "");
+				}
 			}
 			/*//Twitch
 			} else if(urlStr.startsWith(TWITCH_PREFIX_MOB)) {
@@ -345,7 +390,7 @@ public class MetadataObtainer {
 			}*/
 		}
 		
-		if(date.length() > 40) {
+		if(date.length() > 55) {
 			date = "";
 		}
 		
