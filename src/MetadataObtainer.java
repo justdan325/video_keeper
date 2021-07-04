@@ -16,14 +16,17 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
 
 public class MetadataObtainer {
-	private static final String FETCH_ERROR_PREFIX 	= "ERROR FETCHING HTML: ";
-	private static final String YOUTUBE_PREFIX 		= "https://youtube.com/watch?v=";
-	private static final String YOUTUBE_PREFIX_W 	= "https://www.youtube.com/watch?v=";
-	private static final String YOUTUBE_PREFIX_ABBR = "https://youtu.be/";
-	private static final String TWITCH_PREFIX_W		= "https://www.twitch.tv/videos/";
-	private static final String TWITCH_PREFIX_MOB	= "https://m.twitch.tv/videos/";
-	private static final String VIMEO_PREFIX		= "https://vimeo.com/";
-	private static final String ODYSEE_PREFIX		= "https://odysee.com/";
+	private static final String FETCH_ERROR_PREFIX 		= "ERROR FETCHING HTML: ";
+	private static final String YOUTUBE_PREFIX 			= "https://youtube.com/watch?v=";
+	private static final String YOUTUBE_PREFIX_W 		= "https://www.youtube.com/watch?v=";
+	private static final String YOUTUBE_PREFIX_ABBR 	= "https://youtu.be/";
+	private static final String TWITCH_PREFIX_W			= "https://www.twitch.tv/videos/";
+	private static final String TWITCH_PREFIX_MOB		= "https://m.twitch.tv/videos/";
+	private static final String VIMEO_PREFIX			= "https://vimeo.com/";
+	private static final String ODYSEE_PREFIX			= "https://odysee.com/";
+	private static final String DAILYMOTION_PREFIX_W 	= "https://www.dailymotion.com/video/";
+	private static final String DAILYMOTION_PREFIX		= "https://dailymotion.com/video/";
+	private static final String DAILYMOTION_PREFIX_MOB 	= "https://m.dailymotion.com/video/";
 	
 	private String urlStr;
 	private String html;
@@ -36,7 +39,7 @@ public class MetadataObtainer {
 	}
 	
 	public static void main(String[] args){
-		MetadataObtainer o = new MetadataObtainer("https://odysee.com/@SomeOrdinaryGamers:a/i-downloaded-a-game-off-the-dark-web...:9");
+		MetadataObtainer o = new MetadataObtainer("https://www.dailymotion.com/video/x82d25n?playlist=x6lgtp");
 		System.out.println(o.getTitle());
 		System.out.println(o.getDate());
 		System.out.println(o.getChannel());
@@ -48,7 +51,8 @@ public class MetadataObtainer {
 		if(urlStr.startsWith(YOUTUBE_PREFIX) || urlStr.startsWith(YOUTUBE_PREFIX_W) 
 		   || urlStr.startsWith(YOUTUBE_PREFIX_ABBR) || urlStr.startsWith(TWITCH_PREFIX_W) 
 		   || urlStr.startsWith(TWITCH_PREFIX_MOB) || urlStr.startsWith(VIMEO_PREFIX)
-		   || urlStr.startsWith(ODYSEE_PREFIX)) {
+		   || urlStr.startsWith(ODYSEE_PREFIX) ||  urlStr.startsWith(DAILYMOTION_PREFIX_W)
+		   || urlStr.startsWith(DAILYMOTION_PREFIX) || urlStr.startsWith(DAILYMOTION_PREFIX_MOB)) {
 			
 			supported = true;
 		}
@@ -71,7 +75,7 @@ public class MetadataObtainer {
 	}
 	
 	public String getTitle() {
-		String title = "";
+		String title = urlStr;
 		
 		if(!isUrlError()) {
 			//YouTube Regular Links
@@ -136,11 +140,24 @@ public class MetadataObtainer {
 					title = html.substring(begin, end);
 					title = filterEscapeChars(title);
 				}
+			//Dailymotion
+			} else if(urlStr.startsWith(DAILYMOTION_PREFIX) || urlStr.startsWith(DAILYMOTION_PREFIX_W)
+					|| urlStr.startsWith(DAILYMOTION_PREFIX_MOB)) {
+				
+				String prefix = "<meta property=\"og:title\" content=\"";
+				String suffix = " - video Dailymotion\"  />";
+				int begin = html.indexOf(prefix) + prefix.length();
+				int end = html.indexOf(suffix, begin);
+				
+				if (begin != -1 && end != -1) {
+					title = html.substring(begin, end);
+					title = filterEscapeChars(title);
+				}
 			}
 		}
 		
 		if(title.length() > 125) {
-			title = "";
+			title = urlStr;
 		}
 		
 		return title;
@@ -228,6 +245,21 @@ public class MetadataObtainer {
 				}
 				
 				channel += " on Odysee";
+			//Dailymotion
+			} else if(urlStr.startsWith(DAILYMOTION_PREFIX) || urlStr.startsWith(DAILYMOTION_PREFIX_W)
+					|| urlStr.startsWith(DAILYMOTION_PREFIX_MOB)) {
+				
+				String prefix = "<meta property=\"video:director\" content=\"https://www.dailymotion.com/";
+				String suffix = "\"  />";
+				int begin = html.indexOf(prefix) + prefix.length();
+				int end = html.indexOf(suffix, begin);
+				
+				if (begin != -1 && end != -1) {
+					channel = html.substring(begin, end);
+					channel = filterEscapeChars(channel);
+				}
+				
+				channel += " on Dailymotion";
 			}
 		}
 		
@@ -270,7 +302,6 @@ public class MetadataObtainer {
 			} else if(urlStr.startsWith(ODYSEE_PREFIX)) {
 				String prefix = "\"uploadDate\": \"";
 				String suffix = "\",";
-				
 				int begin = html.indexOf(prefix) + prefix.length();
 				int end = html.indexOf(suffix, begin);
 				
@@ -281,6 +312,18 @@ public class MetadataObtainer {
 				date = Instant.parse(date).atZone(ZoneId.of("America/Montreal"))
 						.format(DateTimeFormatter.ofLocalizedDateTime(FormatStyle.FULL).withLocale(Locale.US));
 				date = date.replaceAll("Eastern Daylight Time", "EDT");
+			//Dailymotion
+			} else if(urlStr.startsWith(DAILYMOTION_PREFIX) || urlStr.startsWith(DAILYMOTION_PREFIX_W)
+					|| urlStr.startsWith(DAILYMOTION_PREFIX_MOB)) {
+				
+				String prefix = "<meta property=\"video:release_date\" content=\"";
+				String suffix = "T";
+				int begin = html.indexOf(prefix) + prefix.length();
+				int end = html.indexOf(suffix, begin);
+				
+				if (begin != -1 && end != -1) {
+					date = html.substring(begin, end);
+				}
 			}
 			/*//Twitch
 			} else if(urlStr.startsWith(TWITCH_PREFIX_MOB)) {
@@ -334,15 +377,22 @@ public class MetadataObtainer {
 	
 	private static String sanitize(String urlStr) {
 		String sanitized = urlStr;
+		
+		//https fix
+		if(sanitized.startsWith("http") && !sanitized.startsWith("https")) {
+			sanitized = sanitized.replaceFirst("http", "https");
+		} else if(!sanitized.startsWith("http")) {
+			sanitized = "https://" + urlStr;
+		}
 
 		//YouTube
-		if(urlStr.startsWith(YOUTUBE_PREFIX) || urlStr.startsWith(YOUTUBE_PREFIX_W) 
-		   || urlStr.startsWith(YOUTUBE_PREFIX_ABBR)) {
+		if(sanitized.startsWith(YOUTUBE_PREFIX) || sanitized.startsWith(YOUTUBE_PREFIX_W) 
+		   || sanitized.startsWith(YOUTUBE_PREFIX_ABBR)) {
 			
-			sanitized = sanitizeYoutube(urlStr);
+			sanitized = sanitizeYoutube(sanitized);
 		//Twitch
-		} else if(urlStr.startsWith(TWITCH_PREFIX_W) || urlStr.startsWith(TWITCH_PREFIX_MOB)) {
-			sanitized = sanitizeTwitch(urlStr);
+		} else if(sanitized.startsWith(TWITCH_PREFIX_W) || sanitized.startsWith(TWITCH_PREFIX_MOB)) {
+			sanitized = sanitizeTwitch(sanitized);
 		}
 		
 		return sanitized;
