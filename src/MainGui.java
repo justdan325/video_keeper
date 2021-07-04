@@ -314,6 +314,7 @@ public class MainGui extends JFrame implements WindowListener {
 						nextButton.setBackground(PROG_COLOR_BTN_EN);
 						UP_NEXT_LABEL.setText(UP_NEXT_TXT);
 						titleLabel.setText(keeper.getNextTitle());
+						titleLabel.setToolTipText(keeper.getNextTitle());
 						dateLabel.setText(keeper.getNextDate());
 
 						if(keeper.getNextChannel().length() > 0) {
@@ -326,6 +327,7 @@ public class MainGui extends JFrame implements WindowListener {
 						nextButton.setBackground(PROG_COLOR_BTN_DIS);
 						UP_NEXT_LABEL.setText(EMPTY_QUEUE_TXT);
 						titleLabel.setText(" ");
+						titleLabel.setToolTipText("");
 						dateLabel.setText(" ");
 						channelLabel.setText(" ");
 					}
