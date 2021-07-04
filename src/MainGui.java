@@ -9,6 +9,7 @@ import java.awt.event.FocusAdapter;
 import java.awt.event.WindowListener;
 import java.awt.event.WindowEvent;
 import javax.swing.JTextField;
+import javax.swing.WindowConstants;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
@@ -96,6 +97,7 @@ public class MainGui extends JFrame implements WindowListener {
 		initKeeper();
 		
 		this.getContentPane().setBackground(PROG_COLOR_BKRND);
+		this.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
 		this.setTitle(PROG_NAME + " -- v" + PROG_VER);
 		this.setSize(new Dimension(WIN_X, WIN_Y));
 		this.add(mainPanel);
@@ -411,14 +413,16 @@ public class MainGui extends JFrame implements WindowListener {
 			save();
 		} else {
 			String mess = "Would you like to save the watch list?";
-			int option = JOptionPane.showOptionDialog(this, mess, PROG_NAME + " -- Save?", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, null, null);
+			int option = JOptionPane.showOptionDialog(this, mess, PROG_NAME + " -- Save?", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, null, null);
 			
 			if(option == JOptionPane.YES_OPTION) {
 				save();
+				System.exit(0);
+			} else if(option == JOptionPane.NO_OPTION) {
+				System.exit(0);
 			}
 		}
 		
-		System.exit(0);
 	}
 
 	@Override
