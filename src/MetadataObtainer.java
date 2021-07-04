@@ -1,9 +1,19 @@
 import java.util.Scanner;
 import java.net.URLConnection;
+import java.sql.Time;
 import java.net.URL;
 import java.util.Calendar;
+import java.util.Date;
+import java.util.Locale;
+import java.text.DateFormat;
 import java.text.DateFormatSymbols;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.Instant;
 import java.time.YearMonth;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.time.format.FormatStyle;
 
 public class MetadataObtainer {
 	private static final String FETCH_ERROR_PREFIX 	= "ERROR FETCHING HTML: ";
@@ -13,6 +23,7 @@ public class MetadataObtainer {
 	private static final String TWITCH_PREFIX_W		= "https://www.twitch.tv/videos/";
 	private static final String TWITCH_PREFIX_MOB	= "https://m.twitch.tv/videos/";
 	private static final String VIMEO_PREFIX		= "https://vimeo.com/";
+	private static final String ODYSEE_PREFIX		= "https://odysee.com/";
 	
 	private String urlStr;
 	private String html;
@@ -25,7 +36,7 @@ public class MetadataObtainer {
 	}
 	
 	public static void main(String[] args){
-		MetadataObtainer o = new MetadataObtainer("https://vimeo.com/568526359");
+		MetadataObtainer o = new MetadataObtainer("https://odysee.com/@SomeOrdinaryGamers:a/i-downloaded-a-game-off-the-dark-web...:9");
 		System.out.println(o.getTitle());
 		System.out.println(o.getDate());
 		System.out.println(o.getChannel());
@@ -36,7 +47,8 @@ public class MetadataObtainer {
 
 		if(urlStr.startsWith(YOUTUBE_PREFIX) || urlStr.startsWith(YOUTUBE_PREFIX_W) 
 		   || urlStr.startsWith(YOUTUBE_PREFIX_ABBR) || urlStr.startsWith(TWITCH_PREFIX_W) 
-		   || urlStr.startsWith(TWITCH_PREFIX_MOB) || urlStr.startsWith(VIMEO_PREFIX)) {
+		   || urlStr.startsWith(TWITCH_PREFIX_MOB) || urlStr.startsWith(VIMEO_PREFIX)
+		   || urlStr.startsWith(ODYSEE_PREFIX)) {
 			
 			supported = true;
 		}
@@ -106,6 +118,17 @@ public class MetadataObtainer {
 			} else if(urlStr.startsWith(VIMEO_PREFIX)) {
 				String prefix = "<meta property=\"og:title\" content=\"";
 				String suffix = "\">";
+				int begin = html.indexOf(prefix) + prefix.length();
+				int end = html.indexOf(suffix, begin);
+				
+				if (begin != -1 && end != -1) {
+					title = html.substring(begin, end);
+					title = filterEscapeChars(title);
+				}
+			//Odysee
+			} else if(urlStr.startsWith(ODYSEE_PREFIX)) {
+				String prefix = "<meta charset=\"utf8\"/><title>";
+				String suffix = "</title>";
 				int begin = html.indexOf(prefix) + prefix.length();
 				int end = html.indexOf(suffix, begin);
 				
@@ -192,6 +215,19 @@ public class MetadataObtainer {
 				}
 				
 				channel += " on Vimeo";
+			//Odysee
+			} else if(urlStr.startsWith(ODYSEE_PREFIX)) {
+				String prefix = "@";
+				String suffix = ":";
+				int begin = urlStr.indexOf(prefix);
+				int end = urlStr.indexOf(suffix, begin);
+				
+				if (begin != -1 && end != -1) {
+					channel = urlStr.substring(begin, end);
+					channel = filterEscapeChars(channel);
+				}
+				
+				channel += " on Odysee";
 			}
 		}
 		
@@ -230,6 +266,21 @@ public class MetadataObtainer {
 				if (begin != -1 && end != -1) {
 					date = htmlSubstr.substring(begin, end);
 				}
+			//Odysee
+			} else if(urlStr.startsWith(ODYSEE_PREFIX)) {
+				String prefix = "\"uploadDate\": \"";
+				String suffix = "\",";
+				
+				int begin = html.indexOf(prefix) + prefix.length();
+				int end = html.indexOf(suffix, begin);
+				
+				if (begin != -1 && end != -1) {
+					date = html.substring(begin, end);
+				}
+				
+				date = Instant.parse(date).atZone(ZoneId.of("America/Montreal"))
+						.format(DateTimeFormatter.ofLocalizedDateTime(FormatStyle.FULL).withLocale(Locale.US));
+				date = date.replaceAll("Eastern Daylight Time", "EDT");
 			}
 			/*//Twitch
 			} else if(urlStr.startsWith(TWITCH_PREFIX_MOB)) {
@@ -338,6 +389,7 @@ public class MetadataObtainer {
 		filtered = filtered.replaceAll("&#39;", "'");
 		filtered = filtered.replaceAll("&#x27;", "'");
 		filtered = filtered.replaceAll("&quot;", "\"");
+		filtered = filtered.replaceAll("&#039;", "'");
 		
 		return filtered;
 	}
