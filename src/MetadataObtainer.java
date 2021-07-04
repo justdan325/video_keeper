@@ -12,6 +12,7 @@ public class MetadataObtainer {
 	private static final String YOUTUBE_PREFIX_ABBR = "https://youtu.be/";
 	private static final String TWITCH_PREFIX_W		= "https://www.twitch.tv/videos/";
 	private static final String TWITCH_PREFIX_MOB	= "https://m.twitch.tv/videos/";
+	private static final String VIMEO_PREFIX		= "https://vimeo.com/";
 	
 	private String urlStr;
 	private String html;
@@ -24,11 +25,10 @@ public class MetadataObtainer {
 	}
 	
 	public static void main(String[] args){
-//		MetadataObtainer o = new MetadataObtainer("https://www.twitch.tv/videos/997396590");
-//		System.out.println(o.getTitle());
-//		System.out.println(o.getDate());
-//		System.out.println(o.getChannel());
-//		System.out.println(MetadataObtainer.determineDateOnTwitch("3 days ago"));
+		MetadataObtainer o = new MetadataObtainer("https://vimeo.com/568526359");
+		System.out.println(o.getTitle());
+		System.out.println(o.getDate());
+		System.out.println(o.getChannel());
 	}
 	
 	public static boolean isSupported(String urlStr) {
@@ -36,7 +36,7 @@ public class MetadataObtainer {
 
 		if(urlStr.startsWith(YOUTUBE_PREFIX) || urlStr.startsWith(YOUTUBE_PREFIX_W) 
 		   || urlStr.startsWith(YOUTUBE_PREFIX_ABBR) || urlStr.startsWith(TWITCH_PREFIX_W) 
-		   || urlStr.startsWith(TWITCH_PREFIX_MOB)) {
+		   || urlStr.startsWith(TWITCH_PREFIX_MOB) || urlStr.startsWith(VIMEO_PREFIX)) {
 			
 			supported = true;
 		}
@@ -102,6 +102,17 @@ public class MetadataObtainer {
 				if(strArr.length >= 1) {
 					title = strArr[0];
 				}
+			//Vimeo
+			} else if(urlStr.startsWith(VIMEO_PREFIX)) {
+				String prefix = "<meta property=\"og:title\" content=\"";
+				String suffix = "\">";
+				int begin = html.indexOf(prefix) + prefix.length();
+				int end = html.indexOf(suffix, begin);
+				
+				if (begin != -1 && end != -1) {
+					title = html.substring(begin, end);
+					title = filterEscapeChars(title);
+				}
 			}
 		}
 		
@@ -164,6 +175,23 @@ public class MetadataObtainer {
 				}
 				
 				channel += " on Twitch";
+			//Vimeo
+			} else if(urlStr.startsWith(VIMEO_PREFIX)) {
+				String prefix = "<span class=\"userlink userlink--md\">";
+				String suffix = "</a>";
+				String htmlSubstr = html.substring(html.indexOf(prefix) + prefix.length());
+				
+				prefix = "\">";
+				
+				int begin = htmlSubstr.indexOf(prefix) + prefix.length();
+				int end = htmlSubstr.indexOf(suffix, begin);
+				
+				if (begin != -1 && end != -1) {
+					channel = htmlSubstr.substring(begin, end);
+					channel = filterEscapeChars(channel);
+				}
+				
+				channel += " on Vimeo";
 			}
 		}
 		
@@ -188,6 +216,20 @@ public class MetadataObtainer {
 				if (begin != -1 && end != -1) {
 					date = html.substring(begin, end);
 				}
+			//Vimeo
+			} else if(urlStr.startsWith(VIMEO_PREFIX)) {
+				String prefix = "<span class=\"clip_info-time\"><time datetime=\"";
+				String suffix = "\">";
+				String htmlSubstr = html.substring(html.indexOf(prefix) + prefix.length());
+				
+				prefix = "\" title=\"";
+				
+				int begin = htmlSubstr.indexOf(prefix) + prefix.length();
+				int end = htmlSubstr.indexOf(suffix, begin);
+				
+				if (begin != -1 && end != -1) {
+					date = htmlSubstr.substring(begin, end);
+				}
 			}
 			/*//Twitch
 			} else if(urlStr.startsWith(TWITCH_PREFIX_MOB)) {
@@ -209,7 +251,7 @@ public class MetadataObtainer {
 			}*/
 		}
 		
-		if(date.length() > 30) {
+		if(date.length() > 40) {
 			date = "";
 		}
 		
