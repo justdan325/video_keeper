@@ -202,7 +202,7 @@ public class VideoKeeper
 		}
 	}
 	
-	public String getNextTitle() {
+	public String getNextTitle(boolean truncate) {
 		String nextTitle = "";
 
 		if(mainQueue.size() > 0) {
@@ -211,7 +211,7 @@ public class VideoKeeper
 			nextTitle = skipQueue.peek().getTitle();
 		}
 		
-		if(nextTitle.length() > 60) {
+		if(nextTitle.length() > 60 && truncate) {
 			nextTitle = nextTitle.substring(0, 60) + ". . .";
 		}
 		

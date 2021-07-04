@@ -313,8 +313,8 @@ public class MainGui extends JFrame implements WindowListener {
 						nextButton.setEnabled(true);
 						nextButton.setBackground(PROG_COLOR_BTN_EN);
 						UP_NEXT_LABEL.setText(UP_NEXT_TXT);
-						titleLabel.setText(keeper.getNextTitle());
-						titleLabel.setToolTipText(keeper.getNextTitle());
+						titleLabel.setText(keeper.getNextTitle(true));
+						titleLabel.setToolTipText(keeper.getNextTitle(false));
 						dateLabel.setText(keeper.getNextDate());
 
 						if(keeper.getNextChannel().length() > 0) {
