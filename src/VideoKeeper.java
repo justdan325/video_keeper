@@ -211,6 +211,10 @@ public class VideoKeeper
 			nextTitle = skipQueue.peek().getTitle();
 		}
 		
+		if(nextTitle.length() > 60) {
+			nextTitle = nextTitle.substring(0, 60) + ". . .";
+		}
+		
 		return nextTitle;
 	}
 	

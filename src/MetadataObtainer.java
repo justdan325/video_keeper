@@ -177,8 +177,6 @@ public class MetadataObtainer {
 		
 		if(title.length() > 125) {
 			title = urlStr;
-		} else if(title.length() > 60) {
-			title = title.substring(0, 60) + ". . .";
 		}
 		
 		return title;
