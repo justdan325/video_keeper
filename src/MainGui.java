@@ -28,8 +28,8 @@ import java.awt.Dimension;
 
 public class MainGui extends JFrame implements WindowListener {
 	public  static final String PROG_NAME 			= "Video Keeper";
-	public  static final String PROG_VER			= "2.0a7";
-	public  static final String PROG_FONT			= "Helvetica";
+	public  static final String PROG_VER			= "2.0b1";
+	public  static final String PROG_FONT			= "Arial";
 	public	static final Color 	PROG_COLOR_BKRND	= new Color(3156004);
 	public	static final Color	PROG_COLOR_BTN_EN	= new Color(8388608);
 	public	static final Color	PROG_COLOR_BTN_DIS	= new Color(4013114);
