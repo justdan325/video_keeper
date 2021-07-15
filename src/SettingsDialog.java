@@ -239,7 +239,7 @@ public class SettingsDialog extends JDialog implements WindowListener{
 			@Override
 			public void run() {
 				childDialogOpen = true;
-				String destination = JOptionPane.showInputDialog(parent.getSettingsDialog(), "Enter destination file to export to.", "urls.txt");
+				String destination = (String)JOptionPane.showInputDialog(parent, "Enter destination file to export to.", MainGui.PROG_NAME + " -- Export", JOptionPane.QUESTION_MESSAGE, null, null, "urls.txt");
 				childDialogOpen = false;
 				boolean success = false;
 				

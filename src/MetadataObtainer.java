@@ -46,7 +46,7 @@ public class MetadataObtainer {
 	}
 	
 	public static void main(String[] args){
-		MetadataObtainer o = new MetadataObtainer("https://www.bitchute.com/video/U6AyvloqMdCm/");
+		MetadataObtainer o = new MetadataObtainer("https://odysee.com/numark-pt-01-a-battery-powered-portable:2639e4cf547eb5746b7c67f3ec6db5a35628cb38");
 		System.out.println(o.getTitle());
 		System.out.println(o.getDate());
 		System.out.println(o.getChannel());
@@ -253,16 +253,28 @@ public class MetadataObtainer {
 				channel += " on Vimeo";
 			//Odysee
 			} else if(urlStr.startsWith(ODYSEE_PREFIX)) {
-				String prefix = "@";
-				String suffix = ":";
-				int begin = urlStr.indexOf(prefix);
-				int end = urlStr.indexOf(suffix, begin);
-				
-				if (begin != -1 && end != -1) {
-					channel = urlStr.substring(begin, end);
-					channel = filterEscapeChars(channel);
+				if (urlStr.contains("@")) {
+					String prefix = "@";
+					String suffix = ":";
+					int begin = urlStr.indexOf(prefix);
+					int end = urlStr.indexOf(suffix, begin);
+
+					if (begin != -1 && end != -1) {
+						channel = urlStr.substring(begin, end);
+						channel = filterEscapeChars(channel);
+					}
+				} else {
+					String prefix = "content=\"@";
+					String suffix = "\"/>";
+					int begin = html.indexOf(prefix) + prefix.length() - 1;
+					int end = html.indexOf(suffix, begin);
+
+					if (begin != -1 && end != -1) {
+						channel = html.substring(begin, end);
+						channel = filterEscapeChars(channel);
+					}
 				}
-				
+
 				channel += " on Odysee";
 			//Dailymotion
 			} else if(urlStr.startsWith(DAILYMOTION_PREFIX) || urlStr.startsWith(DAILYMOTION_PREFIX_W)
