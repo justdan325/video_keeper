@@ -1,14 +1,22 @@
 import java.util.LinkedList;
 import java.io.*;
 import java.util.Scanner;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.awt.*;
+
+import javax.swing.JDialog;
 import javax.swing.JOptionPane;
 import java.net.URL;
 import java.awt.datatransfer.StringSelection;
 
 
-public class VideoKeeper
-{
+public class VideoKeeper {
+	private static final String LNK_HNDL_DEFAULT 	= Main.DEFAULT_HNDL_LNKS;
+	private static final String LNK_HNDL_COPY 		= "COPY";
+	private static final String LNK_HNDL_CUST 		= "CUSTOM<";
+	private static final String LNK_HNDL_LNK_VAR 	= "%VIDEOLINK%";
+	
 	private DataModel		model;
 	private Queue 			mainQueue;
 //	private Queue 			addedQueue;
@@ -91,7 +99,7 @@ public class VideoKeeper
 		
 	public void openCurr() {
 		if(curr != null && !curr.isEmpty()) {
-			openWebpage(curr.getUrl());
+			handleLink(curr.getUrl());
 		}
 	}
 	
@@ -100,7 +108,7 @@ public class VideoKeeper
 			curr = mainQueue.pop();
 			
 			if(!curr.isEmpty()) {
-				openWebpage(curr.getUrl());
+				handleLink(curr.getUrl());
 			}
 			
 			refreshNext();
@@ -372,12 +380,52 @@ public class VideoKeeper
 		thread.start();
 	}
 	
-	private void openWebpage(String s) {
-     	try {
-			Desktop.getDesktop().browse(new URL(s).toURI());
-		} catch (Exception e) {
+	private void handleLink(String s) {
+		//open the webpage in default browser. Cache as a backup.
+		if (model.getHandleLinks().equalsIgnoreCase(LNK_HNDL_DEFAULT)) {
+			try {
+				Desktop.getDesktop().browse(new URL(s).toURI());
+			} catch (Exception e) {
+				Toolkit.getDefaultToolkit().getSystemClipboard().setContents(new StringSelection(s), null);
+				JOptionPane.showMessageDialog(mainGui, "Could not open in browser. Video link has \nbeen copied to the clip board.",
+						MainGui.PROG_NAME + " -- Link Copied", JOptionPane.WARNING_MESSAGE);
+			}
+		} else if (model.getHandleLinks().equalsIgnoreCase(LNK_HNDL_COPY)) {
+			JDialog dialog = (new JOptionPane("Video link has been copied to the clip board.", JOptionPane.INFORMATION_MESSAGE)).createDialog(mainGui, MainGui.PROG_NAME + " -- Link Copied");
+			
 			Toolkit.getDefaultToolkit().getSystemClipboard().setContents(new StringSelection(s), null);
-			JOptionPane.showMessageDialog(mainGui, "URL has been cached.", MainGui.PROG_NAME + " -- URL Cached", 1);
+			
+			new Thread(new Runnable() {
+				@Override
+				public void run() {
+					dialog.setVisible(true);
+				}
+			}).start();
+
+			new Timer().schedule(new TimerTask() {
+				@Override
+				public void run() {
+					dialog.dispose();
+				}
+			}, 2000);
+		} else if(model.getHandleLinks().toUpperCase().startsWith(LNK_HNDL_CUST)) {
+			String command = model.getHandleLinks();
+			
+			command = command.substring(LNK_HNDL_CUST.length());
+			command = command.substring(0, command.lastIndexOf(">"));
+			command = command.replaceAll(LNK_HNDL_LNK_VAR, s);
+			
+			try {
+				Runtime.getRuntime().exec(command);
+			} catch (Exception e) {
+				Toolkit.getDefaultToolkit().getSystemClipboard().setContents(new StringSelection(s), null);
+				JOptionPane.showMessageDialog(mainGui, "Could not execute custom command. Video link has \nbeen copied to the clip board.",
+						MainGui.PROG_NAME + " -- Link Copied", JOptionPane.WARNING_MESSAGE);
+				e.printStackTrace();
+			}
+		} else {
+			JOptionPane.showMessageDialog(mainGui, "Invalid link handling method specified in properties file.",
+					MainGui.PROG_NAME + " -- Error", JOptionPane.ERROR_MESSAGE);
 		}
 	}
 	

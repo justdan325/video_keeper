@@ -1,11 +1,13 @@
 
 public class DataModel {
 	private String databaseFile;
+	private String handleLinks;
 	private boolean autoSaveOnExit;
 	private boolean checkForDupl;
 	
 	public DataModel() {
 		this.databaseFile = Main.DEFAULT_DATABASE;
+		this.handleLinks = Main.DEFAULT_HNDL_LNKS;
 		this.autoSaveOnExit = true;
 		this.checkForDupl = true;
 	}
@@ -16,6 +18,14 @@ public class DataModel {
 
 	public void setDatabaseFile(String databaseFile) {
 		this.databaseFile = databaseFile;
+	}
+
+	public String getHandleLinks() {
+		return handleLinks;
+	}
+
+	public void setHandleLinks(String handleLinks) {
+		this.handleLinks = handleLinks;
 	}
 
 	public boolean isAutoSaveOnExit() {
