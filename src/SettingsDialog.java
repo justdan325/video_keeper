@@ -19,10 +19,11 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
-public class SettingsDialog extends JDialog implements WindowListener{
+public class SettingsDialog extends JDialog implements WindowListener {
 	private static final String DIA_TITLE 			= "Settings";
 	private static final String BROWSE_BTN_TITLE 	= "Browse";
 	private static final String AUTO_SAVE_TITLE		= "Auto Save upon Exit";
+	private static final String CHECK_DUPL_TITLE	= "Check for Duplicate Videos";
 	private static final String SAVE_TITLE			= "Save";
 	private static final String EXPORT_TITLE		= "Export";
 	private static final String REFRESH_TITLE		= "Refresh";
@@ -41,6 +42,7 @@ public class SettingsDialog extends JDialog implements WindowListener{
 	private JButton exportButton;
 	private JButton refreshButton;
 	private JCheckBox autoSaveCheckbox;
+	private JCheckBox checkDuplCheckbox;
 	private MainGui parent;
 	private DataModel model;
 	private boolean locked;
@@ -57,6 +59,7 @@ public class SettingsDialog extends JDialog implements WindowListener{
 		this.exportButton = new JButton(EXPORT_TITLE);
 		this.refreshButton = new JButton(REFRESH_TITLE);
 		this.autoSaveCheckbox = new JCheckBox(AUTO_SAVE_TITLE);
+		this.checkDuplCheckbox = new JCheckBox(CHECK_DUPL_TITLE);
 		this.mainPanel = new JPanel(new GridLayout(4, 1));
 		this.parent = parent;
 		this.model = model;
@@ -131,6 +134,9 @@ public class SettingsDialog extends JDialog implements WindowListener{
 		autoSaveCheckbox.setHorizontalAlignment(JCheckBox.CENTER);
 		autoSaveCheckbox.setBackground(MainGui.PROG_COLOR_BKRND);
 		autoSaveCheckbox.setForeground(MainGui.PROG_COLOR_TXT_LT);
+		checkDuplCheckbox.setHorizontalAlignment(JCheckBox.CENTER);
+		checkDuplCheckbox.setBackground(MainGui.PROG_COLOR_BKRND);
+		checkDuplCheckbox.setForeground(MainGui.PROG_COLOR_TXT_LT);
 		
 		if(model.isAutoSaveOnExit()) {
 			autoSaveCheckbox.setSelected(true);
@@ -138,7 +144,14 @@ public class SettingsDialog extends JDialog implements WindowListener{
 			autoSaveCheckbox.setSelected(false);
 		}
 		
+		if(model.isCheckForDupl()) {
+			checkDuplCheckbox.setSelected(true);
+		} else {
+			checkDuplCheckbox.setSelected(false);
+		}
+		
 		checkboxPanel.add(autoSaveCheckbox);
+		checkboxPanel.add(checkDuplCheckbox);
 		
 		return checkboxPanel;
 	}
@@ -201,6 +214,17 @@ public class SettingsDialog extends JDialog implements WindowListener{
 					model.setAutoSaveOnExit(true);
 				} else if(arg0.getStateChange() == ItemEvent.DESELECTED) {
 					model.setAutoSaveOnExit(false);
+				}
+			}
+		});
+		
+		checkDuplCheckbox.addItemListener(new ItemListener() {
+			@Override
+			public void itemStateChanged(ItemEvent arg0) {
+				if(arg0.getStateChange() == ItemEvent.SELECTED) {
+					model.setCheckForDupl(true);
+				} else if(arg0.getStateChange() == ItemEvent.DESELECTED) {
+					model.setCheckForDupl(false);
 				}
 			}
 		});
@@ -329,6 +353,10 @@ public class SettingsDialog extends JDialog implements WindowListener{
 						exportButton.setBackground(MainGui.PROG_COLOR_BTN_DIS);
 						refreshButton.setEnabled(false);
 						refreshButton.setBackground(MainGui.PROG_COLOR_BTN_DIS);
+					}
+					
+					if(checkDuplCheckbox.isSelected() != model.isCheckForDupl()) {
+						checkDuplCheckbox.setSelected(model.isCheckForDupl());
 					}
 					
 					try {

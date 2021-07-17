@@ -12,6 +12,7 @@ public class Main {
 	public  static final String DEFAULT_DATABASE 	= "database.txt";
 	private static final String PROP_KEY_DATABASE	= "database";
 	private static final String PROP_KEY_AUTO_SAVE	= "autoSave";
+	private static final String PROP_KEY_CHECK_DUPL	= "checkDuplicates";
 	private static final String PROP_FILE			= "videokeeper.properties";
 	
 	private PropsFileUtil props;
@@ -66,6 +67,7 @@ public class Main {
 	private void init() {
 		String database = DEFAULT_DATABASE;
 		String autoSave = "1";
+		String checkDuplicates = "1";
 		File databaseFile;
 		
 		//get database
@@ -88,6 +90,19 @@ public class Main {
 			}
 		}
 		
+		//get check duplicates
+		if(!props.containsProp(PROP_KEY_CHECK_DUPL)) {
+			props.set(PROP_KEY_CHECK_DUPL, checkDuplicates);
+		} else {
+			checkDuplicates = props.get(PROP_KEY_CHECK_DUPL);
+			
+			if(checkDuplicates.trim().equals("1")) {
+				model.setCheckForDupl(true);
+			} else {
+				model.setCheckForDupl(false);
+			}
+		}
+		
 		databaseFile = new File(database);
 		model.setDatabaseFile(databaseFile.getAbsolutePath());
 		
@@ -104,6 +119,10 @@ public class Main {
 					//Check to see if model data differs from props. If so, save the props.
 					if(strToBool(props.get(PROP_KEY_AUTO_SAVE)) != model.isAutoSaveOnExit()) {
 						props.set(PROP_KEY_AUTO_SAVE, boolToStr(model.isAutoSaveOnExit()));
+					}
+					
+					if(strToBool(props.get(PROP_KEY_CHECK_DUPL)) != model.isCheckForDupl()) {
+						props.set(PROP_KEY_CHECK_DUPL, boolToStr(model.isCheckForDupl()));
 					}
 					
 					if(!props.get(PROP_KEY_DATABASE).trim().equals(model.getDatabaseFile().trim())) {

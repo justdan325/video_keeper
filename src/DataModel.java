@@ -2,10 +2,12 @@
 public class DataModel {
 	private String databaseFile;
 	private boolean autoSaveOnExit;
+	private boolean checkForDupl;
 	
 	public DataModel() {
 		this.databaseFile = Main.DEFAULT_DATABASE;
 		this.autoSaveOnExit = true;
+		this.checkForDupl = true;
 	}
 
 	public String getDatabaseFile() {
@@ -22,5 +24,13 @@ public class DataModel {
 
 	public void setAutoSaveOnExit(boolean autoSaveOnExit) {
 		this.autoSaveOnExit = autoSaveOnExit;
+	}
+
+	public boolean isCheckForDupl() {
+		return checkForDupl;
+	}
+
+	public void setCheckForDupl(boolean checkForDupl) {
+		this.checkForDupl = checkForDupl;
 	}
 }

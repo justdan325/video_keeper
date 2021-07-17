@@ -16,7 +16,6 @@ public class VideoKeeper
 	private VideoDataNode 	curr;
 	private MainGui 		mainGui;
 	private String			database;
-	private boolean			checkForDuplicates;
 	
 	public VideoKeeper(DataModel model, MainGui mainGui) {
 		this.model				= model;
@@ -26,7 +25,6 @@ public class VideoKeeper
 		this.mainGui 			= mainGui;
 		this.curr 				= null;
 		this.database			= model.getDatabaseFile();
-		this.checkForDuplicates = true;
 		
 		populateQueue();
 		monitorDatabase();
@@ -43,14 +41,14 @@ public class VideoKeeper
 	public void add(VideoDataNode item) {
 		boolean addItem = true;
 		
-		if(checkForDuplicates && mainQueue.contains(item)) {
+		if(model.isCheckForDupl() && mainQueue.contains(item)) {
 			int option = JOptionPane.showConfirmDialog(mainGui, "Link is already in watch list. Add anyway?", MainGui.PROG_NAME + " -- Duplicate Video",  JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
 
 			if(option == JOptionPane.YES_OPTION) {
 				option = JOptionPane.showConfirmDialog(mainGui, "Check for duplicates going forward?", MainGui.PROG_NAME + " -- Check for Duplicates?",  JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
 
 				if(option == JOptionPane.NO_OPTION) {
-					checkForDuplicates = false;
+					model.setCheckForDupl(false);
 				}
 			} else {
 				addItem = false;
