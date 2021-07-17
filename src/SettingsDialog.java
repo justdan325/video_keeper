@@ -382,6 +382,7 @@ public class SettingsDialog extends JDialog implements WindowListener {
 		this.refreshButton.setEnabled(!locked);
 		this.refreshButton.setBackground(locked ? MainGui.PROG_COLOR_BTN_DIS : MainGui.PROG_COLOR_BTN_EN);
 		this.autoSaveCheckbox.setEnabled(!locked);
+		this.checkDuplCheckbox.setEnabled(!locked);
 	}
 	
 	private void selectNewDatabaseFile() {
