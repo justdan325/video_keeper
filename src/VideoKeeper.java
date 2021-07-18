@@ -129,7 +129,7 @@ public class VideoKeeper {
 		}
 	}
 	
-	private synchronized void addSkipped() {
+	public synchronized void addSkipped() {
 		Queue temp = new Queue();
 		
 		if(skipQueue.size() > 0) {

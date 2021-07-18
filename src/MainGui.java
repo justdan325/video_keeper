@@ -2,7 +2,6 @@ import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.Toolkit;
 import java.awt.Font;
-import java.awt.Graphics;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
@@ -10,8 +9,10 @@ import java.awt.event.FocusAdapter;
 import java.awt.event.WindowListener;
 import java.awt.event.WindowEvent;
 import javax.swing.JTextField;
+import javax.swing.SwingConstants;
 import javax.swing.WindowConstants;
-import javax.swing.border.Border;
+
+
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
@@ -20,9 +21,7 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Component;
 import java.awt.GridLayout;
-import java.awt.Insets;
 import java.awt.FlowLayout;
 import java.awt.Dimension;
 
@@ -36,19 +35,21 @@ public class MainGui extends JFrame implements WindowListener {
 	public	static final Color	PROG_COLOR_TXT_LT	= Color.WHITE;
 	public	static final Color	PROG_COLOR_TXT_DRK	= Color.BLACK;
 	
-	private static final String PASTE_MESS 			= "<Paste URL Here>";
+	private static final String PASTE_MESS 			= "<Paste Video Link Here>";
 	private static final String NEXT_BUTTON_TXT 	= "Play Next";
 	private static final String PREV_BUTTON_TXT 	= "Play Prev.";
-	private static final String SKIP_BUTTON_TXT 	= "Skip Next";
+	private static final String SKIP_BUTTON_TXT 	= "Skip";
+	private static final String HEAD_BUTTON_TXT 	= "Head";
 	private static final String SETT_BUTTON_TXT 	= "*";
 	private static final String ADD_BUTTON_TXT 		= "Add";
-	private static final String ADD_LABEL_TXT 		= "Add New Video";
+	private static final String ADD_LABEL_TXT 		= "Add Video Links to Watch List.";
 	private static final String PASTE_BUTTON_TXT 	= "Paste";
 	private static final String TO_WATCH_TXT 		= "Videos:";
 	private static final String UP_NEXT_TXT			= " -- Up Next -- ";
-	private static final String EMPTY_QUEUE_TXT		= "~ No Videos in Watch List ~";
-	private static final String TOOLTIP_PASTE		= "Paste a URL from clip board.";
-	private static final String TOOLTIP_ADD			= "Add URL to watch list.";
+	private static final String EMPTY_QUEUE_TXT		= "~ No Video Links in Watch List ~";
+	private static final String TOOLTIP_PASTE		= "Paste a video link from the clip board.";
+	private static final String TOOLTIP_ADD			= "Add pasted video link to watch list.";
+	private static final String TOOLTIP_HEAD		= "Return to head of the watch list.";
 	private static final String TOOLTIP_SETTINGS	= "Settings";
 	private static final String CHANNEL_PREFIX 		= "By: ";
 	private static final int 	WIN_X 				= 600;
@@ -66,8 +67,9 @@ public class MainGui extends JFrame implements WindowListener {
 	private JButton addButton;
 	private JButton pasteButton;
 	private JButton skipButton;
+	private JButton headButton;
 	private JButton settButton;
-	private JLabel UP_NEXT_LABEL;
+	private JLabel upNextLabel;
 	private JLabel counterLabel;
 	private JLabel titleLabel;
 	private JLabel dateLabel;
@@ -76,6 +78,7 @@ public class MainGui extends JFrame implements WindowListener {
 	private JPanel mainPanel;
 	private int count;
 	private boolean locked;
+	private boolean skipped;
 	
 	public MainGui(DataModel model) {
 		this.model = model;
@@ -85,9 +88,10 @@ public class MainGui extends JFrame implements WindowListener {
 		this.prevButton = new JButton(PREV_BUTTON_TXT);
 		this.addButton = new JButton(ADD_BUTTON_TXT);
 		this.skipButton = new JButton(SKIP_BUTTON_TXT);
+		this.headButton = new JButton(HEAD_BUTTON_TXT);
 		this.settButton = new JButton(SETT_BUTTON_TXT);
 		this.pasteButton = new JButton(PASTE_BUTTON_TXT);
-		this.UP_NEXT_LABEL = new JLabel();
+		this.upNextLabel = new JLabel();
 		this.counterLabel = new JLabel("0");
 		this.titleLabel = new JLabel();
 		this.dateLabel = new JLabel();
@@ -96,6 +100,7 @@ public class MainGui extends JFrame implements WindowListener {
 		this.mainPanel = new JPanel(new BorderLayout());
 		this.count = 0;
 		this.locked = false;
+		this.skipped = false;
 		
 		mainPanel.add(makeNorthPanel(), BorderLayout.NORTH);
 		mainPanel.add(makeCenterPanel(), BorderLayout.CENTER);
@@ -119,10 +124,10 @@ public class MainGui extends JFrame implements WindowListener {
 		
 		north.setBackground(new Color(8617596));
 		
-		UP_NEXT_LABEL.setFont(new Font(PROG_FONT, Font.BOLD, UP_NEXT_FONT_SIZE));
-		UP_NEXT_LABEL.setText(UP_NEXT_TXT);
-		UP_NEXT_LABEL.setHorizontalAlignment(JLabel.CENTER);
-		UP_NEXT_LABEL.setForeground(PROG_COLOR_TXT_DRK);
+		upNextLabel.setFont(new Font(PROG_FONT, Font.BOLD, UP_NEXT_FONT_SIZE));
+		upNextLabel.setText(UP_NEXT_TXT);
+		upNextLabel.setHorizontalAlignment(JLabel.CENTER);
+		upNextLabel.setForeground(PROG_COLOR_TXT_DRK);
 		titleLabel.setFont(new Font(PROG_FONT, Font.TYPE1_FONT, VID_DATA_FONT_SIZE));
 		titleLabel.setText("Title: Test");
 		titleLabel.setHorizontalAlignment(JLabel.CENTER);
@@ -136,7 +141,7 @@ public class MainGui extends JFrame implements WindowListener {
 		channelLabel.setHorizontalAlignment(JLabel.CENTER);
 		channelLabel.setForeground(PROG_COLOR_TXT_DRK);
 		
-		north.add(UP_NEXT_LABEL);
+		north.add(upNextLabel);
 		north.add(titleLabel);
 		north.add(dateLabel);
 		north.add(channelLabel);
@@ -184,13 +189,15 @@ public class MainGui extends JFrame implements WindowListener {
 	}
 	
 	private JPanel makeSouthPanel() {
-		FlowLayout mainLayout = new FlowLayout();
+		FlowLayout mainLayout = new FlowLayout(SwingConstants.LEADING);
 		FlowLayout toWatchLayout = new FlowLayout();
-		GridLayout subLayout = new GridLayout();
+		FlowLayout subLayout = new FlowLayout(SwingConstants.LEADING);
+		final int BUTTON_LENGTH = 104;
+		final int BUTTON_WIDTH = 25;
 		
-		mainLayout.setHgap(60);
+		mainLayout.setHgap(25);
 		mainLayout.setVgap(40);
-		subLayout.setHgap(25);
+		subLayout.setHgap(15);
 		
 		JPanel south = new JPanel(mainLayout);
 		JPanel buttonPanel = new JPanel(subLayout);
@@ -204,12 +211,19 @@ public class MainGui extends JFrame implements WindowListener {
 		toWatchLabel.setForeground(PROG_COLOR_TXT_LT);
 		counterLabel.setForeground(PROG_COLOR_TXT_LT);
 		nextButton.setBackground(PROG_COLOR_BTN_EN);
+		nextButton.setPreferredSize(new Dimension(BUTTON_LENGTH, BUTTON_WIDTH));
 		skipButton.setBackground(PROG_COLOR_BTN_EN);
+		skipButton.setPreferredSize(new Dimension(BUTTON_LENGTH/2+20, BUTTON_WIDTH));
+		headButton.setBackground(PROG_COLOR_BTN_EN);
+		headButton.setPreferredSize(new Dimension(BUTTON_LENGTH/2+20, BUTTON_WIDTH));
+		headButton.setToolTipText(TOOLTIP_HEAD);
 		prevButton.setBackground(PROG_COLOR_BTN_EN);
+		prevButton.setPreferredSize(new Dimension(BUTTON_LENGTH, BUTTON_WIDTH));
 		
 		buttonPanel.add(nextButton);
-		buttonPanel.add(skipButton);
 		buttonPanel.add(prevButton);
+		buttonPanel.add(skipButton);
+		buttonPanel.add(headButton);
 		toWatchPanel.add(toWatchLabel);
 		toWatchPanel.add(counterLabel);
 		
@@ -235,8 +249,17 @@ public class MainGui extends JFrame implements WindowListener {
 		skipButton.addActionListener((new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				keeper.skipNext();
+				skipped = true;
 			}
 		}));
+		
+		headButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				keeper.addSkipped();
+				skipped = false;
+			}
+		});
 		
 		settButton.addActionListener((new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -312,7 +335,7 @@ public class MainGui extends JFrame implements WindowListener {
 					if(count > 0) {
 						nextButton.setEnabled(true);
 						nextButton.setBackground(PROG_COLOR_BTN_EN);
-						UP_NEXT_LABEL.setText(UP_NEXT_TXT);
+						upNextLabel.setText(UP_NEXT_TXT);
 						titleLabel.setText(keeper.getNextTitle(true));
 						titleLabel.setToolTipText(keeper.getNextTitle(false));
 						dateLabel.setText(keeper.getNextDate());
@@ -325,7 +348,7 @@ public class MainGui extends JFrame implements WindowListener {
 					} else {
 						nextButton.setEnabled(false);
 						nextButton.setBackground(PROG_COLOR_BTN_DIS);
-						UP_NEXT_LABEL.setText(EMPTY_QUEUE_TXT);
+						upNextLabel.setText(EMPTY_QUEUE_TXT);
 						titleLabel.setText(" ");
 						titleLabel.setToolTipText("");
 						dateLabel.setText(" ");
@@ -335,9 +358,19 @@ public class MainGui extends JFrame implements WindowListener {
 					if(count > 1) {
 						skipButton.setEnabled(true);
 						skipButton.setBackground(PROG_COLOR_BTN_EN);
+						
+						if(skipped) {
+							headButton.setEnabled(true);
+							headButton.setBackground(PROG_COLOR_BTN_EN);
+						} else {
+							headButton.setEnabled(false);
+							headButton.setBackground(PROG_COLOR_BTN_DIS);
+						}
 					} else {
 						skipButton.setEnabled(false);
 						skipButton.setBackground(PROG_COLOR_BTN_DIS);
+						headButton.setEnabled(false);
+						headButton.setBackground(PROG_COLOR_BTN_DIS);
 					}
 
 					if(keeper.getCurr() == null) {
