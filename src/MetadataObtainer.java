@@ -45,12 +45,12 @@ public class MetadataObtainer {
 		}
 	}
 	
-	public static void main(String[] args){
-		MetadataObtainer o = new MetadataObtainer("https://odysee.com/numark-pt-01-a-battery-powered-portable:2639e4cf547eb5746b7c67f3ec6db5a35628cb38");
-		System.out.println(o.getTitle());
-		System.out.println(o.getDate());
-		System.out.println(o.getChannel());
-	}
+//	public static void main(String[] args){
+//		MetadataObtainer o = new MetadataObtainer("");
+//		System.out.println(o.getTitle());
+//		System.out.println(o.getDate());
+//		System.out.println(o.getChannel());
+//	}
 	
 	public static boolean isSupported(String urlStr) {
 		boolean supported = false;
@@ -110,8 +110,8 @@ public class MetadataObtainer {
 				}
 			//Twitch
 			} else if(urlStr.startsWith(TWITCH_PREFIX_MOB)) {
-				String prefix = "content=\"default\"/><title>";
-				String suffix = " on Twitch</title>";
+				String prefix = "<title>";
+				String suffix = "</title>";
 				int begin = html.indexOf(prefix) + prefix.length();
 				int end = html.indexOf(suffix, begin);
 				
@@ -216,8 +216,8 @@ public class MetadataObtainer {
 				channel += " on YouTube";
 			//Twitch
 			} else if(urlStr.startsWith(TWITCH_PREFIX_MOB)) {
-				String prefix = "content=\"default\"/><title>";
-				String suffix = " on Twitch</title>";
+				String prefix = "<title>";
+				String suffix = "</title>";
 				int begin = html.indexOf(prefix) + prefix.length();
 				int end = html.indexOf(suffix, begin);
 				
@@ -233,7 +233,8 @@ public class MetadataObtainer {
 					channel = strArr[1];
 				}
 				
-				channel += " on Twitch";
+				//This is already contained in the title on Twitch
+//				channel += " on Twitch";
 			//Vimeo
 			} else if(urlStr.startsWith(VIMEO_PREFIX)) {
 				String prefix = "<span class=\"userlink userlink--md\">";
@@ -356,6 +357,7 @@ public class MetadataObtainer {
 				date = Instant.parse(date).atZone(ZoneId.of("America/Montreal"))
 						.format(DateTimeFormatter.ofLocalizedDateTime(FormatStyle.FULL).withLocale(Locale.US));
 				date = date.replaceAll("Eastern Daylight Time", "EDT");
+				date = date.replaceAll("Eastern Standard Time", "EST");
 			//Dailymotion
 			} else if(urlStr.startsWith(DAILYMOTION_PREFIX) || urlStr.startsWith(DAILYMOTION_PREFIX_W)
 					|| urlStr.startsWith(DAILYMOTION_PREFIX_MOB)) {
@@ -400,7 +402,7 @@ public class MetadataObtainer {
 			}*/
 		}
 		
-		if(date.length() > 55) {
+		if(date.length() > 100) {
 			date = "";
 		}
 		
