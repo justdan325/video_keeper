@@ -46,7 +46,8 @@ public class MetadataObtainer {
 	}
 	
 //	public static void main(String[] args){
-//		MetadataObtainer o = new MetadataObtainer("");
+//		MetadataObtainer o = new MetadataObtainer("https://youtu.be/LVdAgAZgFLM");
+////		MetadataObtainer o = new MetadataObtainer("https://www.youtube.com/watch?v=LVdAgAZgFLM");
 //		System.out.println(o.getTitle());
 //		System.out.println(o.getDate());
 //		System.out.println(o.getChannel());
@@ -97,17 +98,17 @@ public class MetadataObtainer {
 					title = html.substring(begin, end);
 					title = filterEscapeChars(title);
 				}
-			//YouTube Shortened Links
-			} else if(urlStr.startsWith(YOUTUBE_PREFIX_ABBR)) {
-				String prefix = "feature=youtu.be\"><title>";
-				String suffix = " - YouTube</title>";
-				int begin = html.indexOf(prefix) + prefix.length();
-				int end = html.indexOf(suffix, begin);
-				
-				if (begin != -1 && end != -1) {
-					title = html.substring(begin, end);
-					title = filterEscapeChars(title);
-				}
+			//YouTube Shortened Links -- Now dealt with in URL sanitization
+//			} else if(urlStr.startsWith(YOUTUBE_PREFIX_ABBR)) {
+//				String prefix = "feature=youtu.be\"><title>";
+//				String suffix = " - YouTube</title>";
+//				int begin = html.indexOf(prefix) + prefix.length();
+//				int end = html.indexOf(suffix, begin);
+//				
+//				if (begin != -1 && end != -1) {
+//					title = html.substring(begin, end);
+//					title = filterEscapeChars(title);
+//				}
 			//Twitch
 			} else if(urlStr.startsWith(TWITCH_PREFIX_MOB)) {
 				String prefix = "<title>";
@@ -457,6 +458,11 @@ public class MetadataObtainer {
 	
 	private static String sanitizeYoutube(String urlStr) {
 		String sanitized = urlStr;
+		
+		//convert to non-abbreviated link
+		if(urlStr.startsWith(YOUTUBE_PREFIX_ABBR)) {
+			sanitized = YOUTUBE_PREFIX_W + sanitized.substring(YOUTUBE_PREFIX_ABBR.length());
+		}
 		
 		//remove playlist data
 		if(urlStr.contains("&list=")) {
