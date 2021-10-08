@@ -190,6 +190,10 @@ public class VideoKeeper {
 	}
 	
 	public void refreshAll() {
+		ProgressBar progBar = new ProgressBar(mainGui);
+		
+		progBar.setMax(mainQueue.size());
+		progBar.showProgressBar();
 		skipQueue.clear();
 		mainQueue.clear();
 		populateQueue();
@@ -209,12 +213,15 @@ public class VideoKeeper {
 				}
 				
 				tempQ.push(temp);
+				progBar.progress();
 			}
 			
 			while(tempQ.size() > 0) {
 				mainQueue.push(tempQ.pop());
 			}
 		}
+		
+		progBar.kill();
 	}
 	
 	public String getNextTitle(boolean truncate) {

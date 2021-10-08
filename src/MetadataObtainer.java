@@ -45,14 +45,14 @@ public class MetadataObtainer {
 		}
 	}
 	
-	public static void main(String[] args){
-//		System.out.println(fetchHtml("https://www.youtube.com/embed/K9HmYzazDE0"));
-		MetadataObtainer o = new MetadataObtainer("https://www.youtube.com/watch?v=bw2Ptvxi_bg");
-		System.out.println(o.getTitle());
-		System.out.println(o.getDate());
-		System.out.println(o.getChannel());
-		System.out.println(o.getTime());
-	}
+//	public static void main(String[] args){
+////		System.out.println(fetchHtml("https://www.youtube.com/embed/K9HmYzazDE0"));
+//		MetadataObtainer o = new MetadataObtainer("https://www.youtube.com/watch?v=hcttfDyTQm8");
+//		System.out.println(o.getTitle());
+//		System.out.println(o.getDate());
+//		System.out.println(o.getChannel());
+//		System.out.println(o.getTime());
+//	}
 	
 	public static boolean isSupported(String urlStr) {
 		boolean supported = false;
