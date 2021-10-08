@@ -47,7 +47,8 @@ public class MetadataObtainer {
 	
 //	public static void main(String[] args){
 ////		System.out.println(fetchHtml("https://www.youtube.com/embed/K9HmYzazDE0"));
-//		MetadataObtainer o = new MetadataObtainer("https://www.youtube.com/watch?v=hcttfDyTQm8");
+////		MetadataObtainer o = new MetadataObtainer("https://www.youtube.com/watch?v=s1JfjEqBG8o");
+//		MetadataObtainer o = new MetadataObtainer("https://www.youtube.com/watch?v=bozGNWOKDEs");
 //		System.out.println(o.getTitle());
 //		System.out.println(o.getDate());
 //		System.out.println(o.getChannel());
@@ -495,18 +496,14 @@ public class MetadataObtainer {
 					time = hours + ":";
 				}
 
-				if (minutes > 0 && minutes < 10) {
+				if (minutes >= 0 && minutes < 10) {
 					time += "0";
-				} else if (minutes == 0) {
-					time += "00";
 				}
 
 				time += minutes + ":";
 
-				if (seconds > 0 && seconds < 10) {
+				if (seconds >= 0 && seconds < 10) {
 					time += "0";
-				} else if (seconds == 0) {
-					time += "00";
 				}
 
 				time += seconds;
