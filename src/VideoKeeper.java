@@ -86,6 +86,10 @@ public class VideoKeeper {
 						if(item.getChannel().length() < 1) {
 							item.setChannel(obtainer.getChannel());
 						}
+						
+						if(item.getTime().length() < 1) {
+							item.setTime(obtainer.getTime());
+						}
 					}
 				}
 			});
@@ -172,6 +176,10 @@ public class VideoKeeper {
 							if(temp.getChannel().length() < 1) {
 								temp.setChannel(obtainer.getChannel());
 							}
+							
+							if(temp.getTime().length() < 1) {
+								temp.setTime(obtainer.getTime());
+							}
 						}
 					}
 				}
@@ -197,6 +205,7 @@ public class VideoKeeper {
 					temp.setTitle(obtainer.getTitle());
 					temp.setDate(obtainer.getDate());
 					temp.setChannel(obtainer.getChannel());
+					temp.setTime(obtainer.getTime());
 				}
 				
 				tempQ.push(temp);
@@ -237,10 +246,18 @@ public class VideoKeeper {
 	public String getNextDate() {
 		String nextDate = "";
 
-		if(mainQueue.size() > 0) {
-			nextDate = mainQueue.peek().getDate();
-		} else if(mainQueue.size() == 0 && skipQueue.size() > 0) {
-			nextDate = skipQueue.peek().getDate();
+		if (mainQueue.size() > 0) {
+			if (mainQueue.peek().getDate().length() > 1 && mainQueue.peek().getTime().length() > 1) {
+				nextDate = mainQueue.peek().getDate() + "   ~   Len. " + mainQueue.peek().getTime();
+			} else {
+				nextDate = mainQueue.peek().getDate() + mainQueue.peek().getTime();
+			}
+		} else if (mainQueue.size() == 0 && skipQueue.size() > 0) {
+			if (skipQueue.peek().getDate().length() > 1 && skipQueue.peek().getTime().length() > 1) {
+				nextDate = skipQueue.peek().getDate() + "   ~   Len. " + skipQueue.peek().getTime();
+			} else {
+				nextDate = skipQueue.peek().getDate() + skipQueue.peek().getTime();
+			}
 		}
 		
 		return nextDate;

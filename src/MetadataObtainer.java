@@ -45,13 +45,14 @@ public class MetadataObtainer {
 		}
 	}
 	
-//	public static void main(String[] args){
-//		MetadataObtainer o = new MetadataObtainer("https://youtu.be/LVdAgAZgFLM");
-////		MetadataObtainer o = new MetadataObtainer("https://www.youtube.com/watch?v=LVdAgAZgFLM");
-//		System.out.println(o.getTitle());
-//		System.out.println(o.getDate());
-//		System.out.println(o.getChannel());
-//	}
+	public static void main(String[] args){
+//		System.out.println(fetchHtml("https://www.youtube.com/embed/K9HmYzazDE0"));
+		MetadataObtainer o = new MetadataObtainer("https://www.youtube.com/watch?v=bw2Ptvxi_bg");
+		System.out.println(o.getTitle());
+		System.out.println(o.getDate());
+		System.out.println(o.getChannel());
+		System.out.println(o.getTime());
+	}
 	
 	public static boolean isSupported(String urlStr) {
 		boolean supported = false;
@@ -275,6 +276,10 @@ public class MetadataObtainer {
 						channel = html.substring(begin, end);
 						channel = filterEscapeChars(channel);
 					}
+					
+					if(!channel.contains("@") || channel.length() > 150) {
+						channel = "Anonymous";
+					}
 				}
 
 				channel += " on Odysee";
@@ -408,6 +413,109 @@ public class MetadataObtainer {
 		}
 		
 		return date;
+	}
+	
+	public String getTime() {
+		String time = "";
+		int seconds = 0;
+		
+		if(!isUrlError()) {
+			//YouTube
+			if(urlStr.startsWith(YOUTUBE_PREFIX) || urlStr.startsWith(YOUTUBE_PREFIX_W) || urlStr.startsWith(YOUTUBE_PREFIX_ABBR)) {
+				//get URL for the embedded YouTube video
+				String prefix = "<meta property=\"og:video:url\" content=\"";
+				String suffix = "\">";
+				String embedded = null;
+				int begin = html.indexOf(prefix) + prefix.length();
+				int end = html.indexOf(suffix, begin);
+				
+				if (begin != -1 && end != -1) {
+					embedded = html.substring(begin, end);
+					
+					//get the embedded video html, which has a category for video seconds
+					String embeddedHtml = fetchHtml(embedded);
+					prefix = "videoDurationSeconds";
+					suffix = "\\\"";
+					begin = embeddedHtml.indexOf(prefix) + 5 + prefix.length();
+					end = embeddedHtml.indexOf(suffix, begin);
+					
+					if (begin != -1 && end != -1) {
+						try {
+							seconds = Integer.parseInt(embeddedHtml.substring(begin, end));
+						} catch (Exception e) {
+							seconds = -1;
+						}
+
+						time = convertSecondsToTimeStr(seconds);
+					}
+				}
+			//Odysee
+			} else if(urlStr.startsWith(ODYSEE_PREFIX)) {
+				String prefix = "<meta property=\"og:video:duration\" content=\"";
+				String suffix = "\"/";
+				int begin = html.indexOf(prefix) + prefix.length();
+				int end = html.indexOf(suffix, begin);
+				
+				if (begin != -1 && end != -1) {
+					time = html.substring(begin, end);
+				}
+				
+				try {
+					seconds = Integer.parseInt(time);
+				} catch (Exception e) {
+					seconds = -1;
+
+					System.err.print("Could not obtain video seconds:");
+					e.printStackTrace();
+				}
+				
+				time = convertSecondsToTimeStr(seconds);
+			}
+		}
+		
+		return time;
+	}
+	
+	private String convertSecondsToTimeStr(int seconds) {
+		String time = "";
+		int minutes = 0;
+		int hours = 0;
+		
+		if (seconds > 0) {
+			if (seconds >= 60) {
+				minutes = seconds/60;
+				seconds = seconds%60;
+				
+				if (minutes >= 60) {
+					hours = minutes / 60;
+					minutes = minutes % 60;
+				}
+				
+				if (hours > 0) {
+					time = hours + ":";
+				}
+
+				if (minutes > 0 && minutes < 10) {
+					time += "0";
+				} else if (minutes == 0) {
+					time += "00";
+				}
+
+				time += minutes + ":";
+
+				if (seconds > 0 && seconds < 10) {
+					time += "0";
+				} else if (seconds == 0) {
+					time += "00";
+				}
+
+				time += seconds;
+			} else {
+				time = "0:" + seconds;
+			}
+		}
+		
+		return time;
 	}
 	
 	private static String fetchHtml(String url) {

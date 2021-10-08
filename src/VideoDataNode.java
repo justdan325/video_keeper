@@ -5,9 +5,10 @@ public class VideoDataNode {
 	private String title;
 	private String date;
 	private String channel;
+	private String time;
 	private boolean empty;
 	
-	//String format: URL|title|date|channel
+	//String format: URL|title|date|channel|time
 	
 	public VideoDataNode() {
 		clear();
@@ -38,6 +39,10 @@ public class VideoDataNode {
 				if(contents.length >= 4) {
 					this.channel = contents[3];
 				}
+				
+				if(contents.length >= 5) {
+					this.time = contents[4];
+				}
 			} else {
 				clear();
 			}
@@ -49,6 +54,7 @@ public class VideoDataNode {
 		this.title = "";
 		this.date = "";
 		this.channel = "";
+		this.time = "";
 		this.empty = true;
 	}
 	
@@ -108,6 +114,22 @@ public class VideoDataNode {
 		}
 	}
 	
+	public String getTime() {
+		return time;
+	}
+	
+	public void setTime(String time) {
+		if(time == null) {
+			this.channel = "";
+		} else {
+			if(time.contains(DELIM)) {
+				time = time.replaceAll("\\" + DELIM, "_");
+			}
+			
+			this.time = time;
+		}
+	}
+	
 	public boolean isEmpty() {
 		return empty;
 	}
@@ -116,7 +138,7 @@ public class VideoDataNode {
 		String str = "";
 		
 		if(!empty) {
-			str = url + DELIM + title + DELIM + date + DELIM + channel;
+			str = url + DELIM + title + DELIM + date + DELIM + channel + DELIM + time;
 		}
 		
 		return str;
