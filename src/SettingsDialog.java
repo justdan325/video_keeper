@@ -369,7 +369,9 @@ public class SettingsDialog extends JDialog implements WindowListener {
 				
 				Object customSelection = JOptionPane.showInputDialog(parent, MESS2, MainGui.PROG_NAME + " -- Custom Link Operation", JOptionPane.QUESTION_MESSAGE, null, null, initialSelection);
 				
-				model.setHandleLinks(VideoKeeper.LNK_HNDL_CUST + customSelection + ">");
+				if (customSelection != null) {
+					model.setHandleLinks(VideoKeeper.LNK_HNDL_CUST + customSelection + ">");
+				}
 			}
 		}
 	}
