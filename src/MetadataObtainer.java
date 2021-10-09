@@ -45,15 +45,15 @@ public class MetadataObtainer {
 		}
 	}
 	
-//	public static void main(String[] args){
-////		System.out.println(fetchHtml("https://www.youtube.com/embed/K9HmYzazDE0"));
-////		MetadataObtainer o = new MetadataObtainer("https://www.youtube.com/watch?v=s1JfjEqBG8o");
-//		MetadataObtainer o = new MetadataObtainer("https://www.youtube.com/watch?v=bozGNWOKDEs");
-//		System.out.println(o.getTitle());
-//		System.out.println(o.getDate());
-//		System.out.println(o.getChannel());
-//		System.out.println(o.getTime());
-//	}
+	public static void main(String[] args){
+//		System.out.println(fetchHtml("https://www.youtube.com/embed/K9HmYzazDE0"));
+//		MetadataObtainer o = new MetadataObtainer("https://www.youtube.com/watch?v=s1JfjEqBG8o");
+		MetadataObtainer o = new MetadataObtainer("https://www.twitch.tv/videos/1149968192");
+		System.out.println(o.getTitle());
+		System.out.println(o.getDate());
+		System.out.println(o.getChannel());
+		System.out.println(o.getTime());
+	}
 	
 	public static boolean isSupported(String urlStr) {
 		boolean supported = false;
@@ -450,8 +450,8 @@ public class MetadataObtainer {
 						time = convertSecondsToTimeStr(seconds);
 					}
 				}
-			//Odysee
-			} else if(urlStr.startsWith(ODYSEE_PREFIX)) {
+			//Odysee and Twitch (not 100% Reliable for Twitch)
+			} else if(urlStr.startsWith(ODYSEE_PREFIX) || urlStr.startsWith(TWITCH_PREFIX_MOB)) {
 				String prefix = "<meta property=\"og:video:duration\" content=\"";
 				String suffix = "\"/";
 				int begin = html.indexOf(prefix) + prefix.length();
@@ -465,13 +465,10 @@ public class MetadataObtainer {
 					seconds = Integer.parseInt(time);
 				} catch (Exception e) {
 					seconds = -1;
-
-					System.err.print("Could not obtain video seconds:");
-					e.printStackTrace();
 				}
 				
 				time = convertSecondsToTimeStr(seconds);
-			}
+			} 
 		}
 		
 		return time;

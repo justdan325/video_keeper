@@ -27,12 +27,14 @@ public class SettingsDialog extends JDialog implements WindowListener {
 	private static final String SAVE_TITLE			= "Save";
 	private static final String EXPORT_TITLE		= "Export";
 	private static final String REFRESH_TITLE		= "Refresh";
+	private static final String OPEN_OP_TITLE		= "Open Op.";
 	private static final String TOOLTIP_SAVE		= "Save changes to the watch list.";
 	private static final String TOOLTIP_EXPORT		= "Export watch list to text file of URLs.";
 	private static final String TOOLTIP_REFRESH		= "Reload the watch list and re-fetch video metadata.";
+	private static final String TOOLTIP_OPEN_OP		= "Select the operation for how to open video links.";
 	private static final int 	WIN_X 				= 500;
 	private static final int 	WIN_Y 				= 325;
-	private static final int	BTN_X				= 90;
+	private static final int	BTN_X				= 105;
 	private static final int	BTN_Y				= 30;
 	
 	private JTextField dbFileTextField;
@@ -41,6 +43,7 @@ public class SettingsDialog extends JDialog implements WindowListener {
 	private JButton saveButton;
 	private JButton exportButton;
 	private JButton refreshButton;
+	private JButton openOpButton;
 	private JCheckBox autoSaveCheckbox;
 	private JCheckBox checkDuplCheckbox;
 	private MainGui parent;
@@ -58,6 +61,7 @@ public class SettingsDialog extends JDialog implements WindowListener {
 		this.saveButton = new JButton(SAVE_TITLE);
 		this.exportButton = new JButton(EXPORT_TITLE);
 		this.refreshButton = new JButton(REFRESH_TITLE);
+		this.openOpButton = new JButton(OPEN_OP_TITLE);
 		this.autoSaveCheckbox = new JCheckBox(AUTO_SAVE_TITLE);
 		this.checkDuplCheckbox = new JCheckBox(CHECK_DUPL_TITLE);
 		this.mainPanel = new JPanel(new GridLayout(4, 1));
@@ -157,7 +161,7 @@ public class SettingsDialog extends JDialog implements WindowListener {
 	}
 	
 	private JPanel makeButtonPanel() {
-		JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 30, 0));
+		JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 0));
 		
 		buttonPanel.setBackground(MainGui.PROG_COLOR_BKRND);
 
@@ -170,10 +174,14 @@ public class SettingsDialog extends JDialog implements WindowListener {
 		refreshButton.setPreferredSize(new Dimension(BTN_X, BTN_Y));
 		refreshButton.setToolTipText(TOOLTIP_REFRESH);
 		refreshButton.setBackground(MainGui.PROG_COLOR_BTN_EN);
+		openOpButton.setPreferredSize(new Dimension(BTN_X, BTN_Y));
+		openOpButton.setToolTipText(TOOLTIP_OPEN_OP);
+		openOpButton.setBackground(MainGui.PROG_COLOR_BTN_EN);
 		
 		buttonPanel.add(saveButton);
 		buttonPanel.add(exportButton);
 		buttonPanel.add(refreshButton);
+		buttonPanel.add(openOpButton);
 		
 		return buttonPanel;
 	}
@@ -197,6 +205,13 @@ public class SettingsDialog extends JDialog implements WindowListener {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				refresh();
+			}
+		});
+		
+		openOpButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				openOp();
 			}
 		});
 		
@@ -315,6 +330,50 @@ public class SettingsDialog extends JDialog implements WindowListener {
 		thread.start();
 	}
 	
+	private void openOp() {
+		final String MESS = "Select how video links should be opened.";
+		final String[] OPTIONS = {"Open link in default browser", "Copy link to clip board", "Custom command"};
+		String initialSelection = "";
+		
+		switch(model.getHandleLinks()) {
+			case VideoKeeper.LNK_HNDL_DEFAULT:
+				initialSelection = OPTIONS[0];
+				break;
+			case VideoKeeper.LNK_HNDL_COPY:
+				initialSelection = OPTIONS[1];
+				break;
+			default:
+				initialSelection = OPTIONS[2];
+		}
+		
+		Object selection = JOptionPane.showInputDialog(parent, MESS, MainGui.PROG_NAME + " -- Set Open Operation", JOptionPane.QUESTION_MESSAGE, null, OPTIONS, initialSelection);
+		
+		if (selection != null) {
+			if (((String) selection).equals(OPTIONS[0])) {
+				model.setHandleLinks(VideoKeeper.LNK_HNDL_DEFAULT);
+			} else if (((String) selection).equals(OPTIONS[1])) {
+				model.setHandleLinks(VideoKeeper.LNK_HNDL_COPY);
+			} else if (((String) selection).equals(OPTIONS[2])) {
+				final String MESS2 = "Enter a custom command. The variable for the link is \"" + VideoKeeper.LNK_HNDL_LNK_VAR + "\"";
+				final String EXAMPLE = "example: xdg-open " + VideoKeeper.LNK_HNDL_LNK_VAR;
+				
+				//If it's already a custom command, display that on the input field. Else put an example.
+				if(initialSelection.contentEquals(OPTIONS[2])) {
+					String current = model.getHandleLinks();
+					
+					//strip off the "CUSTOM" tag and the angle brackets.
+					initialSelection = current.substring(VideoKeeper.LNK_HNDL_CUST.length(), current.length()-1);
+				} else {
+					initialSelection = EXAMPLE;
+				}
+				
+				Object customSelection = JOptionPane.showInputDialog(parent, MESS2, MainGui.PROG_NAME + " -- Custom Link Operation", JOptionPane.QUESTION_MESSAGE, null, null, initialSelection);
+				
+				model.setHandleLinks(VideoKeeper.LNK_HNDL_CUST + customSelection + ">");
+			}
+		}
+	}
+	
 	private void monitor() {
 		Thread thread = new Thread(new Runnable() {
 			@Override
@@ -381,6 +440,8 @@ public class SettingsDialog extends JDialog implements WindowListener {
 		this.exportButton.setBackground(locked ? MainGui.PROG_COLOR_BTN_DIS : MainGui.PROG_COLOR_BTN_EN);
 		this.refreshButton.setEnabled(!locked);
 		this.refreshButton.setBackground(locked ? MainGui.PROG_COLOR_BTN_DIS : MainGui.PROG_COLOR_BTN_EN);
+		this.openOpButton.setEnabled(!locked);
+		this.openOpButton.setBackground(locked ? MainGui.PROG_COLOR_BTN_DIS : MainGui.PROG_COLOR_BTN_EN);
 		this.autoSaveCheckbox.setEnabled(!locked);
 		this.checkDuplCheckbox.setEnabled(!locked);
 	}

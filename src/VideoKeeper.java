@@ -12,10 +12,10 @@ import java.awt.datatransfer.StringSelection;
 
 
 public class VideoKeeper {
-	private static final String LNK_HNDL_DEFAULT 	= Main.DEFAULT_HNDL_LNKS;
-	private static final String LNK_HNDL_COPY 		= "COPY";
-	private static final String LNK_HNDL_CUST 		= "CUSTOM<";
-	private static final String LNK_HNDL_LNK_VAR 	= "%VIDEOLINK%";
+	public static final String LNK_HNDL_DEFAULT 	= Main.DEFAULT_HNDL_LNKS;
+	public static final String LNK_HNDL_COPY 		= "COPY";
+	public static final String LNK_HNDL_CUST 		= "CUSTOM<";
+	public static final String LNK_HNDL_LNK_VAR 	= "%VIDEOLINK%";
 	
 	private DataModel		model;
 	private Queue 			mainQueue;
