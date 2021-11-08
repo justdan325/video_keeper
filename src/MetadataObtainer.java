@@ -45,15 +45,15 @@ public class MetadataObtainer {
 		}
 	}
 	
-	public static void main(String[] args){
-//		System.out.println(fetchHtml("https://www.youtube.com/embed/K9HmYzazDE0"));
-//		MetadataObtainer o = new MetadataObtainer("https://www.youtube.com/watch?v=s1JfjEqBG8o");
-		MetadataObtainer o = new MetadataObtainer("https://www.twitch.tv/videos/1149968192");
-		System.out.println(o.getTitle());
-		System.out.println(o.getDate());
-		System.out.println(o.getChannel());
-		System.out.println(o.getTime());
-	}
+//	public static void main(String[] args){
+////		System.out.println(fetchHtml("https://odysee.com/win11:6d73df3083e0f634b18f54521763184b47980d8a"));
+////		MetadataObtainer o = new MetadataObtainer("https://www.youtube.com/watch?v=s1JfjEqBG8o");
+//		MetadataObtainer o = new MetadataObtainer("https://odysee.com/win11:6d73df3083e0f634b18f54521763184b47980d8a");
+//		System.out.println(o.getTitle());
+//		System.out.println(o.getDate());
+//		System.out.println(o.getChannel());
+//		System.out.println(o.getTime());
+//	}
 	
 	public static boolean isSupported(String urlStr) {
 		boolean supported = false;
@@ -269,8 +269,8 @@ public class MetadataObtainer {
 					}
 				} else {
 					String prefix = "content=\"@";
-					String suffix = "\"/>";
-					int begin = html.indexOf(prefix) + prefix.length() - 1;
+					String suffix = "\"";
+					int begin = html.lastIndexOf(prefix) + prefix.length() - 1;
 					int end = html.indexOf(suffix, begin);
 
 					if (begin != -1 && end != -1) {

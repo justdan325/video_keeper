@@ -1,4 +1,3 @@
-
 public class DataModel {
 	private String databaseFile;
 	private String handleLinks;
