@@ -9,13 +9,14 @@ import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 
 public class Main {
-	public  static final String DEFAULT_DATABASE 	= "database.txt";
-	public  static final String DEFAULT_HNDL_LNKS 	= "DEFAULT";
-	private static final String PROP_KEY_DATABASE	= "database";
-	private static final String PROP_KEY_AUTO_SAVE	= "autoSave";
-	private static final String PROP_KEY_CHECK_DUPL	= "checkDuplicates";
-	private static final String PROP_KEY_HNDL_LNKS	= "handleLinks";
-	private static final String PROP_FILE			= "videokeeper.properties";
+	public  static final String DEFAULT_DATABASE 		= "database.txt";
+	public  static final String DEFAULT_HNDL_LNKS 		= "DEFAULT";
+	private static final String PROP_KEY_DATABASE		= "database";
+	private static final String PROP_KEY_AUTO_SAVE		= "autoSave";
+	private static final String PROP_KEY_CHECK_DUPL		= "checkDuplicates";
+	private static final String PROP_KEY_HNDL_LNKS		= "handleLinks";
+	private static final String PROP_KEY_PREV_HNDL_LNKS	= "prevHandleLinks";
+	private static final String PROP_FILE				= "videokeeper.properties";
 	
 	private PropsFileUtil props;
 	private DataModel model;
@@ -71,6 +72,7 @@ public class Main {
 		String autoSave = "1";
 		String checkDuplicates = "1";
 		String handleLinks = DEFAULT_HNDL_LNKS;
+		String previousHandleLinks = "";
 		File databaseFile;
 		
 		//get database
@@ -113,9 +115,17 @@ public class Main {
 			handleLinks = props.get(PROP_KEY_HNDL_LNKS);
 		}
 		
+		//get prev handle links 
+		if(!props.containsProp(PROP_KEY_PREV_HNDL_LNKS)) {
+			props.set(PROP_KEY_PREV_HNDL_LNKS, previousHandleLinks);
+		} else {
+			previousHandleLinks = props.get(PROP_KEY_PREV_HNDL_LNKS);
+		}
+		
 		databaseFile = new File(database);
 		model.setDatabaseFile(databaseFile.getAbsolutePath());
 		model.setHandleLinks(handleLinks);
+		model.setPreviousHandleLinks(previousHandleLinks);
 		
 		monitorProperties();
 		
@@ -142,6 +152,10 @@ public class Main {
 					
 					if(!props.get(PROP_KEY_HNDL_LNKS).trim().equals(model.getHandleLinks().trim())) {
 						props.set(PROP_KEY_HNDL_LNKS, model.getHandleLinks().trim());
+					}
+					
+					if(!props.get(PROP_KEY_PREV_HNDL_LNKS).trim().equals(model.getPreviousHandleLinks().trim())) {
+						props.set(PROP_KEY_PREV_HNDL_LNKS, model.getPreviousHandleLinks().trim());
 					}
 					
 					try {

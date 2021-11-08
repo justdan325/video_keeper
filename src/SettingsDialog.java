@@ -332,34 +332,49 @@ public class SettingsDialog extends JDialog implements WindowListener {
 	
 	private void openOp() {
 		final String MESS = "Select how video links should be opened.";
-		final String[] OPTIONS = {"Open link in default browser", "Copy link to clip board", "Custom command"};
+		String[] options = {"Open link in default browser", "Copy link to clip board", "Custom command"};
 		String initialSelection = "";
 		
 		switch(model.getHandleLinks()) {
 			case VideoKeeper.LNK_HNDL_DEFAULT:
-				initialSelection = OPTIONS[0];
+				initialSelection = options[0];
 				break;
 			case VideoKeeper.LNK_HNDL_COPY:
-				initialSelection = OPTIONS[1];
+				initialSelection = options[1];
 				break;
 			default:
-				initialSelection = OPTIONS[2];
+				initialSelection = options[2];
 		}
 		
-		Object selection = JOptionPane.showInputDialog(parent, MESS, MainGui.PROG_NAME + " -- Set Open Operation", JOptionPane.QUESTION_MESSAGE, null, OPTIONS, initialSelection);
+		if(model.getPreviousHandleLinks() != null && model.getPreviousHandleLinks().length() > 0) {
+			options = new String[] {"Open link in default browser", "Copy link to clip board", "Custom command", "Previous custom command"};
+		}
+		
+		Object selection = JOptionPane.showInputDialog(parent, MESS, MainGui.PROG_NAME + " -- Set Open Operation", JOptionPane.QUESTION_MESSAGE, null, options, initialSelection);
 		
 		if (selection != null) {
-			if (((String) selection).equals(OPTIONS[0])) {
+			if (((String) selection).equals(options[0])) {
+				if(initialSelection.equals(options[2])) {
+					model.setPreviousHandleLinks(model.getHandleLinks());
+				}
+				
 				model.setHandleLinks(VideoKeeper.LNK_HNDL_DEFAULT);
-			} else if (((String) selection).equals(OPTIONS[1])) {
+			} else if (((String) selection).equals(options[1])) {
+				if(initialSelection.equals(options[2])) {
+					model.setPreviousHandleLinks(model.getHandleLinks());
+				}
+				
 				model.setHandleLinks(VideoKeeper.LNK_HNDL_COPY);
-			} else if (((String) selection).equals(OPTIONS[2])) {
+			} else if (((String) selection).equals(options[2])) {
 				final String MESS2 = "Enter a custom command. The variable for the link is \"" + VideoKeeper.LNK_HNDL_LNK_VAR + "\"";
 				final String EXAMPLE = "example: xdg-open " + VideoKeeper.LNK_HNDL_LNK_VAR;
+				boolean currentlyCustom = false;
 				
 				//If it's already a custom command, display that on the input field. Else put an example.
-				if(initialSelection.contentEquals(OPTIONS[2])) {
+				if(initialSelection.equals(options[2])) {
 					String current = model.getHandleLinks();
+					
+					currentlyCustom = true;
 					
 					//strip off the "CUSTOM" tag and the angle brackets.
 					initialSelection = current.substring(VideoKeeper.LNK_HNDL_CUST.length(), current.length()-1);
@@ -370,7 +385,26 @@ public class SettingsDialog extends JDialog implements WindowListener {
 				Object customSelection = JOptionPane.showInputDialog(parent, MESS2, MainGui.PROG_NAME + " -- Custom Link Operation", JOptionPane.QUESTION_MESSAGE, null, null, initialSelection);
 				
 				if (customSelection != null) {
+					if (currentlyCustom && !customSelection.equals(initialSelection)) {
+						model.setPreviousHandleLinks(model.getHandleLinks());
+					}
+
 					model.setHandleLinks(VideoKeeper.LNK_HNDL_CUST + customSelection + ">");
+				}
+			} else if(options.length == 4 && ((String) selection).equals(options[3])) {
+				String prevOp = model.getPreviousHandleLinks().replace(VideoKeeper.LNK_HNDL_CUST, "");
+				prevOp = prevOp.substring(0, prevOp.length()-1);
+				
+				int choice = JOptionPane.showConfirmDialog(parent, "Use previous custom link operation:\n" + prevOp, MainGui.PROG_NAME, JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null);
+				
+				if(choice == JOptionPane.OK_OPTION) {
+					String currentOp = model.getHandleLinks();
+					
+					model.setHandleLinks(model.getPreviousHandleLinks());
+					
+					if(currentOp.startsWith(VideoKeeper.LNK_HNDL_CUST)) {
+						model.setPreviousHandleLinks(currentOp);
+					}
 				}
 			}
 		}

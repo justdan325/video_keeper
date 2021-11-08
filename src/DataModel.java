@@ -1,6 +1,7 @@
 public class DataModel {
 	private String databaseFile;
 	private String handleLinks;
+	private String previousHandleLinks;
 	private boolean autoSaveOnExit;
 	private boolean checkForDupl;
 	
@@ -25,6 +26,14 @@ public class DataModel {
 
 	public void setHandleLinks(String handleLinks) {
 		this.handleLinks = handleLinks;
+	}
+
+	public String getPreviousHandleLinks() {
+		return previousHandleLinks;
+	}
+
+	public void setPreviousHandleLinks(String previousHandleLinks) {
+		this.previousHandleLinks = previousHandleLinks;
 	}
 
 	public boolean isAutoSaveOnExit() {
