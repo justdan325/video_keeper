@@ -1,16 +1,9 @@
 import java.util.Scanner;
 import java.net.URLConnection;
-import java.sql.Time;
 import java.net.URL;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.Locale;
-import java.text.DateFormat;
-import java.text.DateFormatSymbols;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
+import java.util.Optional;
 import java.time.Instant;
-import java.time.YearMonth;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
@@ -30,11 +23,13 @@ public class MetadataObtainer {
 	private static final String BITCHUTE_PREFIX_W		= "https://www.bitchute.com/video/";
 	private static final String BITCHUTE_PREFIX			= "https://bitchute.com/video/";
 	
+	private Optional<String> atTime;
 	private String urlStr;
 	private String html;
 	private boolean isSupported;
 	
 	public MetadataObtainer(String urlStr) {
+		this.atTime = Optional.empty();
 		this.urlStr = sanitize(urlStr);
 		this.isSupported = isSupported(urlStr);
 	
@@ -45,15 +40,15 @@ public class MetadataObtainer {
 		}
 	}
 	
-//	public static void main(String[] args){
-////		System.out.println(fetchHtml("https://odysee.com/win11:6d73df3083e0f634b18f54521763184b47980d8a"));
-////		MetadataObtainer o = new MetadataObtainer("https://www.youtube.com/watch?v=s1JfjEqBG8o");
-//		MetadataObtainer o = new MetadataObtainer("https://odysee.com/win11:6d73df3083e0f634b18f54521763184b47980d8a");
-//		System.out.println(o.getTitle());
-//		System.out.println(o.getDate());
-//		System.out.println(o.getChannel());
-//		System.out.println(o.getTime());
-//	}
+	public static void main(String[] args){
+//		System.out.println(fetchHtml("https://odysee.com/win11:6d73df3083e0f634b18f54521763184b47980d8a"));
+//		MetadataObtainer o = new MetadataObtainer("https://www.youtube.com/watch?v=s1JfjEqBG8o");
+		MetadataObtainer o = new MetadataObtainer("https://youtu.be/r1RCSsWpHkg?t=1791");
+		System.out.println(o.getTitle());
+		System.out.println(o.getDate());
+		System.out.println(o.getChannel());
+		System.out.println(o.getTime());
+	}
 	
 	public static boolean isSupported(String urlStr) {
 		boolean supported = false;
@@ -450,6 +445,10 @@ public class MetadataObtainer {
 						time = convertSecondsToTimeStr(seconds);
 					}
 				}
+				
+				if(atTime.isPresent()) {
+					time += " (in progress " + convertSecondsToTimeStr(Integer.parseInt(atTime.get())) + ")";
+				}
 			//Odysee and Twitch (not 100% Reliable for Twitch)
 			} else if(urlStr.startsWith(ODYSEE_PREFIX) || urlStr.startsWith(TWITCH_PREFIX_MOB)) {
 				String prefix = "<meta property=\"og:video:duration\" content=\"";
@@ -535,7 +534,7 @@ public class MetadataObtainer {
 		return content;
 	}
 	
-	private static String sanitize(String urlStr) {
+	private String sanitize(String urlStr) {
 		String sanitized = urlStr;
 		
 		//https fix
@@ -558,7 +557,7 @@ public class MetadataObtainer {
 		return sanitized;
 	}
 	
-	private static String sanitizeYoutube(String urlStr) {
+	private String sanitizeYoutube(String urlStr) {
 		String sanitized = urlStr;
 		
 		//convert to non-abbreviated link
@@ -578,7 +577,11 @@ public class MetadataObtainer {
 		
 		//remove time tags
 		if(urlStr.contains("&t=")) {
+			this.atTime = Optional.of(sanitized.substring(sanitized.indexOf("&t=") + 3));
 			sanitized = sanitized.substring(0, sanitized.indexOf("&t="));
+		} else if(urlStr.contains("?t=")) {
+			this.atTime = Optional.of(sanitized.substring(sanitized.indexOf("?t=") + 3));
+			sanitized = sanitized.substring(0, sanitized.indexOf("?t="));
 		}
 		
 		return sanitized;
