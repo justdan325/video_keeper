@@ -1,35 +1,41 @@
 import java.util.LinkedList;
 import java.io.*;
-import java.nio.file.*;
 import java.util.Scanner;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.awt.*;
+
+import javax.swing.JDialog;
 import javax.swing.JOptionPane;
 import java.net.URL;
-import java.awt.datatransfer.ClipboardOwner;
 import java.awt.datatransfer.StringSelection;
-import javax.swing.JFrame;
 
 
-public class VideoKeeper
-{
-	private Queue 			mainQueue;
-	private Queue 			addedQueue;
-	private Queue			skipQueue;
-	private String 		database;
-	private VideoDataNode 	curr;
-	private JFrame 		frame;
-	private boolean		checkForDuplicates;
+public class VideoKeeper {
+	public static final String LNK_HNDL_DEFAULT 	= Main.DEFAULT_HNDL_LNKS;
+	public static final String LNK_HNDL_COPY 		= "COPY";
+	public static final String LNK_HNDL_CUST 		= "CUSTOM<";
+	public static final String LNK_HNDL_LNK_VAR 	= "%VIDEOLINK%";
 	
-	public VideoKeeper(String database, JFrame frame) {
-		this.mainQueue 		= new Queue();	
-		this.addedQueue 		= new Queue();
+	private DataModel		model;
+	private Queue 			mainQueue;
+//	private Queue 			addedQueue;
+	private Queue			skipQueue;
+	private VideoDataNode 	curr;
+	private MainGui 		mainGui;
+	private String			database;
+	
+	public VideoKeeper(DataModel model, MainGui mainGui) {
+		this.model				= model;
+		this.mainQueue 			= new Queue();	
+//		this.addedQueue 		= new Queue();
 		this.skipQueue			= new Queue();
-		this.database 			= database;
-		this.frame 			= frame;
-		this.curr 			= null;
-		this.checkForDuplicates 	= true;
+		this.mainGui 			= mainGui;
+		this.curr 				= null;
+		this.database			= model.getDatabaseFile();
 		
 		populateQueue();
+		monitorDatabase();
 	}
 	
 	public int getSize() {
@@ -43,18 +49,21 @@ public class VideoKeeper
 	public void add(VideoDataNode item) {
 		boolean addItem = true;
 		
-		if(checkForDuplicates && mainQueue.contains(item)) {
-			int option = JOptionPane.showConfirmDialog(frame, "Link is already in watch queue. Add anyway?", MainGui.PROG_NAME,  JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
+		if(model.isCheckForDupl() && mainQueue.contains(item)) {
+			int option = JOptionPane.showConfirmDialog(mainGui, "Link is already in watch list. Add anyway?", MainGui.PROG_NAME + " -- Duplicate Video",  JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
 
 			if(option == JOptionPane.YES_OPTION) {
-				option = JOptionPane.showConfirmDialog(frame, "Check for duplicates going forward?", MainGui.PROG_NAME,  JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
+				option = JOptionPane.showConfirmDialog(mainGui, "Check for duplicates going forward?", MainGui.PROG_NAME + " -- Check for Duplicates?",  JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
 
 				if(option == JOptionPane.NO_OPTION) {
-					checkForDuplicates = false;
+					model.setCheckForDupl(false);
 				}
 			} else {
 				addItem = false;
 			}
+		} else if((!item.getUrl().contains(".") && !item.getUrl().contains("/")) || item.getUrl().trim().length() < 3) {
+			addItem = false;
+			JOptionPane.showMessageDialog(mainGui, "Must enter a valid URL.", MainGui.PROG_NAME + " -- Invalid URL", JOptionPane.ERROR_MESSAGE);
 		}
 
 		if(addItem) {
@@ -77,20 +86,24 @@ public class VideoKeeper
 						if(item.getChannel().length() < 1) {
 							item.setChannel(obtainer.getChannel());
 						}
+						
+						if(item.getTime().length() < 1) {
+							item.setTime(obtainer.getTime());
+						}
 					}
 				}
 			});
 			
 			thread.start();
 			
-			addedQueue.push(item);
+//			addedQueue.push(item);
 			mainQueue.push(item);
 		}
 	}
 		
 	public void openCurr() {
 		if(curr != null && !curr.isEmpty()) {
-			openWebpage(curr.getUrl());
+			handleLink(curr.getUrl());
 		}
 	}
 	
@@ -99,7 +112,7 @@ public class VideoKeeper
 			curr = mainQueue.pop();
 			
 			if(!curr.isEmpty()) {
-				openWebpage(curr.getUrl());
+				handleLink(curr.getUrl());
 			}
 			
 			refreshNext();
@@ -120,10 +133,8 @@ public class VideoKeeper
 		}
 	}
 	
-	private synchronized void addSkipped() {
+	public synchronized void addSkipped() {
 		Queue temp = new Queue();
-		int total = mainQueue.size() + skipQueue.size();
-		int finalTotal = -1;
 		
 		if(skipQueue.size() > 0) {
 			while(skipQueue.size() > 0) {
@@ -140,12 +151,6 @@ public class VideoKeeper
 				VideoDataNode node = temp.pop();
 				mainQueue.push(node);
 			}
-		}
-		
-		finalTotal = mainQueue.size() + skipQueue.size();
-		
-		if(finalTotal != total) {
-			System.out.println("ya fucked up: " + total + " " + finalTotal);
 		}
 	}
 	
@@ -171,6 +176,10 @@ public class VideoKeeper
 							if(temp.getChannel().length() < 1) {
 								temp.setChannel(obtainer.getChannel());
 							}
+							
+							if(temp.getTime().length() < 1) {
+								temp.setTime(obtainer.getTime());
+							}
 						}
 					}
 				}
@@ -180,13 +189,52 @@ public class VideoKeeper
 		thread.start();
 	}
 	
-	public String getNextTitle() {
+	public void refreshAll() {
+		ProgressBar progBar = new ProgressBar(mainGui);
+		
+		progBar.setMax(mainQueue.size());
+		progBar.showProgressBar();
+		skipQueue.clear();
+		mainQueue.clear();
+		populateQueue();
+		
+		if(mainQueue.size() > 0) {
+			Queue tempQ = new Queue();
+
+			while(mainQueue.size() > 0) {
+				VideoDataNode temp = mainQueue.pop();
+				
+				if(!temp.isEmpty()) {
+					MetadataObtainer obtainer = new MetadataObtainer(temp.getUrl());
+					temp.setTitle(obtainer.getTitle());
+					temp.setDate(obtainer.getDate());
+					temp.setChannel(obtainer.getChannel());
+					temp.setTime(obtainer.getTime());
+				}
+				
+				tempQ.push(temp);
+				progBar.progress();
+			}
+			
+			while(tempQ.size() > 0) {
+				mainQueue.push(tempQ.pop());
+			}
+		}
+		
+		progBar.kill();
+	}
+	
+	public String getNextTitle(boolean truncate) {
 		String nextTitle = "";
 
 		if(mainQueue.size() > 0) {
 			nextTitle = mainQueue.peek().getTitle();
 		} else if(mainQueue.size() == 0 && skipQueue.size() > 0) {
 			nextTitle = skipQueue.peek().getTitle();
+		}
+		
+		if(nextTitle.length() > 60 && truncate) {
+			nextTitle = nextTitle.substring(0, 60) + ". . .";
 		}
 		
 		return nextTitle;
@@ -205,10 +253,18 @@ public class VideoKeeper
 	public String getNextDate() {
 		String nextDate = "";
 
-		if(mainQueue.size() > 0) {
-			nextDate = mainQueue.peek().getDate();
-		} else if(mainQueue.size() == 0 && skipQueue.size() > 0) {
-			nextDate = skipQueue.peek().getDate();
+		if (mainQueue.size() > 0) {
+			if (mainQueue.peek().getDate().length() > 1 && mainQueue.peek().getTime().length() > 1) {
+				nextDate = mainQueue.peek().getDate() + "   ~   Len. " + mainQueue.peek().getTime();
+			} else {
+				nextDate = mainQueue.peek().getDate() + mainQueue.peek().getTime();
+			}
+		} else if (mainQueue.size() == 0 && skipQueue.size() > 0) {
+			if (skipQueue.peek().getDate().length() > 1 && skipQueue.peek().getTime().length() > 1) {
+				nextDate = skipQueue.peek().getDate() + "   ~   Len. " + skipQueue.peek().getTime();
+			} else {
+				nextDate = skipQueue.peek().getDate() + skipQueue.peek().getTime();
+			}
 		}
 		
 		return nextDate;
@@ -227,9 +283,10 @@ public class VideoKeeper
 	}
 	
 	public void populateQueue() {
-		Queue temp = new Queue();
-		VideoDataNode hold;
+//		Queue temp = new Queue();
+//		VideoDataNode hold;
 		mainQueue.clear();
+		skipQueue.clear();
 		
 		String[] list = readFile(database).split("\n");
 		
@@ -241,51 +298,158 @@ public class VideoKeeper
 			}
 		}
 		
-		while(addedQueue.size() > 0) {
-			hold = addedQueue.pop();
-			mainQueue.push(hold);
-			temp.push(hold);
-		}
-		
-		addedQueue = temp;
+		//I have no clue why I had added this, but all it was doing was cross-contaminating databases.
+		//Leaving it in case I remember what it does.
+//		while(addedQueue.size() > 0) {
+//			hold = addedQueue.pop();
+//			mainQueue.push(hold);
+//			temp.push(hold);
+//		}
+//		
+//		addedQueue = temp;
 		
 		refreshNext();
 	}
 	
-	public void save() {
+	public synchronized boolean save() {
+		Queue skipCopy = skipQueue.duplicate();
+		Queue mainCopy = mainQueue.duplicate();
 		String toWrite = "";
+		boolean saved = false;
 		int i = 0;
 		
-		while(skipQueue.size() > 0) {
+		while(skipCopy.size() > 0) {
 			if(i > 0) {
-				toWrite += "\n" + skipQueue.pop().toString();
+				toWrite += "\n" + skipCopy.pop().toString();
 			} else {
-				toWrite += skipQueue.pop().toString();
+				toWrite += skipCopy.pop().toString();
 			}
 			
 			i++;
 		}
 		
-		while(mainQueue.size() > 0) {
+		while(mainCopy.size() > 0) {
 			if(i > 0) {
-				toWrite += "\n" + mainQueue.pop().toString();
+				toWrite += "\n" + mainCopy.pop().toString();
 			} else {
-				toWrite += mainQueue.pop().toString();
+				toWrite += mainCopy.pop().toString();
 			}
 			
 			i++;
 		}
 		
 		clearFile(database);
-		writeFile(toWrite, database);
+		
+		saved = writeFile(toWrite, database);
+		
+		return saved;
 	}
 	
-	private void openWebpage(String s) {
-     	try {
-			Desktop.getDesktop().browse(new URL(s).toURI());
-		} catch (Exception e) {
+	public boolean exportUrls(String destination) {
+		String urls = "";
+		Queue tempQ = skipQueue.duplicate();
+		boolean success = true;
+		
+		while(tempQ.size() > 0) {
+			urls += tempQ.pop().getUrl() + "\n";
+		}
+		
+		tempQ = mainQueue.duplicate();
+		
+		while(tempQ.size() > 0) {
+			urls += tempQ.pop().getUrl() + "\n";
+		}
+		
+		if (urls.length() > 7) {
+			success = writeFile(urls, destination);
+		} else {
+			success = false;
+		}
+		
+		return success;
+	}
+	
+	private void monitorDatabase() {
+		Thread thread = new Thread(new Runnable() {
+			@Override
+			public void run() {
+				for(;;) {
+					//if database changes, save and reload with new database
+					if(!database.equals(model.getDatabaseFile())) {
+						if(model.isAutoSaveOnExit()) {
+							save();
+						} else {
+							String mess = "Would you like to save changes to \nthe current database before switching?";
+							((SettingsDialog) mainGui.getSettingsDialog()).setChildDialogOpen(true);
+							int option = JOptionPane.showOptionDialog(mainGui.getSettingsDialog(), mess, MainGui.PROG_NAME + " -- Save?", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, null, null);
+							((SettingsDialog) mainGui.getSettingsDialog()).setChildDialogOpen(false);
+							
+							if(option == JOptionPane.YES_OPTION) {
+								save();
+							}
+						}
+						
+						database = model.getDatabaseFile();
+						populateQueue();
+					}
+					
+					try {
+						Thread.sleep(30);
+					} catch (InterruptedException e) {
+					}
+				}
+			}
+		});
+		
+		thread.start();
+	}
+	
+	private void handleLink(String s) {
+		//open the webpage in default browser. Cache as a backup.
+		if (model.getHandleLinks().equalsIgnoreCase(LNK_HNDL_DEFAULT)) {
+			try {
+				Desktop.getDesktop().browse(new URL(s).toURI());
+			} catch (Exception e) {
+				Toolkit.getDefaultToolkit().getSystemClipboard().setContents(new StringSelection(s), null);
+				JOptionPane.showMessageDialog(mainGui, "Could not open in browser. Video link has \nbeen copied to the clip board.",
+						MainGui.PROG_NAME + " -- Link Copied", JOptionPane.WARNING_MESSAGE);
+			}
+		} else if (model.getHandleLinks().equalsIgnoreCase(LNK_HNDL_COPY)) {
+			JDialog dialog = (new JOptionPane("Video link has been copied to the clip board.", JOptionPane.INFORMATION_MESSAGE)).createDialog(mainGui, MainGui.PROG_NAME + " -- Link Copied");
+			
 			Toolkit.getDefaultToolkit().getSystemClipboard().setContents(new StringSelection(s), null);
-			JOptionPane.showMessageDialog(frame, "URL has been cached.", "URL Cached", 1);
+			
+			new Thread(new Runnable() {
+				@Override
+				public void run() {
+					dialog.setVisible(true);
+				}
+			}).start();
+
+			new Timer().schedule(new TimerTask() {
+				@Override
+				public void run() {
+					dialog.dispose();
+				}
+			}, 2000);
+		} else if(model.getHandleLinks().toUpperCase().startsWith(LNK_HNDL_CUST)) {
+			String command = model.getHandleLinks();
+			
+			command = command.substring(LNK_HNDL_CUST.length());
+			command = command.substring(0, command.lastIndexOf(">"));
+			command = command.replaceAll(LNK_HNDL_LNK_VAR, s);
+			
+			try {
+				Runtime.getRuntime().exec(command);
+			} catch (Exception e) {
+				Toolkit.getDefaultToolkit().getSystemClipboard().setContents(new StringSelection(s), null);
+				JOptionPane.showMessageDialog(mainGui, "Could not execute custom command. Video link has \nbeen copied to the clip board.",
+						MainGui.PROG_NAME + " -- Link Copied", JOptionPane.WARNING_MESSAGE);
+				e.printStackTrace();
+			}
+		} else {
+			JOptionPane.showMessageDialog(mainGui, "Invalid link handling method specified in properties file.",
+					MainGui.PROG_NAME + " -- Error", JOptionPane.ERROR_MESSAGE);
 		}
 	}
 	
@@ -326,33 +490,43 @@ public class VideoKeeper
 		return str;
 	}
 
-	private static void writeFile(String fileStr, String destination) {
+	private static boolean writeFile(String fileStr, String destination) {
 		final long LENGTH = fileStr.length();
+		boolean success = true;
 		File file = new File(destination);
-		PrintWriter outputFile;
+		PrintWriter outputFile = null;
 
 		if(LENGTH > 0) {
 			try {
-				outputFile = new PrintWriter(file);
-			} catch(FileNotFoundException e) {
-				System.out.println("File " + destination + " could not be found...\n");
-				e.printStackTrace();
-				
-				return;
-			}
-
-			for(int i = 0; i < LENGTH; i++) {
-				if(fileStr.substring(i,i+1).equals("\n")) {
-					outputFile.println();
-				} else if(fileStr.substring(i,i+1).equals("\t")) {
-					outputFile.write("\t");
-				} else {
-					outputFile.append(fileStr.charAt(i));
+				if(!file.exists()) {
+					success = file.createNewFile();
 				}
+				
+				if(success) {
+					outputFile = new PrintWriter(file);
+				}
+			} catch(Exception e) {
+				success = false;
 			}
 
-			outputFile.close();
+			if (success && outputFile != null) {
+				for (int i = 0; i < LENGTH; i++) {
+					if (fileStr.substring(i, i + 1).equals("\n")) {
+						outputFile.println();
+					} else if (fileStr.substring(i, i + 1).equals("\t")) {
+						outputFile.write("\t");
+					} else {
+						outputFile.append(fileStr.charAt(i));
+					}
+				}
+
+				outputFile.close();
+			} else {
+				success = false;
+			}
 		}
+		
+		return success;
 	}
 	
 	private static void clearFile(String fileName) {
@@ -426,6 +600,16 @@ public class VideoKeeper
 			}
 			
 			return contains;
+		}
+		
+		public synchronized Queue duplicate() {
+			Queue copy = new Queue();
+			
+			for(VideoDataNode node : list) {
+				copy.push(node);
+			}
+			
+			return copy;
 		}
 	}
 }
