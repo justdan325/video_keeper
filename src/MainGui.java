@@ -463,6 +463,7 @@ public class MainGui extends JFrame implements WindowListener {
 	public void windowClosing(WindowEvent e) {
 		if (model.isAutoSaveOnExit()) {
 			save();
+			System.exit(0);
 		} else {
 			String mess = "Would you like to save the watch list?";
 			int option = JOptionPane.showOptionDialog(this, mess, PROG_NAME + " -- Save?", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, null, null);
