@@ -25,6 +25,7 @@ import java.awt.GridLayout;
 import java.awt.FlowLayout;
 import java.awt.Dimension;
 
+@SuppressWarnings("serial")
 public class MainGui extends JFrame implements WindowListener {
 	public  static final String PROG_NAME 			= "Video Keeper";
 	public  static final String PROG_VER			= "2.0";

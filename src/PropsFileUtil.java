@@ -1,5 +1,4 @@
 import java.io.*;
-import java.util.Hashtable;
 import java.util.Properties;
 
 public class PropsFileUtil {
