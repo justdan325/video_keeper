@@ -22,6 +22,7 @@ public class MetadataObtainer {
 	private static final String DAILYMOTION_PREFIX_MOB 	= "https://m.dailymotion.com/video/";
 	private static final String BITCHUTE_PREFIX_W		= "https://www.bitchute.com/video/";
 	private static final String BITCHUTE_PREFIX			= "https://bitchute.com/video/";
+	private static final String RUMBLE_PREFIX			= "https://rumble.com/";
 	
 	private Optional<String> atTime;
 	private String urlStr;
@@ -42,8 +43,7 @@ public class MetadataObtainer {
 	
 	public static void main(String[] args){
 //		System.out.println(fetchHtml("https://odysee.com/win11:6d73df3083e0f634b18f54521763184b47980d8a"));
-//		MetadataObtainer o = new MetadataObtainer("https://www.youtube.com/watch?v=s1JfjEqBG8o");
-		MetadataObtainer o = new MetadataObtainer("https://youtu.be/r1RCSsWpHkg?t=1791");
+		MetadataObtainer o = new MetadataObtainer("https://www.youtube.com/watch?v=s1JfjEqBG8o");
 		System.out.println(o.getTitle());
 		System.out.println(o.getDate());
 		System.out.println(o.getChannel());
@@ -58,7 +58,8 @@ public class MetadataObtainer {
 		   || urlStr.startsWith(TWITCH_PREFIX_MOB) || urlStr.startsWith(VIMEO_PREFIX)
 		   || urlStr.startsWith(ODYSEE_PREFIX) ||  urlStr.startsWith(DAILYMOTION_PREFIX_W)
 		   || urlStr.startsWith(DAILYMOTION_PREFIX) || urlStr.startsWith(DAILYMOTION_PREFIX_MOB)
-		   || urlStr.startsWith(BITCHUTE_PREFIX) || urlStr.startsWith(BITCHUTE_PREFIX_W)) {
+		   || urlStr.startsWith(BITCHUTE_PREFIX) || urlStr.startsWith(BITCHUTE_PREFIX_W)
+		   || urlStr.startsWith(RUMBLE_PREFIX)) {
 			
 			supported = true;
 		}
@@ -163,6 +164,17 @@ public class MetadataObtainer {
 			} else if(urlStr.startsWith(BITCHUTE_PREFIX) || urlStr.startsWith(BITCHUTE_PREFIX_W)) {
 				String prefix = "<title>";
 				String suffix = "</title>";
+				int begin = html.indexOf(prefix) + prefix.length();
+				int end = html.indexOf(suffix, begin);
+				
+				if (begin != -1 && end != -1) {
+					title = html.substring(begin, end);
+					title = filterEscapeChars(title);
+				}
+			//Rumble
+			} else if(urlStr.startsWith(RUMBLE_PREFIX)) {
+				String prefix = "title=\"";
+				String suffix = "\" type";
 				int begin = html.indexOf(prefix) + prefix.length();
 				int end = html.indexOf(suffix, begin);
 				
@@ -307,6 +319,19 @@ public class MetadataObtainer {
 				}
 				
 				channel += " on BITCHUTE";
+			//Rumble
+			} else if(urlStr.startsWith(RUMBLE_PREFIX)) {
+				String prefix = "<button data-title=";
+				String suffix = " data-slug=";
+				int begin = html.indexOf(prefix) + prefix.length();
+				int end = html.indexOf(suffix, begin);
+				
+				if (begin != -1 && end != -1) {
+					channel = html.substring(begin, end);
+					channel = filterEscapeChars(channel);
+				}
+				
+				channel += " on Rumble";
 			}
 		}
 		
@@ -376,6 +401,17 @@ public class MetadataObtainer {
 			} else if(urlStr.startsWith(BITCHUTE_PREFIX) || urlStr.startsWith(BITCHUTE_PREFIX_W)) {
 				String prefix = "<div class=\"video-publish-date\">";
 				String suffix = "</div>";
+				int begin = html.indexOf(prefix) + prefix.length();
+				int end = html.indexOf(suffix, begin);
+				
+				if (begin != -1 && end != -1) {
+					date = html.substring(begin, end);
+					date = date.replaceAll("\n", "");
+				}
+			//Rumble
+			} else if(urlStr.startsWith(RUMBLE_PREFIX)) {
+				String prefix = "<div class=\"media-published\" title=\"";
+				String suffix = "\">";
 				int begin = html.indexOf(prefix) + prefix.length();
 				int end = html.indexOf(suffix, begin);
 				
