@@ -182,22 +182,10 @@ public class Main {
 	}
 	
 	private boolean strToBool(String str) {
-		boolean bool = false;
-		
-		if(str.trim().equals("1")) {
-			bool = true;
-		}
-		
-		return bool;
+		return str.trim().equals("1") ? true : false;
 	}
 	
 	private String boolToStr(boolean bool) {
-		String str = "0";
-		
-		if(bool) {
-			str = "1";
-		}
-		
-		return str;
+		return bool ? "1" : "0";
 	}
 }
