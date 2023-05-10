@@ -552,6 +552,7 @@ public class VideoKeeper {
 			list = new LinkedList<VideoDataNode>();
 		}
 		
+		@SuppressWarnings("unused")
 		public synchronized void push(String item) {
 			list.addLast(new VideoDataNode(item));
 		}
@@ -577,6 +578,7 @@ public class VideoKeeper {
 		}
 
 		//only compares url since that is the key
+		@SuppressWarnings("unused")
 		public synchronized boolean contains(String key) {
 			boolean contains = false;
 

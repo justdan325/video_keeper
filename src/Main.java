@@ -3,7 +3,6 @@ import java.io.IOException;
 
 import javax.swing.JOptionPane;
 import javax.swing.UIManager;
-import javax.swing.UnsupportedLookAndFeelException;
 
 public class Main {
 	public  static final String DEFAULT_DATABASE 		= "database.txt";
@@ -39,21 +38,22 @@ public class Main {
 		init();
 	}
 	
-	private void setLookAndFeel() {
-		try {
-			// Set cross-platform Java L&F (also called "Metal")
-			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-		} catch (UnsupportedLookAndFeelException e) {
-			System.out.println(e);
-		} catch (ClassNotFoundException e) {
-			System.out.println(e);
-		} catch (InstantiationException e) {
-			System.out.println(e);
-		} catch (IllegalAccessException e) {
-			System.out.println(e);
-		}
-	}
+//	private void setLookAndFeel() {
+//		try {
+//			// Set cross-platform Java L&F (also called "Metal")
+//			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+//		} catch (UnsupportedLookAndFeelException e) {
+//			System.out.println(e);
+//		} catch (ClassNotFoundException e) {
+//			System.out.println(e);
+//		} catch (InstantiationException e) {
+//			System.out.println(e);
+//		} catch (IllegalAccessException e) {
+//			System.out.println(e);
+//		}
+//	}
 	
+	@SuppressWarnings("static-access")
 	private void setUiColorScheme() {
 		 UIManager UI = new UIManager();
 		 UI.put("OptionPane.messageForeground", MainGui.PROG_COLOR_TXT_LT);
@@ -182,22 +182,10 @@ public class Main {
 	}
 	
 	private boolean strToBool(String str) {
-		boolean bool = false;
-		
-		if(str.trim().equals("1")) {
-			bool = true;
-		}
-		
-		return bool;
+		return str.trim().equals("1") ? true : false;
 	}
 	
 	private String boolToStr(boolean bool) {
-		String str = "0";
-		
-		if(bool) {
-			str = "1";
-		}
-		
-		return str;
+		return bool ? "1" : "0";
 	}
 }

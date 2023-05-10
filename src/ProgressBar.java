@@ -5,6 +5,7 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JProgressBar;
 
+@SuppressWarnings("serial")
 public class ProgressBar extends JDialog {
 	private final String PROGRESS_PREFIX = "Reloaded ";
 	

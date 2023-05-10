@@ -19,6 +19,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
+@SuppressWarnings("serial")
 public class SettingsDialog extends JDialog implements WindowListener {
 	private static final String DIA_TITLE 			= "Settings";
 	private static final String BROWSE_BTN_TITLE 	= "Browse";
