@@ -1,6 +1,5 @@
 import java.util.Scanner;
 import java.net.URLConnection;
-import java.text.ParseException;
 import java.net.URL;
 import java.util.Locale;
 import java.util.Optional;
@@ -482,8 +481,8 @@ public class MetadataObtainer {
 						time = convertSecondsToTimeStr(seconds);
 					}
 				}
-				
-				if(atTime.isPresent()) {
+
+				if (atTime.isPresent()) {
 					time += " (in progress " + convertSecondsToTimeStr(Integer.parseInt(atTime.get())) + ")";
 				}
 			//Odysee and Twitch (not 100% Reliable for Twitch)
@@ -492,7 +491,7 @@ public class MetadataObtainer {
 				String suffix = "\"/";
 				int begin = html.indexOf(prefix) + prefix.length();
 				int end = html.indexOf(suffix, begin);
-				
+
 				if (begin != -1 && end != -1) {
 					time = html.substring(begin, end);
 				}
@@ -505,22 +504,35 @@ public class MetadataObtainer {
 				
 				time = convertSecondsToTimeStr(seconds);
 				
-				if(atTime.isPresent() && urlStr.startsWith(TWITCH_PREFIX_MOB)) {
+				if (atTime.isPresent() && urlStr.startsWith(TWITCH_PREFIX_MOB)) {
 					String progress = atTime.get();
-					
+
 					progress = progress.replace("h", ":");
 					progress = progress.replace("m", ":");
 					progress = progress.replace("s", "");
-					
+
 					time += " (in progress " + progress + ")";
-				} else if(atTime.isPresent() && urlStr.startsWith(ODYSEE_PREFIX)) {
+				} else if (atTime.isPresent() && urlStr.startsWith(ODYSEE_PREFIX)) {
 					try {
 						time += " (in progress " + convertSecondsToTimeStr(Integer.parseInt(atTime.get())) + ")";
 					} catch (Exception e) {
 						time += " (in progress)";
 					}
 				}
-			} 
+			//Vimeo (only gets the progress of the video)
+			} else if (urlStr.startsWith(VIMEO_PREFIX)) {
+				final String TIME_Q_PARAM = "#t=";
+				
+				if(urlStr.contains(TIME_Q_PARAM)) {
+					time = urlStr.substring(urlStr.indexOf(TIME_Q_PARAM) + TIME_Q_PARAM.length(), urlStr.lastIndexOf("s"));
+					
+					try {
+						time = " In progress at " + convertSecondsToTimeStr(Integer.parseInt(time));
+					} catch(Exception e) {
+						time = "Video is in progress.";
+					}
+				}
+			}
 		}
 		
 		return time;
