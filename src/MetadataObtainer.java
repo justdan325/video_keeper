@@ -43,7 +43,7 @@ public class MetadataObtainer {
 	
 	public static void main(String[] args){
 //		System.out.println(fetchHtml("https://odysee.com/win11:6d73df3083e0f634b18f54521763184b47980d8a"));
-		MetadataObtainer o = new MetadataObtainer("https://www.youtube.com/watch?v=s1JfjEqBG8o");
+		MetadataObtainer o = new MetadataObtainer("");
 		System.out.println(o.getTitle());
 		System.out.println(o.getDate());
 		System.out.println(o.getChannel());
@@ -321,8 +321,8 @@ public class MetadataObtainer {
 				channel += " on BITCHUTE";
 			//Rumble
 			} else if(urlStr.startsWith(RUMBLE_PREFIX)) {
-				String prefix = "<button data-title=";
-				String suffix = " data-slug=";
+				String prefix = "data-title=\"";
+				String suffix = "\"";
 				int begin = html.indexOf(prefix) + prefix.length();
 				int end = html.indexOf(suffix, begin);
 				
