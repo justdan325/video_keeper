@@ -304,6 +304,8 @@ public class MainGui extends JFrame implements WindowListener {
 				if (contents != null) {
 					try {
 						urlField.setText((String) contents.getTransferData(DataFlavor.stringFlavor));
+						addButton.setEnabled(true);
+						addButton.setBackground(PROG_COLOR_BTN_EN);
 					} catch (Exception f) {
 						f.printStackTrace();
 					}
