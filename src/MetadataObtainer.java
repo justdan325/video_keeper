@@ -1,5 +1,6 @@
 import java.util.Scanner;
 import java.net.URLConnection;
+import java.text.ParseException;
 import java.net.URL;
 import java.util.Locale;
 import java.util.Optional;
@@ -504,7 +505,7 @@ public class MetadataObtainer {
 				
 				time = convertSecondsToTimeStr(seconds);
 				
-				if(atTime.isPresent()) {
+				if(atTime.isPresent() && urlStr.startsWith(TWITCH_PREFIX_MOB)) {
 					String progress = atTime.get();
 					
 					progress = progress.replace("h", ":");
@@ -512,6 +513,12 @@ public class MetadataObtainer {
 					progress = progress.replace("s", "");
 					
 					time += " (in progress " + progress + ")";
+				} else if(atTime.isPresent() && urlStr.startsWith(ODYSEE_PREFIX)) {
+					try {
+						time += " (in progress " + convertSecondsToTimeStr(Integer.parseInt(atTime.get())) + ")";
+					} catch (Exception e) {
+						time += " (in progress)";
+					}
 				}
 			} 
 		}
@@ -596,8 +603,8 @@ public class MetadataObtainer {
 			
 			sanitized = sanitizeYoutube(sanitized);
 		//Twitch
-		} else if(sanitized.startsWith(TWITCH_PREFIX_W) || sanitized.startsWith(TWITCH_PREFIX_MOB)) {
-			sanitized = sanitizeTwitch(sanitized);
+		} else if(sanitized.startsWith(TWITCH_PREFIX_W) || sanitized.startsWith(TWITCH_PREFIX_MOB) || sanitized.startsWith(ODYSEE_PREFIX)) {
+			sanitized = sanitizeTwitchAndOdysee(sanitized);
 		}
 		
 		return sanitized;
@@ -633,7 +640,7 @@ public class MetadataObtainer {
 		return sanitized;
 	}
 
-	private String sanitizeTwitch(String urlStr) {
+	private String sanitizeTwitchAndOdysee(String urlStr) {
 		final String TIME_Q_PARAM = "?t=";
 		String sanitized = urlStr;
 		
@@ -641,10 +648,14 @@ public class MetadataObtainer {
 		//must convert to mobile to get data
 		if(urlStr.startsWith(TWITCH_PREFIX_W)) {
 			sanitized = urlStr.replaceFirst(TWITCH_PREFIX_W, TWITCH_PREFIX_MOB);
-		}
-		
-		if(sanitized.contains(TIME_Q_PARAM)) {
-			atTime = Optional.of(sanitized.substring(sanitized.indexOf(TIME_Q_PARAM) + TIME_Q_PARAM.length(), sanitized.lastIndexOf("s") + 1));
+			
+			if(sanitized.contains(TIME_Q_PARAM)) {
+				atTime = Optional.of(sanitized.substring(sanitized.indexOf(TIME_Q_PARAM) + TIME_Q_PARAM.length(), sanitized.lastIndexOf("s") + 1));
+			}
+		} else if(urlStr.contains(ODYSEE_PREFIX)) {
+			if(urlStr.contains(TIME_Q_PARAM)) {
+				atTime = Optional.of(sanitized.substring(sanitized.indexOf(TIME_Q_PARAM) + TIME_Q_PARAM.length()));
+			}
 		}
 
 		return sanitized;
