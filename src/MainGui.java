@@ -5,6 +5,8 @@ import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.awt.event.FocusAdapter;
 import java.awt.event.WindowListener;
 import java.awt.event.WindowEvent;
@@ -186,6 +188,8 @@ public class MainGui extends JFrame implements WindowListener {
 		center.add(addLabel, BorderLayout.NORTH);
 		center.add(urlPanel, BorderLayout.CENTER);
 		
+		addButton.setEnabled(false);
+		
 		return center;
 	}
 	
@@ -293,6 +297,23 @@ public class MainGui extends JFrame implements WindowListener {
 				add();
 			}
 		}));
+		
+		urlField.addKeyListener(new KeyListener() {
+			@Override
+			public void keyTyped(KeyEvent e) {}
+			
+			@Override
+			public void keyReleased(KeyEvent e) {
+				if(urlField.getText().trim().equals(PASTE_MESS) == false && urlField.getText().trim().length() > 0) {
+					addButton.setEnabled(true);
+				} else {
+					addButton.setEnabled(false);
+				}
+			}
+			
+			@Override
+			public void keyPressed(KeyEvent e) {}
+		});
 		
 		urlField.addFocusListener(new FocusAdapter() {
 			@Override
