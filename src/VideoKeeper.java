@@ -115,7 +115,7 @@ public class VideoKeeper {
 				handleLink(curr.getUrl());
 			}
 			
-			refreshNext();
+			refreshNextInSepThread(true);
 		} else if(skipQueue.size() > 0) {
 			addSkipped();
 			openNext();
@@ -126,7 +126,7 @@ public class VideoKeeper {
 		if(mainQueue.size() > 0) {
 			curr = mainQueue.pop();
 			skipQueue.push(curr);
-			refreshNext();
+			refreshNextInSepThread(true);
 		} else if(mainQueue.size() == 0 && skipQueue.size() > 0) {
 			addSkipped();
 			skipNext();
@@ -154,39 +154,43 @@ public class VideoKeeper {
 		}
 	}
 	
-	public void refreshNext() {
+	public void refreshNextInSepThread(boolean abortIfNotEmpty) {
 		Thread thread = new Thread(new Runnable() {
 			@Override
 			public void run() {
-				if(mainQueue.size() > 0) {
-					VideoDataNode temp = mainQueue.peek();
-
-					if(!temp.isEmpty()) {
-						if(temp.getTitle().length() < 1 || temp.getDate().length() < 1 || temp.getChannel().length() < 1) {
-							MetadataObtainer obtainer = new MetadataObtainer(temp.getUrl());
-
-							if(temp.getTitle().length() < 1) {
-								temp.setTitle(obtainer.getTitle());
-							}
-
-							if(temp.getDate().length() < 1) {
-								temp.setDate(obtainer.getDate());
-							}
-
-							if(temp.getChannel().length() < 1) {
-								temp.setChannel(obtainer.getChannel());
-							}
-							
-							if(temp.getTime().length() < 1) {
-								temp.setTime(obtainer.getTime());
-							}
-						}
-					}
-				}
+				refreshNext(abortIfNotEmpty);
 			}
 		});
 		
 		thread.start();
+	}
+	
+	public void refreshNext(boolean abortIfNotEmpty) {
+		if(mainQueue.size() > 0) {
+			VideoDataNode temp = mainQueue.peek();
+
+			if(!temp.isEmpty()) {
+				if(abortIfNotEmpty == false || temp.getTitle().length() < 1 || temp.getDate().length() < 1 || temp.getChannel().length() < 1) {
+					MetadataObtainer obtainer = new MetadataObtainer(temp.getUrl());
+
+					if(abortIfNotEmpty == false || temp.getTitle().length() < 1) {
+						temp.setTitle(obtainer.getTitle());
+					}
+
+					if(abortIfNotEmpty == false || temp.getDate().length() < 1) {
+						temp.setDate(obtainer.getDate());
+					}
+
+					if(abortIfNotEmpty == false || temp.getChannel().length() < 1) {
+						temp.setChannel(obtainer.getChannel());
+					}
+					
+					if(abortIfNotEmpty == false || temp.getTime().length() < 1) {
+						temp.setTime(obtainer.getTime());
+					}
+				}
+			}
+		}
 	}
 	
 	public void refreshAll() {
@@ -206,6 +210,7 @@ public class VideoKeeper {
 				
 				if(!temp.isEmpty()) {
 					MetadataObtainer obtainer = new MetadataObtainer(temp.getUrl());
+					
 					temp.setTitle(obtainer.getTitle());
 					temp.setDate(obtainer.getDate());
 					temp.setChannel(obtainer.getChannel());
@@ -250,7 +255,7 @@ public class VideoKeeper {
 		return currTitle;
 	}
 	
-	public String getNextDate() {
+	public String getNextDateAndTime() {
 		String nextDate = "";
 
 		if (mainQueue.size() > 0) {
@@ -308,7 +313,7 @@ public class VideoKeeper {
 //		
 //		addedQueue = temp;
 		
-		refreshNext();
+		refreshNextInSepThread(true);
 	}
 	
 	public synchronized boolean save() {

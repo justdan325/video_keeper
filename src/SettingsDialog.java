@@ -27,15 +27,15 @@ public class SettingsDialog extends JDialog implements WindowListener {
 	private static final String CHECK_DUPL_TITLE	= "Check for Duplicate Videos";
 //	private static final String SAVE_TITLE			= "Save";
 	private static final String EXPORT_TITLE		= "Export";
-	private static final String REFRESH_TITLE		= "Refresh";
+	private static final String REFRESH_TITLE		= "Refresh All";
 	private static final String OPEN_OP_TITLE		= "Open Op.";
-	private static final String TOOLTIP_SAVE		= "Save changes to the watch list.";
+//	private static final String TOOLTIP_SAVE		= "Save changes to the watch list.";
 	private static final String TOOLTIP_EXPORT		= "Export watch list to text file of URLs.";
 	private static final String TOOLTIP_REFRESH		= "Reload the watch list and re-fetch video metadata.";
 	private static final String TOOLTIP_OPEN_OP		= "Select the operation for how to open video links.";
 	private static final int 	WIN_X 				= 500;
 	private static final int 	WIN_Y 				= 325;
-	private static final int	BTN_X				= 105;
+	private static final int	BTN_X				= 120;
 	private static final int	BTN_Y				= 30;
 	
 	private JTextField dbFileTextField;
@@ -246,34 +246,34 @@ public class SettingsDialog extends JDialog implements WindowListener {
 		});
 	}
 	
-	private void save() {
-		Thread thread = new Thread(new Runnable() {
-			@Override
-			public void run() {
-				boolean saved = false;
-				
-				setLocked(true);
-				saved = parent.save();
-				
-				if(!saved) {
-					String mess = "Watch list could not be saved to database file.";
-					childDialogOpen = true;
-					JOptionPane.showMessageDialog(parent.getSettingsDialog(), mess, MainGui.PROG_NAME + " -- Save Failure", JOptionPane.ERROR_MESSAGE);
-					childDialogOpen = false;
-				}
-				
-				setLocked(false);
-				
-				if(saved) {
-					((MainGui) parent).saveEnabled(false);
-//					saveButton.setEnabled(false);
-//					saveButton.setBackground(MainGui.PROG_COLOR_BTN_DIS);
-				}
-			}
-		});
-		
-		thread.start();
-	}
+//	private void save() {
+//		Thread thread = new Thread(new Runnable() {
+//			@Override
+//			public void run() {
+//				boolean saved = false;
+//				
+//				setLocked(true);
+//				saved = parent.save();
+//				
+//				if(!saved) {
+//					String mess = "Watch list could not be saved to database file.";
+//					childDialogOpen = true;
+//					JOptionPane.showMessageDialog(parent.getSettingsDialog(), mess, MainGui.PROG_NAME + " -- Save Failure", JOptionPane.ERROR_MESSAGE);
+//					childDialogOpen = false;
+//				}
+//				
+//				setLocked(false);
+//				
+//				if(saved) {
+//					((MainGui) parent).saveEnabled(false);
+////					saveButton.setEnabled(false);
+////					saveButton.setBackground(MainGui.PROG_COLOR_BTN_DIS);
+//				}
+//			}
+//		});
+//		
+//		thread.start();
+//	}
 	
 	private void export() {
 		Thread thread = new Thread(new Runnable() {
