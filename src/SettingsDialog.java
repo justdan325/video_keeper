@@ -25,7 +25,7 @@ public class SettingsDialog extends JDialog implements WindowListener {
 	private static final String BROWSE_BTN_TITLE 	= "Browse";
 	private static final String AUTO_SAVE_TITLE		= "Auto Save upon Exit";
 	private static final String CHECK_DUPL_TITLE	= "Check for Duplicate Videos";
-	private static final String SAVE_TITLE			= "Save";
+//	private static final String SAVE_TITLE			= "Save";
 	private static final String EXPORT_TITLE		= "Export";
 	private static final String REFRESH_TITLE		= "Refresh";
 	private static final String OPEN_OP_TITLE		= "Open Op.";
@@ -41,9 +41,9 @@ public class SettingsDialog extends JDialog implements WindowListener {
 	private JTextField dbFileTextField;
 	private JPanel mainPanel;
 	private JButton dbFileButton;
-	private JButton saveButton;
+//	private JButton saveButton;
 	private JButton exportButton;
-	private JButton refreshButton;
+	private JButton refreshAllButton;
 	private JButton openOpButton;
 	private JCheckBox autoSaveCheckbox;
 	private JCheckBox checkDuplCheckbox;
@@ -59,9 +59,9 @@ public class SettingsDialog extends JDialog implements WindowListener {
 	public SettingsDialog(MainGui parent, DataModel model) {
 		this.dbFileTextField = new JTextField();
 		this.dbFileButton = new JButton(BROWSE_BTN_TITLE);
-		this.saveButton = new JButton(SAVE_TITLE);
+//		this.saveButton = new JButton(SAVE_TITLE);
 		this.exportButton = new JButton(EXPORT_TITLE);
-		this.refreshButton = new JButton(REFRESH_TITLE);
+		this.refreshAllButton = new JButton(REFRESH_TITLE);
 		this.openOpButton = new JButton(OPEN_OP_TITLE);
 		this.autoSaveCheckbox = new JCheckBox(AUTO_SAVE_TITLE);
 		this.checkDuplCheckbox = new JCheckBox(CHECK_DUPL_TITLE);
@@ -166,22 +166,22 @@ public class SettingsDialog extends JDialog implements WindowListener {
 		
 		buttonPanel.setBackground(MainGui.PROG_COLOR_BKRND);
 
-		saveButton.setPreferredSize(new Dimension(BTN_X, BTN_Y));
-		saveButton.setToolTipText(TOOLTIP_SAVE);
-		saveButton.setBackground(MainGui.PROG_COLOR_BTN_DIS);
+//		saveButton.setPreferredSize(new Dimension(BTN_X, BTN_Y));
+//		saveButton.setToolTipText(TOOLTIP_SAVE);
+//		saveButton.setBackground(MainGui.PROG_COLOR_BTN_DIS);
 		exportButton.setPreferredSize(new Dimension(BTN_X, BTN_Y));
 		exportButton.setToolTipText(TOOLTIP_EXPORT);
 		exportButton.setBackground(MainGui.PROG_COLOR_BTN_EN);
-		refreshButton.setPreferredSize(new Dimension(BTN_X, BTN_Y));
-		refreshButton.setToolTipText(TOOLTIP_REFRESH);
-		refreshButton.setBackground(MainGui.PROG_COLOR_BTN_EN);
+		refreshAllButton.setPreferredSize(new Dimension(BTN_X, BTN_Y));
+		refreshAllButton.setToolTipText(TOOLTIP_REFRESH);
+		refreshAllButton.setBackground(MainGui.PROG_COLOR_BTN_EN);
 		openOpButton.setPreferredSize(new Dimension(BTN_X, BTN_Y));
 		openOpButton.setToolTipText(TOOLTIP_OPEN_OP);
 		openOpButton.setBackground(MainGui.PROG_COLOR_BTN_EN);
 		
-		buttonPanel.add(saveButton);
+//		buttonPanel.add(saveButton);
 		buttonPanel.add(exportButton);
-		buttonPanel.add(refreshButton);
+		buttonPanel.add(refreshAllButton);
 		buttonPanel.add(openOpButton);
 		
 		return buttonPanel;
@@ -195,14 +195,14 @@ public class SettingsDialog extends JDialog implements WindowListener {
 			}
 		});
 		
-		saveButton.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent arg0) {
-				save();
-			}
-		});
+//		saveButton.addActionListener(new ActionListener() {
+//			@Override
+//			public void actionPerformed(ActionEvent arg0) {
+//				save();
+//			}
+//		});
 		
-		refreshButton.addActionListener(new ActionListener() {
+		refreshAllButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				refresh();
@@ -265,8 +265,9 @@ public class SettingsDialog extends JDialog implements WindowListener {
 				setLocked(false);
 				
 				if(saved) {
-					saveButton.setEnabled(false);
-					saveButton.setBackground(MainGui.PROG_COLOR_BTN_DIS);
+					((MainGui) parent).saveEnabled(false);
+//					saveButton.setEnabled(false);
+//					saveButton.setBackground(MainGui.PROG_COLOR_BTN_DIS);
 				}
 			}
 		});
@@ -422,8 +423,10 @@ public class SettingsDialog extends JDialog implements WindowListener {
 				}
 				
 				int size = parent.getCount();
-				saveButton.setEnabled(false);
-				saveButton.setBackground(MainGui.PROG_COLOR_BTN_DIS);
+				
+				((MainGui) parent).saveEnabled(false);
+//				saveButton.setEnabled(false);
+//				saveButton.setBackground(MainGui.PROG_COLOR_BTN_DIS);
 				
 				for(;;) {
 					while(locked) {
@@ -435,20 +438,21 @@ public class SettingsDialog extends JDialog implements WindowListener {
 					
 					if(parent.getCount() != size) {
 						size = parent.getCount();
-						saveButton.setEnabled(true);
-						saveButton.setBackground(MainGui.PROG_COLOR_BTN_EN);
+						((MainGui) parent).saveEnabled(true);
+//						saveButton.setEnabled(true);
+//						saveButton.setBackground(MainGui.PROG_COLOR_BTN_EN);
 					}
 					
 					if(size > 0) {
 						exportButton.setEnabled(true);
 						exportButton.setBackground(MainGui.PROG_COLOR_BTN_EN);
-						refreshButton.setEnabled(true);
-						refreshButton.setBackground(MainGui.PROG_COLOR_BTN_EN);
+						refreshAllButton.setEnabled(true);
+						refreshAllButton.setBackground(MainGui.PROG_COLOR_BTN_EN);
 					} else {
 						exportButton.setEnabled(false);
 						exportButton.setBackground(MainGui.PROG_COLOR_BTN_DIS);
-						refreshButton.setEnabled(false);
-						refreshButton.setBackground(MainGui.PROG_COLOR_BTN_DIS);
+						refreshAllButton.setEnabled(false);
+						refreshAllButton.setBackground(MainGui.PROG_COLOR_BTN_DIS);
 					}
 					
 					if(checkDuplCheckbox.isSelected() != model.isCheckForDupl()) {
@@ -471,12 +475,12 @@ public class SettingsDialog extends JDialog implements WindowListener {
 		this.dbFileTextField.setEnabled(!locked);
 		this.dbFileButton.setEnabled(!locked);
 		this.dbFileButton.setBackground(locked ? MainGui.PROG_COLOR_BTN_DIS : MainGui.PROG_COLOR_BTN_EN);
-		this.saveButton.setEnabled(!locked);
-		this.saveButton.setBackground(locked ? MainGui.PROG_COLOR_BTN_DIS : MainGui.PROG_COLOR_BTN_EN);
+//		this.saveButton.setEnabled(!locked);
+//		this.saveButton.setBackground(locked ? MainGui.PROG_COLOR_BTN_DIS : MainGui.PROG_COLOR_BTN_EN);
 		this.exportButton.setEnabled(!locked);
 		this.exportButton.setBackground(locked ? MainGui.PROG_COLOR_BTN_DIS : MainGui.PROG_COLOR_BTN_EN);
-		this.refreshButton.setEnabled(!locked);
-		this.refreshButton.setBackground(locked ? MainGui.PROG_COLOR_BTN_DIS : MainGui.PROG_COLOR_BTN_EN);
+		this.refreshAllButton.setEnabled(!locked);
+		this.refreshAllButton.setBackground(locked ? MainGui.PROG_COLOR_BTN_DIS : MainGui.PROG_COLOR_BTN_EN);
 		this.openOpButton.setEnabled(!locked);
 		this.openOpButton.setBackground(locked ? MainGui.PROG_COLOR_BTN_DIS : MainGui.PROG_COLOR_BTN_EN);
 		this.autoSaveCheckbox.setEnabled(!locked);

@@ -13,8 +13,7 @@ import java.awt.event.WindowEvent;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 import javax.swing.WindowConstants;
-
-
+import javax.swing.border.Border;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
@@ -30,7 +29,7 @@ import java.awt.Dimension;
 @SuppressWarnings("serial")
 public class MainGui extends JFrame implements WindowListener {
 	public  static final String PROG_NAME 			= "Video Keeper";
-	public  static final String PROG_VER			= "2.0";
+	public  static final String PROG_VER			= "3.0a1";
 	public  static final String PROG_FONT			= "Arial";
 	public	static final Color 	PROG_COLOR_BKRND	= new Color(3156004);
 	public	static final Color	PROG_COLOR_BTN_EN	= new Color(8388608);
@@ -47,6 +46,8 @@ public class MainGui extends JFrame implements WindowListener {
 	private static final String ADD_BUTTON_TXT 		= "Add";
 	private static final String ADD_LABEL_TXT 		= "Add Video Links to Watch List.";
 	private static final String PASTE_BUTTON_TXT 	= "Paste";
+	private static final String SAVE_BUTTON_TXT 	= "Save";
+	private static final String REFR_BUTTON_TXT 	= "Refresh";
 	private static final String TO_WATCH_TXT 		= "Videos:";
 	private static final String UP_NEXT_TXT			= " -- Up Next -- ";
 	private static final String EMPTY_QUEUE_TXT		= "~ No Video Links in Watch List ~";
@@ -54,9 +55,10 @@ public class MainGui extends JFrame implements WindowListener {
 	private static final String TOOLTIP_ADD			= "Add pasted video link to watch list.";
 	private static final String TOOLTIP_HEAD		= "Return to head of the watch list.";
 	private static final String TOOLTIP_SETTINGS	= "Settings";
+	private static final String TOOLTIP_REFRESH		= "Refresh video metadata.";
 	private static final String CHANNEL_PREFIX 		= "By: ";
 	private static final int 	WIN_X 				= 600;
-	private static final int 	WIN_Y 				= 350;
+	private static final int 	WIN_Y 				= 400;
 	private static final int 	URL_FIELD_X			= 450;
 	private static final int 	URL_FIELD_Y			= 40;
 	private static final int 	UP_NEXT_FONT_SIZE 	= 20;
@@ -65,6 +67,7 @@ public class MainGui extends JFrame implements WindowListener {
 	private DataModel model;
 	private VideoKeeper keeper;
 	private SettingsDialog settings;
+	private MainGui mainGui;
 	private JButton nextButton;
 	private JButton prevButton;
 	private JButton addButton;
@@ -72,6 +75,8 @@ public class MainGui extends JFrame implements WindowListener {
 	private JButton skipButton;
 	private JButton headButton;
 	private JButton settButton;
+	private JButton saveButton;
+	private JButton refreshButton;
 	private JLabel upNextLabel;
 	private JLabel counterLabel;
 	private JLabel titleLabel;
@@ -86,6 +91,7 @@ public class MainGui extends JFrame implements WindowListener {
 	public MainGui(DataModel model) {
 		this.model = model;
 		this.keeper = new VideoKeeper(model, this);
+		this.mainGui = this;
 		this.settings = new SettingsDialog(this, model);
 		this.nextButton = new JButton(NEXT_BUTTON_TXT);
 		this.prevButton = new JButton(PREV_BUTTON_TXT);
@@ -94,6 +100,8 @@ public class MainGui extends JFrame implements WindowListener {
 		this.headButton = new JButton(HEAD_BUTTON_TXT);
 		this.settButton = new JButton(SETT_BUTTON_TXT);
 		this.pasteButton = new JButton(PASTE_BUTTON_TXT);
+		this.saveButton = new JButton(SAVE_BUTTON_TXT);
+		this.refreshButton = new JButton(REFR_BUTTON_TXT);
 		this.upNextLabel = new JLabel();
 		this.counterLabel = new JLabel("0");
 		this.titleLabel = new JLabel();
@@ -124,6 +132,7 @@ public class MainGui extends JFrame implements WindowListener {
 	
 	private JPanel makeNorthPanel() {
 		JPanel north = new JPanel(new GridLayout(5, 1));
+		JPanel topPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
 		
 		north.setBackground(new Color(8617596));
 		
@@ -143,7 +152,15 @@ public class MainGui extends JFrame implements WindowListener {
 		channelLabel.setText("By: Test");
 		channelLabel.setHorizontalAlignment(JLabel.CENTER);
 		channelLabel.setForeground(PROG_COLOR_TXT_DRK);
+		refreshButton.setToolTipText(TOOLTIP_REFRESH);
+		settButton.setToolTipText(TOOLTIP_SETTINGS);
+		settButton.setBackground(PROG_COLOR_BTN_EN);
 		
+		topPanel.add(settButton);
+		topPanel.add(saveButton);
+		topPanel.add(refreshButton);
+		
+		north.add(topPanel);
 		north.add(upNextLabel);
 		north.add(titleLabel);
 		north.add(dateLabel);
@@ -154,10 +171,12 @@ public class MainGui extends JFrame implements WindowListener {
 	
 	private JPanel makeCenterPanel() {
 		GridLayout layout = new GridLayout(2, 1);
+		BorderLayout centerLayout = new BorderLayout();
 		
 		layout.setVgap(5);
+		centerLayout.setHgap(2);
 		
-		JPanel center = new JPanel(new BorderLayout());
+		JPanel center = new JPanel(centerLayout);
 		JPanel urlPanel = new JPanel(new FlowLayout());
 		JPanel buttonPanel = new JPanel(layout);
 		JLabel addLabel = new JLabel(ADD_LABEL_TXT);
@@ -167,9 +186,9 @@ public class MainGui extends JFrame implements WindowListener {
 		buttonPanel.setBackground(PROG_COLOR_BKRND);
 		addLabel.setBackground(PROG_COLOR_BKRND);
 		urlField.setPreferredSize(new Dimension(URL_FIELD_X, URL_FIELD_Y));
-		settButton.setPreferredSize(new Dimension(URL_FIELD_Y, URL_FIELD_Y));
-		settButton.setToolTipText(TOOLTIP_SETTINGS);
-		settButton.setBackground(PROG_COLOR_BTN_EN);
+//		settButton.setPreferredSize(new Dimension(URL_FIELD_Y, URL_FIELD_Y));
+//		settButton.setToolTipText(TOOLTIP_SETTINGS);
+//		settButton.setBackground(PROG_COLOR_BTN_EN);
 		addLabel.setFont(new Font(PROG_FONT, Font.PLAIN, VID_DATA_FONT_SIZE-2));
 		addLabel.setHorizontalAlignment(JLabel.CENTER);
 		addLabel.setForeground(PROG_COLOR_TXT_LT);
@@ -181,7 +200,7 @@ public class MainGui extends JFrame implements WindowListener {
 		buttonPanel.add(pasteButton);
 		buttonPanel.add(addButton);
 		
-		urlPanel.add(settButton);
+//		urlPanel.add(settButton);
 		urlPanel.add(urlField);
 		urlPanel.add(buttonPanel);
 		
@@ -321,6 +340,20 @@ public class MainGui extends JFrame implements WindowListener {
 			@Override
 			public void focusGained(final FocusEvent focusEvent) {
 				urlFieldFocusGained(focusEvent);
+			}
+		});
+		
+		saveButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				String mess = "Watch list could not be saved to database file.";
+				boolean saved = save();
+				
+				if(saved) {
+					saveEnabled(false);
+				} else {
+					JOptionPane.showMessageDialog(mainGui, mess, MainGui.PROG_NAME + " -- Save Failure", JOptionPane.ERROR_MESSAGE);
+				}
 			}
 		});
 	}
@@ -475,6 +508,16 @@ public class MainGui extends JFrame implements WindowListener {
 	
 	public int getCount() {
 		return count;
+	}
+	
+	public void saveEnabled(boolean enable) {
+		if(enable) {
+			saveButton.setEnabled(true);
+			saveButton.setBackground(MainGui.PROG_COLOR_BTN_EN);
+		} else {
+			saveButton.setEnabled(false);
+			saveButton.setBackground(MainGui.PROG_COLOR_BTN_DIS);
+		}
 	}
 
 	@Override
