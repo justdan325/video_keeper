@@ -174,7 +174,7 @@ public class MainGui extends JFrame implements WindowListener {
 		addLabel.setHorizontalAlignment(JLabel.CENTER);
 		addLabel.setForeground(PROG_COLOR_TXT_LT);
 		pasteButton.setBackground(PROG_COLOR_BTN_EN);
-		addButton.setBackground(PROG_COLOR_BTN_EN);
+		addButton.setBackground(PROG_COLOR_BTN_DIS);
 		pasteButton.setToolTipText(TOOLTIP_PASTE);
 		addButton.setToolTipText(TOOLTIP_ADD);
 		
@@ -306,8 +306,10 @@ public class MainGui extends JFrame implements WindowListener {
 			public void keyReleased(KeyEvent e) {
 				if(urlField.getText().trim().equals(PASTE_MESS) == false && urlField.getText().trim().length() > 0) {
 					addButton.setEnabled(true);
+					addButton.setBackground(PROG_COLOR_BTN_EN);
 				} else {
 					addButton.setEnabled(false);
+					addButton.setBackground(PROG_COLOR_BTN_DIS);
 				}
 			}
 			
