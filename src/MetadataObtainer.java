@@ -503,6 +503,16 @@ public class MetadataObtainer {
 				}
 				
 				time = convertSecondsToTimeStr(seconds);
+				
+				if(atTime.isPresent()) {
+					String progress = atTime.get();
+					
+					progress = progress.replace("h", ":");
+					progress = progress.replace("m", ":");
+					progress = progress.replace("s", "");
+					
+					time += " (in progress " + progress + ")";
+				}
 			} 
 		}
 		
@@ -623,13 +633,18 @@ public class MetadataObtainer {
 		return sanitized;
 	}
 
-	private static String sanitizeTwitch(String urlStr) {
+	private String sanitizeTwitch(String urlStr) {
+		final String TIME_Q_PARAM = "?t=";
 		String sanitized = urlStr;
 		
 		//normal twitch video id i.e. https://www.twitch.tv/videos/997396590
 		//must convert to mobile to get data
 		if(urlStr.startsWith(TWITCH_PREFIX_W)) {
 			sanitized = urlStr.replaceFirst(TWITCH_PREFIX_W, TWITCH_PREFIX_MOB);
+		}
+		
+		if(sanitized.contains(TIME_Q_PARAM)) {
+			atTime = Optional.of(sanitized.substring(sanitized.indexOf(TIME_Q_PARAM) + TIME_Q_PARAM.length(), sanitized.lastIndexOf("s") + 1));
 		}
 
 		return sanitized;
