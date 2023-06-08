@@ -46,7 +46,7 @@ public class MainGui extends JFrame implements WindowListener {
 	private static final String PASTE_BUTTON_TXT 	= "Paste";
 	private static final String SAVE_BUTTON_TXT 	= "Save";
 	private static final String REFR_BUTTON_TXT 	= "Refresh";
-	private static final String TO_WATCH_TXT 		= "Videos:";
+//	private static final String TO_WATCH_TXT 		= "Videos:";
 	private static final String UP_NEXT_TXT			= " -- Up Next -- ";
 	private static final String EMPTY_QUEUE_TXT		= "~ No Video Links in Watch List ~";
 	private static final String TOOLTIP_PASTE		= "Paste a video link from the clip board.";
@@ -84,6 +84,7 @@ public class MainGui extends JFrame implements WindowListener {
 	private JTextField urlField;
 	private JPanel mainPanel;
 	private int count;
+	private int index;
 	private boolean locked;
 	private boolean notAtHead;
 	private boolean refreshing;
@@ -111,6 +112,7 @@ public class MainGui extends JFrame implements WindowListener {
 		this.urlField = new JTextField(PASTE_MESS);
 		this.mainPanel = new JPanel(new BorderLayout());
 		this.count = 0;
+		this.index = 0;
 		this.locked = false;
 		this.notAtHead = false;
 		
@@ -229,7 +231,7 @@ public class MainGui extends JFrame implements WindowListener {
 		JPanel south = new JPanel(mainLayout);
 		JPanel buttonPanel = new JPanel(subLayout);
 		JPanel toWatchPanel = new JPanel(toWatchLayout);
-		JLabel toWatchLabel = new JLabel(TO_WATCH_TXT);
+		JLabel toWatchLabel = new JLabel();
 		
 		south.setBackground(PROG_COLOR_BKRND);
 		buttonPanel.setBackground(PROG_COLOR_BKRND);
@@ -400,7 +402,8 @@ public class MainGui extends JFrame implements WindowListener {
 					}
 					
 					count = keeper.getSize();
-					counterLabel.setText("" + count);
+					index = keeper.getCurrIndex() + 1;
+					counterLabel.setText(index + "/" + count);
 					
 					if(urlField.getText().trim().equals(PASTE_MESS) == false && urlField.getText().trim().length() > 0) {
 						addButton.setEnabled(true);

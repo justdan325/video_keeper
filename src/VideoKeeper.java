@@ -39,6 +39,10 @@ public class VideoKeeper {
 		return vidNodeList.size();
 	}
 	
+	public int getCurrIndex() {
+		return vidNodeList.getIndex();
+	}
+	
 	public VideoDataNode getPrev() {
 		return prev;
 	}
