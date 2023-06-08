@@ -37,7 +37,8 @@ public class MainGui extends JFrame implements WindowListener {
 	private static final String PASTE_MESS 			= "<Paste Video Link Here>";
 	private static final String NEXT_BUTTON_TXT 	= "Play Next";
 	private static final String PREV_BUTTON_TXT 	= "Play Prev.";
-	private static final String SKIP_BUTTON_TXT 	= "Skip";
+	private static final String FWRD_BUTTON_TXT 	= ">";
+	private static final String BKWRD_BUTTON_TXT 	= "<";
 	private static final String HEAD_BUTTON_TXT 	= "Head";
 	private static final String SETT_BUTTON_TXT 	= "*";
 	private static final String ADD_BUTTON_TXT 		= "Add";
@@ -69,7 +70,8 @@ public class MainGui extends JFrame implements WindowListener {
 	private JButton prevButton;
 	private JButton addButton;
 	private JButton pasteButton;
-	private JButton skipButton;
+	private JButton fwrdButton;
+	private JButton bkwrdButton;
 	private JButton headButton;
 	private JButton settButton;
 	private JButton saveButton;
@@ -83,7 +85,8 @@ public class MainGui extends JFrame implements WindowListener {
 	private JPanel mainPanel;
 	private int count;
 	private boolean locked;
-	private boolean skipped;
+	private boolean notAtHead;
+	private boolean refreshing;
 	
 	public MainGui(DataModel model) {
 		this.model = model;
@@ -93,7 +96,8 @@ public class MainGui extends JFrame implements WindowListener {
 		this.nextButton = new JButton(NEXT_BUTTON_TXT);
 		this.prevButton = new JButton(PREV_BUTTON_TXT);
 		this.addButton = new JButton(ADD_BUTTON_TXT);
-		this.skipButton = new JButton(SKIP_BUTTON_TXT);
+		this.fwrdButton = new JButton(FWRD_BUTTON_TXT);
+		this.bkwrdButton = new JButton(BKWRD_BUTTON_TXT);
 		this.headButton = new JButton(HEAD_BUTTON_TXT);
 		this.settButton = new JButton(SETT_BUTTON_TXT);
 		this.pasteButton = new JButton(PASTE_BUTTON_TXT);
@@ -108,7 +112,7 @@ public class MainGui extends JFrame implements WindowListener {
 		this.mainPanel = new JPanel(new BorderLayout());
 		this.count = 0;
 		this.locked = false;
-		this.skipped = false;
+		this.notAtHead = false;
 		
 		mainPanel.add(makeNorthPanel(), BorderLayout.NORTH);
 		mainPanel.add(makeCenterPanel(), BorderLayout.CENTER);
@@ -218,7 +222,7 @@ public class MainGui extends JFrame implements WindowListener {
 		final int BUTTON_LENGTH = 104;
 		final int BUTTON_WIDTH = 25;
 		
-		mainLayout.setHgap(25);
+		mainLayout.setHgap(15);
 		mainLayout.setVgap(40);
 		subLayout.setHgap(15);
 		
@@ -235,18 +239,21 @@ public class MainGui extends JFrame implements WindowListener {
 		counterLabel.setForeground(PROG_COLOR_TXT_LT);
 		nextButton.setBackground(PROG_COLOR_BTN_EN);
 		nextButton.setPreferredSize(new Dimension(BUTTON_LENGTH, BUTTON_WIDTH));
-		skipButton.setBackground(PROG_COLOR_BTN_EN);
-		skipButton.setPreferredSize(new Dimension(BUTTON_LENGTH/2+20, BUTTON_WIDTH));
+		fwrdButton.setBackground(PROG_COLOR_BTN_EN);
+		fwrdButton.setPreferredSize(new Dimension(BUTTON_LENGTH/2 - 5, BUTTON_WIDTH));
+		bkwrdButton.setBackground(PROG_COLOR_BTN_EN);
+		bkwrdButton.setPreferredSize(new Dimension(BUTTON_LENGTH/2 - 5, BUTTON_WIDTH));
 		headButton.setBackground(PROG_COLOR_BTN_EN);
-		headButton.setPreferredSize(new Dimension(BUTTON_LENGTH/2+20, BUTTON_WIDTH));
+		headButton.setPreferredSize(new Dimension(BUTTON_LENGTH/2 + 20, BUTTON_WIDTH));
 		headButton.setToolTipText(TOOLTIP_HEAD);
 		prevButton.setBackground(PROG_COLOR_BTN_EN);
 		prevButton.setPreferredSize(new Dimension(BUTTON_LENGTH, BUTTON_WIDTH));
 		
 		buttonPanel.add(nextButton);
 		buttonPanel.add(prevButton);
-		buttonPanel.add(skipButton);
+		buttonPanel.add(bkwrdButton);
 		buttonPanel.add(headButton);
+		buttonPanel.add(fwrdButton);
 		toWatchPanel.add(toWatchLabel);
 		toWatchPanel.add(counterLabel);
 		
@@ -265,22 +272,28 @@ public class MainGui extends JFrame implements WindowListener {
 		
 		prevButton.addActionListener((new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				keeper.openCurr();
+				keeper.openPrev();
 			}
 		}));
 		
-		skipButton.addActionListener((new ActionListener() {
+		fwrdButton.addActionListener((new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				keeper.skipNext();
-				skipped = true;
+				notAtHead = !keeper.skipToNext();
 			}
 		}));
+		
+		bkwrdButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				notAtHead = !keeper.goBackToPrev();
+			}
+		});
 		
 		headButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
-				keeper.addSkipped();
-				skipped = false;
+				keeper.head();
+				notAtHead = false;
 			}
 		});
 		
@@ -340,7 +353,20 @@ public class MainGui extends JFrame implements WindowListener {
 		refreshButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				keeper.refreshNextInSepThread(false);
+				new Thread(new Runnable() {
+					@Override
+					public void run() {
+						refreshing = true;
+						refreshButton.setEnabled(false);
+						refreshButton.setBackground(PROG_COLOR_BTN_DIS);
+						keeper.refreshCurr(false);
+						refreshButton.setBackground(PROG_COLOR_BTN_EN);
+						refreshButton.setEnabled(true);
+						refreshing = false;			
+						saveButton.setEnabled(true);
+						saveButton.setBackground(PROG_COLOR_BTN_EN);
+					}
+				}).start();
 			}
 		});
 	}
@@ -388,11 +414,14 @@ public class MainGui extends JFrame implements WindowListener {
 						nextButton.setEnabled(true);
 						nextButton.setBackground(PROG_COLOR_BTN_EN);
 						upNextLabel.setText(UP_NEXT_TXT);
-						titleLabel.setText(keeper.getNextTitle(true));
-						titleLabel.setToolTipText(keeper.getNextTitle(false));
-						dateAndTimeLabel.setText(keeper.getNextDateAndTime());
-						refreshButton.setEnabled(true);
-						refreshButton.setBackground(PROG_COLOR_BTN_EN);
+						titleLabel.setText(keeper.getCurrTitle(true));
+						titleLabel.setToolTipText(keeper.getCurrTitle(false));
+						dateAndTimeLabel.setText(keeper.getCurrDateAndTime());
+						
+						if (refreshing == false) {
+							refreshButton.setEnabled(true);
+							refreshButton.setBackground(PROG_COLOR_BTN_EN);
+						}
 
 						if(keeper.getNextChannel().length() > 0) {
 							channelLabel.setText(CHANNEL_PREFIX + keeper.getNextChannel());
@@ -407,37 +436,46 @@ public class MainGui extends JFrame implements WindowListener {
 						titleLabel.setToolTipText("");
 						dateAndTimeLabel.setText(" ");
 						channelLabel.setText(" ");
-						refreshButton.setEnabled(false);
-						refreshButton.setBackground(PROG_COLOR_BTN_DIS);
+						
+						if (refreshing == false) {
+							refreshButton.setEnabled(false);
+							refreshButton.setBackground(PROG_COLOR_BTN_DIS);
+						}
 					}
 					
 					if(count > 1) {
-						skipButton.setEnabled(true);
-						skipButton.setBackground(PROG_COLOR_BTN_EN);
+						fwrdButton.setEnabled(true);
+						fwrdButton.setBackground(PROG_COLOR_BTN_EN);
 						
-						if(skipped) {
+						if(notAtHead) {
 							headButton.setEnabled(true);
 							headButton.setBackground(PROG_COLOR_BTN_EN);
+							bkwrdButton.setEnabled(true);
+							bkwrdButton.setBackground(PROG_COLOR_BTN_EN);
 						} else {
 							headButton.setEnabled(false);
 							headButton.setBackground(PROG_COLOR_BTN_DIS);
+							bkwrdButton.setEnabled(false);
+							bkwrdButton.setBackground(PROG_COLOR_BTN_DIS);
 						}
 					} else {
-						skipButton.setEnabled(false);
-						skipButton.setBackground(PROG_COLOR_BTN_DIS);
+						fwrdButton.setEnabled(false);
+						fwrdButton.setBackground(PROG_COLOR_BTN_DIS);
+						bkwrdButton.setEnabled(false);
+						bkwrdButton.setBackground(PROG_COLOR_BTN_DIS);
 						headButton.setEnabled(false);
 						headButton.setBackground(PROG_COLOR_BTN_DIS);
 					}
 
-					if(keeper.getCurr() == null) {
+					if(keeper.getPrev() == null) {
 						prevButton.setEnabled(false);
 						prevButton.setBackground(PROG_COLOR_BTN_DIS);
 					} else {
 						prevButton.setEnabled(true);
 						prevButton.setBackground(PROG_COLOR_BTN_EN);
 						
-						if(keeper.getCurrTitle().length() > 0) {
-							prevButton.setToolTipText("Prev. Video: " + keeper.getCurrTitle());
+						if(keeper.getPrevTitle().length() > 0) {
+							prevButton.setToolTipText("Prev. Video: " + keeper.getPrevTitle());
 						} else {
 							prevButton.setToolTipText("");
 						}
@@ -492,8 +530,8 @@ public class MainGui extends JFrame implements WindowListener {
 		this.prevButton.setBackground(locked ? PROG_COLOR_BTN_DIS : PROG_COLOR_BTN_EN);
 		this.addButton.setEnabled(!locked);
 		this.addButton.setBackground(locked ? PROG_COLOR_BTN_DIS : PROG_COLOR_BTN_EN);
-		this.skipButton.setEnabled(!locked);
-		this.skipButton.setBackground(locked ? PROG_COLOR_BTN_DIS : PROG_COLOR_BTN_EN);
+		this.fwrdButton.setEnabled(!locked);
+		this.fwrdButton.setBackground(locked ? PROG_COLOR_BTN_DIS : PROG_COLOR_BTN_EN);
 		this.settButton.setEnabled(!locked);
 		this.settButton.setBackground(locked ? PROG_COLOR_BTN_DIS : PROG_COLOR_BTN_EN);
 		this.pasteButton.setEnabled(!locked);

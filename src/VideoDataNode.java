@@ -66,7 +66,7 @@ public class VideoDataNode {
 		if(url == null || !url.contains(".")) {
 			clear();
 		} else {
-			this.url = url;
+			this.url = url.trim();
 		}
 	}
 	
@@ -82,7 +82,7 @@ public class VideoDataNode {
 				title = title.replaceAll("\\" + DELIM, "_");
 			}
 			
-			this.title = title;
+			this.title = title.trim();
 		}
 	}
 	
@@ -94,7 +94,7 @@ public class VideoDataNode {
 		if(date == null) {
 			this.date = "";
 		} else {
-			this.date = date;
+			this.date = date.trim();
 		}
 	}
 	
@@ -110,7 +110,7 @@ public class VideoDataNode {
 				channel = channel.replaceAll("\\" + DELIM, "_");
 			}
 			
-			this.channel = channel;
+			this.channel = channel.trim();
 		}
 	}
 	
@@ -126,7 +126,7 @@ public class VideoDataNode {
 				time = time.replaceAll("\\" + DELIM, "_");
 			}
 			
-			this.time = time;
+			this.time = time.trim();
 		}
 	}
 	

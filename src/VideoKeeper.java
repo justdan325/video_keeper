@@ -1,4 +1,5 @@
-import java.util.LinkedList;
+import java.util.ArrayList;
+import java.util.Optional;
 import java.io.*;
 import java.util.Scanner;
 import java.util.Timer;
@@ -18,38 +19,38 @@ public class VideoKeeper {
 	public static final String LNK_HNDL_LNK_VAR 	= "%VIDEOLINK%";
 	
 	private DataModel		model;
-	private Queue 			mainQueue;
-//	private Queue 			addedQueue;
-	private Queue			skipQueue;
-	private VideoDataNode 	curr;
+	private VideoList		vidNodeList;
+	private VideoDataNode 	prev;
 	private MainGui 		mainGui;
 	private String			database;
 	
 	public VideoKeeper(DataModel model, MainGui mainGui) {
-		this.model				= model;
-		this.mainQueue 			= new Queue();	
-//		this.addedQueue 		= new Queue();
-		this.skipQueue			= new Queue();
-		this.mainGui 			= mainGui;
-		this.curr 				= null;
-		this.database			= model.getDatabaseFile();
+		this.model			= model;
+		this.vidNodeList 	= new VideoList();
+		this.mainGui 		= mainGui;
+		this.prev 			= null;
+		this.database		= model.getDatabaseFile();
 		
 		populateQueue();
 		monitorDatabase();
 	}
 	
 	public int getSize() {
-		return mainQueue.size() + skipQueue.size();
+		return vidNodeList.size();
 	}
 	
-	public VideoDataNode getCurr() {
-		return curr;
+	public VideoDataNode getPrev() {
+		return prev;
+	}
+	
+	public void head() {
+		vidNodeList.resetIndex();
 	}
 	
 	public void add(VideoDataNode item) {
 		boolean addItem = true;
 		
-		if(model.isCheckForDupl() && mainQueue.contains(item)) {
+		if(model.isCheckForDupl() && vidNodeList.contains(item.getUrl())) {
 			int option = JOptionPane.showConfirmDialog(mainGui, "Link is already in watch list. Add anyway?", MainGui.PROG_NAME + " -- Duplicate Video",  JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
 
 			if(option == JOptionPane.YES_OPTION) {
@@ -96,80 +97,108 @@ public class VideoKeeper {
 			
 			thread.start();
 			
-//			addedQueue.push(item);
-			mainQueue.push(item);
+			vidNodeList.append(item);
 		}
 	}
 		
-	public void openCurr() {
-		if(curr != null && !curr.isEmpty()) {
-			handleLink(curr.getUrl());
+	public void openPrev() {
+		if(prev != null && !prev.isEmpty()) {
+			handleLink(prev.getUrl());
 		}
 	}
 	
 	public void openNext() {
-		if(mainQueue.size() > 0) {
-			curr = mainQueue.pop();
+		if(vidNodeList.size() > 0) {
+			prev = vidNodeList.popCurr().get();
 			
-			if(!curr.isEmpty()) {
-				handleLink(curr.getUrl());
+			if(!prev.isEmpty()) {
+				handleLink(prev.getUrl());
 			}
 			
-			refreshNextInSepThread(true);
-		} else if(skipQueue.size() > 0) {
-			addSkipped();
-			openNext();
+			refreshCurrInSepThread(true);
+//		} else if(skipQueue.size() > 0) {
+//			addSkipped();
+//			openNext();
 		}
 	}
 	
-	public void skipNext() {
-		if(mainQueue.size() > 0) {
-			curr = mainQueue.pop();
-			skipQueue.push(curr);
-			refreshNextInSepThread(true);
-		} else if(mainQueue.size() == 0 && skipQueue.size() > 0) {
-			addSkipped();
-			skipNext();
-		}
-	}
-	
-	public synchronized void addSkipped() {
-		Queue temp = new Queue();
+	public boolean skipToNext() {
+		Optional<VideoDataNode> opt = Optional.empty();
+		boolean atHead = false;
 		
-		if(skipQueue.size() > 0) {
-			while(skipQueue.size() > 0) {
-				VideoDataNode node = skipQueue.pop();
-				temp.push(node);
-			}
-
-			while(mainQueue.size() > 0) {
-				VideoDataNode node = mainQueue.pop();
-				temp.push(node);
-			}
-
-			while(temp.size() > 0) {
-				VideoDataNode node = temp.pop();
-				mainQueue.push(node);
+		refreshCurrInSepThread(true);
+		
+		opt = vidNodeList.peek(vidNodeList.getIndex());
+		
+		if (opt.isPresent()) {
+			prev = opt.get();
+			vidNodeList.incrementIndex();
+			
+			if(vidNodeList.getIndex() <= 0) {
+				atHead = true;
 			}
 		}
+		
+		return atHead;
 	}
 	
-	public void refreshNextInSepThread(boolean abortIfNotEmpty) {
+	public boolean goBackToPrev() {
+		Optional<VideoDataNode> opt = Optional.empty();
+		boolean atHead = false;
+		
+		opt = vidNodeList.peek(vidNodeList.getIndex());
+		
+		if (opt.isPresent()) {
+			prev = opt.get();
+			vidNodeList.deccrementIndex();
+			
+			if(vidNodeList.getIndex() <= 0) {
+				atHead = true;
+			}
+		}
+		
+		return atHead;
+	}
+	
+//	public synchronized void addSkipped() {
+//		Queue temp = new Queue();
+//		
+//		if(skipQueue.size() > 0) {
+//			while(skipQueue.size() > 0) {
+//				VideoDataNode node = skipQueue.pop();
+//				temp.push(node);
+//			}
+//
+//			while(mainQueue.size() > 0) {
+//				VideoDataNode node = mainQueue.pop();
+//				temp.push(node);
+//			}
+//
+//			while(temp.size() > 0) {
+//				VideoDataNode node = temp.pop();
+//				mainQueue.push(node);
+//			}
+//		}
+//	}
+	
+	public void refreshCurrInSepThread(boolean abortIfNotEmpty) {
 		Thread thread = new Thread(new Runnable() {
 			@Override
 			public void run() {
-				refreshNext(abortIfNotEmpty);
+				refreshCurr(abortIfNotEmpty);
 			}
 		});
 		
 		thread.start();
 	}
 	
-	public void refreshNext(boolean abortIfNotEmpty) {
-		if(mainQueue.size() > 0) {
-			VideoDataNode temp = mainQueue.peek();
+	public void refreshCurr(boolean abortIfNotEmpty) {
+		if(vidNodeList.size() > 0) {
+			Optional<VideoDataNode> opt = vidNodeList.peekCurr();
 
-			if(!temp.isEmpty()) {
+			if(opt.isPresent() && opt.get().isEmpty() == false) {
+				VideoDataNode temp = opt.get();
+				
 				if(abortIfNotEmpty == false || temp.getTitle().length() < 1 || temp.getDate().length() < 1 || temp.getChannel().length() < 1) {
 					MetadataObtainer obtainer = new MetadataObtainer(temp.getUrl());
 
@@ -196,17 +225,16 @@ public class VideoKeeper {
 	public void refreshAll() {
 		ProgressBar progBar = new ProgressBar(mainGui);
 		
-		progBar.setMax(mainQueue.size());
+		progBar.setMax(vidNodeList.size());
 		progBar.showProgressBar();
-		skipQueue.clear();
-		mainQueue.clear();
+		vidNodeList.clear();
 		populateQueue();
 		
-		if(mainQueue.size() > 0) {
-			Queue tempQ = new Queue();
+		if(vidNodeList.size() > 0) {
+			VideoList tempQ = new VideoList(vidNodeList);
 
-			while(mainQueue.size() > 0) {
-				VideoDataNode temp = mainQueue.pop();
+			while(vidNodeList.size() > 0) {
+				VideoDataNode temp = vidNodeList.popCurr().get();
 				
 				if(!temp.isEmpty()) {
 					MetadataObtainer obtainer = new MetadataObtainer(temp.getUrl());
@@ -217,58 +245,50 @@ public class VideoKeeper {
 					temp.setTime(obtainer.getTime());
 				}
 				
-				tempQ.push(temp);
+				tempQ.append(temp);
 				progBar.progress();
 			}
 			
 			while(tempQ.size() > 0) {
-				mainQueue.push(tempQ.pop());
+				vidNodeList.append(tempQ.popCurr().get());
 			}
 		}
 		
 		progBar.kill();
 	}
 	
-	public String getNextTitle(boolean truncate) {
+	public String getCurrTitle(boolean truncate) {
 		String nextTitle = "";
 
-		if(mainQueue.size() > 0) {
-			nextTitle = mainQueue.peek().getTitle();
-		} else if(mainQueue.size() == 0 && skipQueue.size() > 0) {
-			nextTitle = skipQueue.peek().getTitle();
+		if (vidNodeList.size() > 0) {
+			nextTitle = vidNodeList.peekCurr().get().getTitle();
 		}
-		
-		if(nextTitle.length() > 60 && truncate) {
+
+		if (nextTitle.length() > 60 && truncate) {
 			nextTitle = nextTitle.substring(0, 60) + ". . .";
 		}
 		
 		return nextTitle;
 	}
 	
-	public String getCurrTitle() {
-		String currTitle = "";
+	public String getPrevTitle() {
+		String prevTitle = "";
 
-		if(curr != null) {
-			currTitle = curr.getTitle();
+		if(prev != null) {
+			prevTitle = prev.getTitle();
 		}
 		
-		return currTitle;
+		return prevTitle;
 	}
 	
-	public String getNextDateAndTime() {
+	public String getCurrDateAndTime() {
 		String nextDate = "";
 
-		if (mainQueue.size() > 0) {
-			if (mainQueue.peek().getDate().length() > 1 && mainQueue.peek().getTime().length() > 1) {
-				nextDate = mainQueue.peek().getDate() + "   ~   Len. " + mainQueue.peek().getTime();
+		if (vidNodeList.size() > 0) {
+			if (vidNodeList.peekCurr().get().getDate().length() > 1 && vidNodeList.peekCurr().get().getTime().length() > 1) {
+				nextDate = vidNodeList.peekCurr().get().getDate() + "   ~   Len. " + vidNodeList.peekCurr().get().getTime();
 			} else {
-				nextDate = mainQueue.peek().getDate() + mainQueue.peek().getTime();
-			}
-		} else if (mainQueue.size() == 0 && skipQueue.size() > 0) {
-			if (skipQueue.peek().getDate().length() > 1 && skipQueue.peek().getTime().length() > 1) {
-				nextDate = skipQueue.peek().getDate() + "   ~   Len. " + skipQueue.peek().getTime();
-			} else {
-				nextDate = skipQueue.peek().getDate() + skipQueue.peek().getTime();
+				nextDate = vidNodeList.peekCurr().get().getDate() + vidNodeList.peekCurr().get().getTime();
 			}
 		}
 		
@@ -278,20 +298,15 @@ public class VideoKeeper {
 	public String getNextChannel() {
 		String nextChannel = "";
 
-		if(mainQueue.size() > 0) {
-			nextChannel = mainQueue.peek().getChannel();
-		} else if(mainQueue.size() == 0 && skipQueue.size() > 0) {
-			nextChannel = skipQueue.peek().getChannel();
+		if(vidNodeList.size() > 0) {
+			nextChannel = vidNodeList.peekCurr().get().getChannel();
 		}
 		
 		return nextChannel;
 	}
 	
 	public void populateQueue() {
-//		Queue temp = new Queue();
-//		VideoDataNode hold;
-		mainQueue.clear();
-		skipQueue.clear();
+		vidNodeList.clear();
 		
 		String[] list = readFile(database).split("\n");
 		
@@ -299,47 +314,26 @@ public class VideoKeeper {
 			VideoDataNode node = new VideoDataNode(list[i]);
 			
 			if(!(i == 0 || i == list.length-1) || !node.isEmpty()) {
-				mainQueue.push(node);
+				vidNodeList.append(node);
 			}
 		}
 		
-		//I have no clue why I had added this, but all it was doing was cross-contaminating databases.
-		//Leaving it in case I remember what it does.
-//		while(addedQueue.size() > 0) {
-//			hold = addedQueue.pop();
-//			mainQueue.push(hold);
-//			temp.push(hold);
-//		}
-//		
-//		addedQueue = temp;
-		
-		refreshNextInSepThread(true);
+		refreshCurrInSepThread(true);
 	}
 	
 	public synchronized boolean save() {
-		Queue skipCopy = skipQueue.duplicate();
-		Queue mainCopy = mainQueue.duplicate();
+		VideoList mainCopy = new VideoList(vidNodeList);
 		String toWrite = "";
 		boolean saved = false;
 		int i = 0;
 		
-		while(skipCopy.size() > 0) {
-			if(i > 0) {
-				toWrite += "\n" + skipCopy.pop().toString();
+		while (mainCopy.size() > 0) {
+			if (i > 0) {
+				toWrite += "\n" + mainCopy.popCurr().get().toString();
 			} else {
-				toWrite += skipCopy.pop().toString();
+				toWrite += mainCopy.popCurr().get().toString();
 			}
-			
-			i++;
-		}
-		
-		while(mainCopy.size() > 0) {
-			if(i > 0) {
-				toWrite += "\n" + mainCopy.pop().toString();
-			} else {
-				toWrite += mainCopy.pop().toString();
-			}
-			
+
 			i++;
 		}
 		
@@ -352,25 +346,25 @@ public class VideoKeeper {
 	
 	public boolean exportUrls(String destination) {
 		String urls = "";
-		Queue tempQ = skipQueue.duplicate();
+		VideoList tempQ = new VideoList(vidNodeList);
 		boolean success = true;
 		
-		while(tempQ.size() > 0) {
-			urls += tempQ.pop().getUrl() + "\n";
+		while (tempQ.size() > 0) {
+			urls += tempQ.popCurr().get().getUrl() + "\n";
 		}
-		
-		tempQ = mainQueue.duplicate();
-		
-		while(tempQ.size() > 0) {
-			urls += tempQ.pop().getUrl() + "\n";
+
+		tempQ = new VideoList(vidNodeList);
+
+		while (tempQ.size() > 0) {
+			urls += tempQ.popCurr().get().getUrl() + "\n";
 		}
-		
+
 		if (urls.length() > 7) {
 			success = writeFile(urls, destination);
 		} else {
 			success = false;
 		}
-		
+
 		return success;
 	}
 	
@@ -550,73 +544,264 @@ public class VideoKeeper {
 	
 	/*********************************************************************************************************************/
 	
-	private class Queue {
-		private LinkedList<VideoDataNode> list;
+	private class VideoList {
+		private ArrayList<VideoDataNode> list;
+		private int index = -1;
 		
-		public Queue() {
-			list = new LinkedList<VideoDataNode>();
+		public VideoList() {
+			this.list = new ArrayList<>();
+		}
+		
+		public VideoList(VideoList orig) {
+			if (orig != null) {
+				this.list = new ArrayList<>();
+				
+				if (orig.size() > 0) {
+					for (int i = 0; i < orig.size(); i++) {
+						Optional<VideoDataNode> curr = orig.peek(i);
+
+						if (curr.isPresent()) {
+							this.append(curr.get());
+						}
+					}
+
+					this.index = orig.getIndex();
+				}
+			}
+		}
+		
+		public synchronized void append(VideoDataNode node) {
+			list.add(node);
+			
+			if(index < 0) {
+				resetIndex();;
+			}
 		}
 		
 		@SuppressWarnings("unused")
-		public synchronized void push(String item) {
-			list.addLast(new VideoDataNode(item));
+		public synchronized void prepend(VideoDataNode node) {
+			list.add(0, node);
+			
+			if (index != 0) {
+				incrementIndex();
+			} else {
+				resetIndex();
+			}
 		}
 		
-		public synchronized void push(VideoDataNode item) {
-			list.addLast(item);
+		@SuppressWarnings("unused")
+		public synchronized boolean insert(int index, VideoDataNode node) {
+			boolean added = false;
+			
+			if (index >= 0 && index <= this.index) {
+				list.add(index, node);
+				
+				if (index <= this.index) {
+					incrementIndex();
+				}
+				
+				added = true;
+			}
+			
+			return added;
 		}
 		
-		public synchronized VideoDataNode pop() {
-			return list.removeFirst();
+		public synchronized Optional<VideoDataNode> popCurr() {
+			Optional<VideoDataNode> curr = Optional.empty();
+			
+			if (list.size() > 0) {
+				curr = Optional.of(list.remove(index));
+
+				//reset index to head if it walks off of end of list or if list is empty
+				if (index > list.size() - 1) {
+					resetIndex();
+				}
+			}
+			
+			return curr;
 		}
 		
+		@SuppressWarnings("unused")
+		public synchronized Optional<VideoDataNode> pop(int index) {
+			Optional<VideoDataNode> curr = Optional.empty();
+
+			if (index >= 0 && index <= list.size() ) {
+				curr = Optional.of(list.remove(index));
+
+				//reset index to head if it walks off of end of list or if list is empty
+				if (index > list.size() - 1) {
+					resetIndex();
+				}
+			}
+
+			return curr;
+		}
+		
+		public synchronized Optional<VideoDataNode> peekCurr() {
+			Optional<VideoDataNode> curr = Optional.empty();
+
+			if (list.size() > 0) {
+				curr = Optional.of(list.get(index));
+			}
+
+			return curr;
+		}
+		
+		@SuppressWarnings("unused")
+		public synchronized Optional<VideoDataNode> peekNext() {
+			Optional<VideoDataNode> curr = Optional.empty();
+
+			if (list.size() > 0) {
+				if (index + 1 == list.size()) {
+					curr = Optional.of(list.get(0));
+				} else {
+					curr = Optional.of(list.get(index + 1));
+				}
+			}
+
+			return curr;
+		}
+		
+		public synchronized Optional<VideoDataNode> peek(int index) {
+			Optional<VideoDataNode> curr = Optional.empty();
+
+			if (index >= 0 && index <= list.size()) {
+				curr = Optional.of(list.get(index));
+			}
+
+			return curr;
+		}
+		
+		public synchronized int getIndex() {
+			return index;
+		}
+
+		@SuppressWarnings("unused")
+		public synchronized boolean setIndex(int index) {
+			boolean set = false;
+
+			if (index <= list.size() - 1) {
+				this.index = index;
+				set = true;
+			}
+
+			return set;
+		}
+
+		public synchronized void incrementIndex() {
+			index++;
+
+			if (index == list.size()) {
+				index = 0;
+			}
+		}
+		
+		public synchronized void deccrementIndex() {
+			index--;
+
+			if (index <= 0) {
+				resetIndex();;
+			}
+		}
+
 		public synchronized int size() {
 			return list.size();
 		}
 		
-		public synchronized VideoDataNode peek() {
-			return list.peekFirst();
-		}
-		
 		public synchronized void clear() {
 			list.clear();
+			index = -1;
 		}
 
-		//only compares url since that is the key
-		@SuppressWarnings("unused")
-		public synchronized boolean contains(String key) {
+		public synchronized void resetIndex() {
+			if (list.size() == 0) {
+				index = -1;
+			} else {
+				index = 0;
+			}
+		}
+
+		public synchronized boolean contains(String url) {
 			boolean contains = false;
 
-			for(VideoDataNode node : list) {
-				if(node.getUrl().equals(key)) {
+			for (VideoDataNode node : list) {
+				if (node.getUrl().equals(url)) {
 					contains = true;
+					break;
 				}
 			}
-			
-			return contains;
-		}
-		
-		//only compares url since that is the key
-		public synchronized boolean contains(VideoDataNode node) {
-			boolean contains = false;
 
-			for(VideoDataNode i : list) {
-				if(i.getUrl().equals(node.getUrl())) {
-					contains = true;
-				}
-			}
-			
 			return contains;
-		}
-		
-		public synchronized Queue duplicate() {
-			Queue copy = new Queue();
-			
-			for(VideoDataNode node : list) {
-				copy.push(node);
-			}
-			
-			return copy;
 		}
 	}
+	
+//	private class Queue {
+//		private LinkedList<VideoDataNode> list;
+//		
+//		public Queue() {
+//			list = new LinkedList<VideoDataNode>();
+//		}
+//		
+//		@SuppressWarnings("unused")
+//		public synchronized void push(String item) {
+//			list.addLast(new VideoDataNode(item));
+//		}
+//		
+//		public synchronized void push(VideoDataNode item) {
+//			list.addLast(item);
+//		}
+//		
+//		public synchronized VideoDataNode pop() {
+//			return list.removeFirst();
+//		}
+//		
+//		public synchronized int size() {
+//			return list.size();
+//		}
+//		
+//		public synchronized VideoDataNode peek() {
+//			return list.peekFirst();
+//		}
+//		
+//		public synchronized void clear() {
+//			list.clear();
+//		}
+//
+//		//only compares url since that is the key
+//		@SuppressWarnings("unused")
+//		public synchronized boolean contains(String key) {
+//			boolean contains = false;
+//
+//			for(VideoDataNode node : list) {
+//				if(node.getUrl().equals(key)) {
+//					contains = true;
+//				}
+//			}
+//			
+//			return contains;
+//		}
+//		
+//		//only compares url since that is the key
+//		public synchronized boolean contains(VideoDataNode node) {
+//			boolean contains = false;
+//
+//			for(VideoDataNode i : list) {
+//				if(i.getUrl().equals(node.getUrl())) {
+//					contains = true;
+//				}
+//			}
+//			
+//			return contains;
+//		}
+//		
+//		public synchronized Queue duplicate() {
+//			Queue copy = new Queue();
+//			
+//			for(VideoDataNode node : list) {
+//				copy.push(node);
+//			}
+//			
+//			return copy;
+//		}
+//	}
 }
