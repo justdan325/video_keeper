@@ -331,6 +331,8 @@ public class VideoKeeper {
 		boolean saved = false;
 		int i = 0;
 		
+		mainCopy.resetIndex();
+		
 		while (mainCopy.size() > 0) {
 			if (i > 0) {
 				toWrite += "\n" + mainCopy.popCurr().get().toString();
@@ -578,7 +580,7 @@ public class VideoKeeper {
 			list.add(node);
 			
 			if(index < 0) {
-				resetIndex();;
+				resetIndex();
 			}
 		}
 		
