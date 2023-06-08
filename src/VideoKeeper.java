@@ -31,7 +31,7 @@ public class VideoKeeper {
 		this.prev 			= null;
 		this.database		= model.getDatabaseFile();
 		
-		populateQueue();
+		populateList();
 		monitorDatabase();
 	}
 	
@@ -232,15 +232,16 @@ public class VideoKeeper {
 		progBar.setMax(vidNodeList.size());
 		progBar.showProgressBar();
 		vidNodeList.clear();
-		populateQueue();
+		populateList();
+		vidNodeList.resetIndex();
 		
 		if(vidNodeList.size() > 0) {
-			VideoList tempQ = new VideoList(vidNodeList);
+			VideoList tempList = new VideoList();
 
 			while(vidNodeList.size() > 0) {
 				VideoDataNode temp = vidNodeList.popCurr().get();
 				
-				if(!temp.isEmpty()) {
+				if(temp.isEmpty() == false) {
 					MetadataObtainer obtainer = new MetadataObtainer(temp.getUrl());
 					
 					temp.setTitle(obtainer.getTitle());
@@ -249,12 +250,12 @@ public class VideoKeeper {
 					temp.setTime(obtainer.getTime());
 				}
 				
-				tempQ.append(temp);
+				tempList.append(temp);
 				progBar.progress();
 			}
 			
-			while(tempQ.size() > 0) {
-				vidNodeList.append(tempQ.popCurr().get());
+			while(tempList.size() > 0) {
+				vidNodeList.append(tempList.popCurr().get());
 			}
 		}
 		
@@ -309,7 +310,7 @@ public class VideoKeeper {
 		return nextChannel;
 	}
 	
-	public void populateQueue() {
+	public void populateList() {
 		vidNodeList.clear();
 		
 		String[] list = readFile(database).split("\n");
@@ -395,7 +396,7 @@ public class VideoKeeper {
 						}
 						
 						database = model.getDatabaseFile();
-						populateQueue();
+						populateList();
 					}
 					
 					try {
