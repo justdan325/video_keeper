@@ -642,11 +642,8 @@ public class MetadataObtainer {
 		
 		//remove time tags
 		if(urlStr.contains("&t=")) {
-			this.atTime = Optional.of(sanitized.substring(sanitized.indexOf("&t=") + 3));
+			this.atTime = Optional.of(sanitized.substring(sanitized.indexOf("&t=") + 3, sanitized.lastIndexOf("s")));
 			sanitized = sanitized.substring(0, sanitized.indexOf("&t="));
-		} else if(urlStr.contains("?t=")) {
-			this.atTime = Optional.of(sanitized.substring(sanitized.indexOf("?t=") + 3));
-			sanitized = sanitized.substring(0, sanitized.indexOf("?t="));
 		}
 		
 		return sanitized;

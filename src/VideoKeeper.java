@@ -699,8 +699,8 @@ public class VideoKeeper {
 		public synchronized void deccrementIndex() {
 			index--;
 
-			if (index <= 0) {
-				resetIndex();;
+			if (index < 0 && list.size() >= 0) {
+				index = list.size() - 1;
 			}
 		}
 
