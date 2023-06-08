@@ -353,17 +353,11 @@ public class VideoKeeper {
 	
 	public boolean exportUrls(String destination) {
 		String urls = "";
-		VideoList tempQ = new VideoList(vidNodeList);
+		VideoList tempList = new VideoList(vidNodeList);
 		boolean success = true;
 		
-		while (tempQ.size() > 0) {
-			urls += tempQ.popCurr().get().getUrl() + "\n";
-		}
-
-		tempQ = new VideoList(vidNodeList);
-
-		while (tempQ.size() > 0) {
-			urls += tempQ.popCurr().get().getUrl() + "\n";
+		while (tempList.size() > 0) {
+			urls += tempList.popCurr().get().getUrl() + "\n";
 		}
 
 		if (urls.length() > 7) {
