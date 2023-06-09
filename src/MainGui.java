@@ -480,6 +480,8 @@ public class MainGui extends JFrame implements WindowListener {
 					if(count > 1) {
 						fwrdButton.setEnabled(true);
 						fwrdButton.setBackground(PROG_COLOR_BTN_EN);
+						bkwrdButton.setEnabled(true);
+						bkwrdButton.setBackground(PROG_COLOR_BTN_EN);
 						
 						if(notAtHead) {
 							headButton.setEnabled(true);
