@@ -1,4 +1,3 @@
-import java.util.ArrayList;
 import java.util.Optional;
 import java.io.*;
 import java.util.Scanner;
@@ -32,7 +31,7 @@ public class VideoKeeper {
 		this.database		= model.getDatabaseFile();
 		
 		populateList();
-		monitorDatabase();
+		monitor();
 	}
 	
 	public int getSize() {
@@ -374,7 +373,7 @@ public class VideoKeeper {
 		return success;
 	}
 	
-	private void monitorDatabase() {
+	private void monitor() {
 		Thread thread = new Thread(new Runnable() {
 			@Override
 			public void run() {
@@ -396,6 +395,7 @@ public class VideoKeeper {
 						
 						database = model.getDatabaseFile();
 						populateList();
+						model.setVideoList(Optional.of(vidNodeList));
 					}
 					
 					try {

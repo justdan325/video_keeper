@@ -16,51 +16,51 @@ public class DataModel {
 		this.checkForDupl = true;
 	}
 	
-	public Optional<VideoList> getVideoList() {
+	public synchronized Optional<VideoList> getVideoList() {
 		return videoList;
 	}
 
-	public void setVideoList(Optional<VideoList> videoList) {
+	public synchronized void setVideoList(Optional<VideoList> videoList) {
 		this.videoList = videoList;
 	}
 
-	public String getDatabaseFile() {
+	public synchronized String getDatabaseFile() {
 		return databaseFile;
 	}
 
-	public void setDatabaseFile(String databaseFile) {
+	public synchronized void setDatabaseFile(String databaseFile) {
 		this.databaseFile = databaseFile;
 	}
 
-	public String getHandleLinks() {
+	public synchronized String getHandleLinks() {
 		return handleLinks;
 	}
 
-	public void setHandleLinks(String handleLinks) {
+	public synchronized void setHandleLinks(String handleLinks) {
 		this.handleLinks = handleLinks;
 	}
 
-	public String getPreviousHandleLinks() {
+	public synchronized String getPreviousHandleLinks() {
 		return previousHandleLinks;
 	}
 
-	public void setPreviousHandleLinks(String previousHandleLinks) {
+	public synchronized void setPreviousHandleLinks(String previousHandleLinks) {
 		this.previousHandleLinks = previousHandleLinks;
 	}
 
-	public boolean isAutoSaveOnExit() {
+	public synchronized boolean isAutoSaveOnExit() {
 		return autoSaveOnExit;
 	}
 
-	public void setAutoSaveOnExit(boolean autoSaveOnExit) {
+	public synchronized void setAutoSaveOnExit(boolean autoSaveOnExit) {
 		this.autoSaveOnExit = autoSaveOnExit;
 	}
 
-	public boolean isCheckForDupl() {
+	public synchronized boolean isCheckForDupl() {
 		return checkForDupl;
 	}
 
-	public void setCheckForDupl(boolean checkForDupl) {
+	public synchronized void setCheckForDupl(boolean checkForDupl) {
 		this.checkForDupl = checkForDupl;
 	}
 }

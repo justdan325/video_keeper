@@ -69,6 +69,7 @@ public class MainGui extends JFrame implements WindowListener {
 	private DataModel model;
 	private VideoKeeper keeper;
 	private SettingsDialog settings;
+	private SearchDialog searchDialog;
 	private MainGui mainGui;
 	private JButton nextButton;
 	private JButton prevButton;
@@ -100,6 +101,7 @@ public class MainGui extends JFrame implements WindowListener {
 		this.keeper = new VideoKeeper(model, this);
 		this.mainGui = this;
 		this.settings = new SettingsDialog(this, model);
+		this.searchDialog = new SearchDialog(model, this);
 		this.nextButton = new JButton(NEXT_BUTTON_TXT);
 		this.prevButton = new JButton(PREV_BUTTON_TXT);
 		this.addButton = new JButton(ADD_BUTTON_TXT);
@@ -387,6 +389,13 @@ public class MainGui extends JFrame implements WindowListener {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				keeper.deleteCurr();
+			}
+		});
+		
+		searchButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				searchDialog.setVisible(true);
 			}
 		});
 	}
