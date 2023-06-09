@@ -7,6 +7,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusAdapter;
 import java.awt.event.WindowListener;
+import java.io.File;
 import java.awt.event.WindowEvent;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
@@ -412,6 +413,19 @@ public class MainGui extends JFrame implements WindowListener {
 							Thread.sleep(10);
 						} catch (InterruptedException e) {
 						}
+					}
+					File dbFile = new File(model.getDatabaseFile());
+					
+					if (dbFile.exists()) {
+						String name = dbFile.getName();
+						
+						if(name.length() > 20) {
+							name = name.substring(0, 20) + "...";
+						}
+						
+						setTitle(PROG_NAME + " -- v" + PROG_VER + "  [" + name + "]");
+					} else {
+						setTitle(PROG_NAME + " -- v" + PROG_VER);
 					}
 					
 					count = keeper.getSize();
