@@ -1,4 +1,7 @@
+import java.util.Optional;
+
 public class DataModel {
+	private Optional<VideoList> videoList;
 	private String databaseFile;
 	private String handleLinks;
 	private String previousHandleLinks;
@@ -6,10 +9,19 @@ public class DataModel {
 	private boolean checkForDupl;
 	
 	public DataModel() {
+		this.videoList = Optional.empty();
 		this.databaseFile = Main.DEFAULT_DATABASE;
 		this.handleLinks = Main.DEFAULT_HNDL_LNKS;
 		this.autoSaveOnExit = true;
 		this.checkForDupl = true;
+	}
+	
+	public Optional<VideoList> getVideoList() {
+		return videoList;
+	}
+
+	public void setVideoList(Optional<VideoList> videoList) {
+		this.videoList = videoList;
 	}
 
 	public String getDatabaseFile() {
