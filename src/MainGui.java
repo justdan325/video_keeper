@@ -48,6 +48,7 @@ public class MainGui extends JFrame implements WindowListener {
 	private static final String SAVE_BUTTON_TXT 	= "Save";
 	private static final String REFR_BUTTON_TXT 	= "Refresh";
 	private static final String DEL_BUTTON_TXT 		= "Delete";
+	private static final String SEARCH_BUTTON_TXT 	= "Search";
 //	private static final String TO_WATCH_TXT 		= "Videos:";
 	private static final String UP_NEXT_TXT			= " -- Up Next -- ";
 	private static final String EMPTY_QUEUE_TXT		= "~ No Video Links in Watch List ~";
@@ -80,6 +81,7 @@ public class MainGui extends JFrame implements WindowListener {
 	private JButton saveButton;
 	private JButton refreshButton;
 	private JButton deleteButton;
+	private JButton searchButton;
 	private JLabel upNextLabel;
 	private JLabel counterLabel;
 	private JLabel titleLabel;
@@ -109,6 +111,7 @@ public class MainGui extends JFrame implements WindowListener {
 		this.saveButton = new JButton(SAVE_BUTTON_TXT);
 		this.refreshButton = new JButton(REFR_BUTTON_TXT);
 		this.deleteButton = new JButton(DEL_BUTTON_TXT);
+		this.searchButton = new JButton(SEARCH_BUTTON_TXT);
 		this.upNextLabel = new JLabel();
 		this.counterLabel = new JLabel("0");
 		this.titleLabel = new JLabel();
@@ -171,6 +174,7 @@ public class MainGui extends JFrame implements WindowListener {
 		topPanel.add(saveButton);
 		topPanel.add(refreshButton);
 		topPanel.add(deleteButton);
+		topPanel.add(searchButton);
 		
 		north.add(topPanel);
 		north.add(upNextLabel);
@@ -414,6 +418,7 @@ public class MainGui extends JFrame implements WindowListener {
 						} catch (InterruptedException e) {
 						}
 					}
+					
 					File dbFile = new File(model.getDatabaseFile());
 					
 					if (dbFile.exists()) {
@@ -449,6 +454,8 @@ public class MainGui extends JFrame implements WindowListener {
 						dateAndTimeLabel.setText(keeper.getCurrDateAndTime());
 						deleteButton.setEnabled(true);
 						deleteButton.setBackground(PROG_COLOR_BTN_EN);
+						searchButton.setEnabled(true);
+						searchButton.setBackground(PROG_COLOR_BTN_EN);
 						
 						if (refreshing == false) {
 							refreshButton.setEnabled(true);
@@ -470,6 +477,8 @@ public class MainGui extends JFrame implements WindowListener {
 						channelLabel.setText(" ");
 						deleteButton.setEnabled(false);
 						deleteButton.setBackground(PROG_COLOR_BTN_DIS);
+						searchButton.setEnabled(false);
+						searchButton.setBackground(PROG_COLOR_BTN_DIS);
 						
 						if (refreshing == false) {
 							refreshButton.setEnabled(false);
