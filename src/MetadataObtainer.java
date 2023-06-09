@@ -408,16 +408,33 @@ public class MetadataObtainer {
 					date = html.substring(begin, end);
 					date = date.replaceAll("\n", "");
 				}
-			//Rumble
+				//Rumble
 			} else if(urlStr.startsWith(RUMBLE_PREFIX)) {
-				String prefix = "<div class=\"media-published\" title=\"";
-				String suffix = "\">";
-				int begin = html.indexOf(prefix) + prefix.length();
-				int end = html.indexOf(suffix, begin);
+				final String STREAM_INDICATOR = "<div class=\"streamed-on\">";
 				
-				if (begin != -1 && end != -1) {
-					date = html.substring(begin, end);
-					date = date.replaceAll("\n", "");
+				//Stream on Rumble have the date located in a different tag
+				if (html.contains(STREAM_INDICATOR)) {
+					String prefix = ">";
+					String suffix = "</time>";
+					int begin = html.indexOf(STREAM_INDICATOR) + STREAM_INDICATOR.length();
+					String htmlTrimmed = html.substring(begin);
+
+					begin = htmlTrimmed.indexOf(prefix) + 1;
+					int end = htmlTrimmed.indexOf(suffix, begin);
+
+					if (begin != -1 && end != -1) {
+						date = "Streamed on " + htmlTrimmed.substring(begin, end).trim();
+					}
+				} else {
+					String prefix = "<div class=\"media-published\" title=\"";
+					String suffix = "\">";
+					int begin = html.indexOf(prefix) + prefix.length();
+					int end = html.indexOf(suffix, begin);
+
+					if (begin != -1 && end != -1) {
+						date = html.substring(begin, end);
+						date = date.replaceAll("\n", "");
+					}
 				}
 			}
 			/*//Twitch
