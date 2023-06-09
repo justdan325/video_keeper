@@ -9,6 +9,7 @@ import java.awt.event.ItemListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.io.File;
+import java.util.Optional;
 
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
@@ -246,47 +247,30 @@ public class SettingsDialog extends JDialog implements WindowListener {
 		});
 	}
 	
-//	private void save() {
-//		Thread thread = new Thread(new Runnable() {
-//			@Override
-//			public void run() {
-//				boolean saved = false;
-//				
-//				setLocked(true);
-//				saved = parent.save();
-//				
-//				if(!saved) {
-//					String mess = "Watch list could not be saved to database file.";
-//					childDialogOpen = true;
-//					JOptionPane.showMessageDialog(parent.getSettingsDialog(), mess, MainGui.PROG_NAME + " -- Save Failure", JOptionPane.ERROR_MESSAGE);
-//					childDialogOpen = false;
-//				}
-//				
-//				setLocked(false);
-//				
-//				if(saved) {
-//					((MainGui) parent).saveEnabled(false);
-////					saveButton.setEnabled(false);
-////					saveButton.setBackground(MainGui.PROG_COLOR_BTN_DIS);
-//				}
-//			}
-//		});
-//		
-//		thread.start();
-//	}
-	
 	private void export() {
 		Thread thread = new Thread(new Runnable() {
 			@Override
 			public void run() {
+				JFileChooser chooser = new JFileChooser(new File(model.getDatabaseFile()).getParent());
+				Optional<String> destination = Optional.empty();
+				
 				childDialogOpen = true;
-				String destination = (String)JOptionPane.showInputDialog(parent, "Enter destination file to export to.", MainGui.PROG_NAME + " -- Export", JOptionPane.QUESTION_MESSAGE, null, null, "urls.txt");
+				int option = chooser.showSaveDialog(parent);
+				
+				if(option == JFileChooser.APPROVE_OPTION) {
+					destination = Optional.of(chooser.getSelectedFile().getAbsolutePath());
+				} else if(option == JFileChooser.ERROR_OPTION) {
+					String mess = "Error exporting to specified file.";
+					
+					JOptionPane.showMessageDialog(parent.getSettingsDialog(), mess, MainGui.PROG_NAME + " -- Export Failure", JOptionPane.ERROR_MESSAGE);
+				}
+				 
 				childDialogOpen = false;
 				boolean success = false;
 				
-				if (destination != null) {
+				if (destination.isPresent()) {
 					setLocked(true);
-					success = parent.export(destination);
+					success = parent.export(destination.get());
 					setLocked(false);
 
 					if (success) {
