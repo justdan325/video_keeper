@@ -46,6 +46,7 @@ public class MainGui extends JFrame implements WindowListener {
 	private static final String PASTE_BUTTON_TXT 	= "Paste";
 	private static final String SAVE_BUTTON_TXT 	= "Save";
 	private static final String REFR_BUTTON_TXT 	= "Refresh";
+	private static final String DEL_BUTTON_TXT 		= "Delete";
 //	private static final String TO_WATCH_TXT 		= "Videos:";
 	private static final String UP_NEXT_TXT			= " -- Up Next -- ";
 	private static final String EMPTY_QUEUE_TXT		= "~ No Video Links in Watch List ~";
@@ -54,6 +55,7 @@ public class MainGui extends JFrame implements WindowListener {
 	private static final String TOOLTIP_HEAD		= "Return to head of the watch list.";
 	private static final String TOOLTIP_SETTINGS	= "Settings";
 	private static final String TOOLTIP_REFRESH		= "Refresh video metadata for the next video.";
+	private static final String TOOLTIP_DELETE		= "Delete current video from the list.";
 	private static final String CHANNEL_PREFIX 		= "By: ";
 	private static final int 	WIN_X 				= 600;
 	private static final int 	WIN_Y 				= 400;
@@ -76,6 +78,7 @@ public class MainGui extends JFrame implements WindowListener {
 	private JButton settButton;
 	private JButton saveButton;
 	private JButton refreshButton;
+	private JButton deleteButton;
 	private JLabel upNextLabel;
 	private JLabel counterLabel;
 	private JLabel titleLabel;
@@ -104,6 +107,7 @@ public class MainGui extends JFrame implements WindowListener {
 		this.pasteButton = new JButton(PASTE_BUTTON_TXT);
 		this.saveButton = new JButton(SAVE_BUTTON_TXT);
 		this.refreshButton = new JButton(REFR_BUTTON_TXT);
+		this.deleteButton = new JButton(DEL_BUTTON_TXT);
 		this.upNextLabel = new JLabel();
 		this.counterLabel = new JLabel("0");
 		this.titleLabel = new JLabel();
@@ -156,6 +160,7 @@ public class MainGui extends JFrame implements WindowListener {
 		channelLabel.setHorizontalAlignment(JLabel.CENTER);
 		channelLabel.setForeground(PROG_COLOR_TXT_DRK);
 		refreshButton.setToolTipText(TOOLTIP_REFRESH);
+		deleteButton.setToolTipText(TOOLTIP_DELETE);
 		settButton.setToolTipText(TOOLTIP_SETTINGS);
 		settButton.setBackground(PROG_COLOR_BTN_EN);
 		
@@ -164,6 +169,7 @@ public class MainGui extends JFrame implements WindowListener {
 		topPanel.add(settButton);
 		topPanel.add(saveButton);
 		topPanel.add(refreshButton);
+		topPanel.add(deleteButton);
 		
 		north.add(topPanel);
 		north.add(upNextLabel);
@@ -268,7 +274,7 @@ public class MainGui extends JFrame implements WindowListener {
 	private void addListeners() {
 		nextButton.addActionListener((new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				keeper.openNext();
+				keeper.openCurr();
 			}
 		}));
 		
@@ -371,6 +377,13 @@ public class MainGui extends JFrame implements WindowListener {
 				}).start();
 			}
 		});
+		
+		deleteButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				keeper.deleteCurr();
+			}
+		});
 	}
 	
 	private void add() {
@@ -420,6 +433,8 @@ public class MainGui extends JFrame implements WindowListener {
 						titleLabel.setText(keeper.getCurrTitle(true));
 						titleLabel.setToolTipText(keeper.getCurrTitle(false));
 						dateAndTimeLabel.setText(keeper.getCurrDateAndTime());
+						deleteButton.setEnabled(true);
+						deleteButton.setBackground(PROG_COLOR_BTN_EN);
 						
 						if (refreshing == false) {
 							refreshButton.setEnabled(true);
@@ -439,6 +454,8 @@ public class MainGui extends JFrame implements WindowListener {
 						titleLabel.setToolTipText("");
 						dateAndTimeLabel.setText(" ");
 						channelLabel.setText(" ");
+						deleteButton.setEnabled(false);
+						deleteButton.setBackground(PROG_COLOR_BTN_DIS);
 						
 						if (refreshing == false) {
 							refreshButton.setEnabled(false);

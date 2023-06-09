@@ -111,7 +111,7 @@ public class VideoKeeper {
 		}
 	}
 	
-	public void openNext() {
+	public void openCurr() {
 		if(vidNodeList.size() > 0) {
 			prev = vidNodeList.popCurr().get();
 			
@@ -120,9 +120,14 @@ public class VideoKeeper {
 			}
 			
 			refreshCurrInSepThread(true);
-//		} else if(skipQueue.size() > 0) {
-//			addSkipped();
-//			openNext();
+		}
+	}
+	
+	public void deleteCurr() {
+		if(vidNodeList.size() > 0) {
+			prev = vidNodeList.popCurr().get();
+			
+			refreshCurrInSepThread(true);
 		}
 	}
 	
