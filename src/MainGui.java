@@ -58,6 +58,7 @@ public class MainGui extends JFrame implements WindowListener {
 	private static final String TOOLTIP_SETTINGS	= "Settings";
 	private static final String TOOLTIP_REFRESH		= "Refresh video metadata for the next video.";
 	private static final String TOOLTIP_DELETE		= "Delete current video from the list.";
+	private static final String TOOLTIP_SEARCH		= "Search through the list of videos.";
 	private static final String CHANNEL_PREFIX 		= "By: ";
 	private static final int 	WIN_X 				= 600;
 	private static final int 	WIN_Y 				= 400;
@@ -167,6 +168,7 @@ public class MainGui extends JFrame implements WindowListener {
 		channelLabel.setForeground(PROG_COLOR_TXT_DRK);
 		refreshButton.setToolTipText(TOOLTIP_REFRESH);
 		deleteButton.setToolTipText(TOOLTIP_DELETE);
+		searchButton.setToolTipText(TOOLTIP_SEARCH);
 		settButton.setToolTipText(TOOLTIP_SETTINGS);
 		settButton.setBackground(PROG_COLOR_BTN_EN);
 		

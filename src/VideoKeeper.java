@@ -30,6 +30,8 @@ public class VideoKeeper {
 		this.prev 			= null;
 		this.database		= model.getDatabaseFile();
 		
+		model.setVideoList(Optional.of(vidNodeList));
+		
 		populateList();
 		monitor();
 	}
@@ -379,7 +381,7 @@ public class VideoKeeper {
 			public void run() {
 				for(;;) {
 					//if database changes, save and reload with new database
-					if(!database.equals(model.getDatabaseFile())) {
+					if(database.equals(model.getDatabaseFile()) == false) {
 						if(model.isAutoSaveOnExit()) {
 							save();
 						} else {
@@ -396,6 +398,7 @@ public class VideoKeeper {
 						database = model.getDatabaseFile();
 						populateList();
 						model.setVideoList(Optional.of(vidNodeList));
+						System.out.println("Set");
 					}
 					
 					try {
