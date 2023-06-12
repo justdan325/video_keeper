@@ -1,6 +1,9 @@
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
+import java.util.ArrayList;
 import java.util.Optional;
 import java.util.Vector;
 
@@ -16,34 +19,29 @@ public class SearchDialog extends JDialog implements WindowListener {
 	private static final String COL_TITLE_TITLE		= "Title";
 	private static final String COL_TITLE_AUTH		= "Author";
 	private static final String COL_TITLE_DATE		= "Date";
-	private static final String BROWSE_BTN_TITLE 	= "Browse";
-	private static final String AUTO_SAVE_TITLE		= "Auto Save upon Exit";
+	private static final String SEARCH_BTN_TITLE 	= "Search";
+	private static final String RESET_BTN_TITLE		= " Reset ";
 	private static final String CHECK_DUPL_TITLE	= "Check for Duplicate Videos";
-//	private static final String SAVE_TITLE			= "Save";
 	private static final String EXPORT_TITLE		= "Export";
 	private static final String REFRESH_TITLE		= "Refresh All";
 	private static final String OPEN_OP_TITLE		= "Open Op.";
-//	private static final String TOOLTIP_SAVE		= "Save changes to the watch list.";
-	private static final String TOOLTIP_EXPORT		= "Export watch list to text file of URLs.";
-	private static final String TOOLTIP_REFRESH		= "Reload the watch list and re-fetch video metadata.";
-	private static final String TOOLTIP_OPEN_OP		= "Select the operation for how to open video links.";
-	private static final int 	WIN_X 				= 750;
-	private static final int 	WIN_Y 				= 500;
+	private static final int 	WIN_X 				= 900;
+	private static final int 	WIN_Y 				= 600;
 	private static final int	BTN_X				= 120;
 	private static final int	BTN_Y				= 30;
+	private static final int	SEARCH_BAR_X		= 50;
 	private static final int	ROWS_DEFAULT		= 0;
 	private static final int	COLS_DEFAULT		= 5;
-	private static final int 	COL_MAX_WIDTH_NUM 	= 25;
+	private static final int 	COL_MAX_WIDTH_NUM 	= 50;
 	private static final int 	COL_MAX_WIDTH_TITLE = 600;
 	private static final int 	COL_MAX_WIDTH_AUTH 	= 200;
 	private static final int 	COL_MAX_WIDTH_DATE 	= 100;
 	
-	private JTextField dbFileTextField;
+	private JTextField searchBar;
 	private JTable mainTable;
 	private JPanel mainPanel;
-	private JButton dbFileButton;
-//	private JButton saveButton;
-	private JButton exportButton;
+	private JButton searchButton;
+	private JButton resetButton;
 	private JButton refreshAllButton;
 	private JButton openOpButton;
 	private JCheckBox autoSaveCheckbox;
@@ -74,6 +72,7 @@ public class SearchDialog extends JDialog implements WindowListener {
 		
 		mainPanel.setBackground(MainGui.PROG_COLOR_BKRND);
 		
+		mainPanel.add(makeSearchPanel(), BorderLayout.NORTH);
 		mainPanel.add(makeTablePanel(), BorderLayout.CENTER);
 //		mainPanel.add(makeTextFieldPanel());
 //		mainPanel.add(makeCheckboxPanel());
@@ -89,6 +88,47 @@ public class SearchDialog extends JDialog implements WindowListener {
 		this.setSize(new Dimension(WIN_X, WIN_Y));
 		this.setResizable(false);
 		this.addWindowListener(this);
+		
+		addActionListeners();
+	}
+	
+	private void addActionListeners() {
+		searchBar.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				searchAndSet(searchBar.getText());
+			}
+		});
+		
+		searchButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				searchAndSet(searchBar.getText());
+			}
+		});
+		
+		resetButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				((DefaultTableModel) mainTable.getModel()).setRowCount(0);
+				populateList();
+			}
+		});
+	}
+	
+	private JPanel makeSearchPanel() {
+		JPanel searchPanel = new JPanel();
+		
+		this.searchBar = new JTextField();
+		this.searchButton = new JButton(SEARCH_BTN_TITLE);
+		this.resetButton = new JButton(RESET_BTN_TITLE);
+		
+		searchBar.setColumns(SEARCH_BAR_X);
+		searchPanel.add(searchBar);
+		searchPanel.add(searchButton);
+		searchPanel.add(resetButton);
+		
+		return searchPanel;
 	}
 	
 	private JPanel makeTablePanel() {
@@ -109,6 +149,39 @@ public class SearchDialog extends JDialog implements WindowListener {
 		this.mainTable = table;
 		
 		return listPanel;
+	}
+	
+	private void searchAndSet(String query) {
+		ArrayList<VideoDataNode> results = new ArrayList<>();
+		
+		if (model.getVideoList().isPresent() && query.length() > 0) {
+			Optional<VideoList> videoListOpt = model.getVideoList();
+			VideoList videoList = null;
+
+			if (videoListOpt.isPresent()) {
+				//make a copy
+				videoList = new VideoList(videoListOpt.get());
+
+				while (videoList.size() > 0) {
+					Optional<VideoDataNode> curr = videoList.popCurr();
+
+					if (curr.isPresent()) {
+						if (curr.get().getTitle().contains(query.trim())
+								|| curr.get().getChannel().contains(query.trim())
+								|| curr.get().getDate().contains(query.trim())) {
+							
+							results.add(curr.get());
+						}
+					}
+				}
+			}
+		}
+		
+		((DefaultTableModel) mainTable.getModel()).setRowCount(0);
+		
+		for(VideoDataNode node : results) {
+			addToList(node);
+		}
 	}
 	
 	private void populateList() {
