@@ -238,6 +238,8 @@ public class SearchDialog extends JDialog implements WindowListener {
 
 	@Override
 	public void windowClosing(WindowEvent arg0) {
+		((DefaultTableModel) mainTable.getModel()).setRowCount(0);
+		populateList();
 		this.setVisible(false);
 		this.dispose();
 	}
@@ -253,6 +255,7 @@ public class SearchDialog extends JDialog implements WindowListener {
 
 	@Override
 	public void windowOpened(WindowEvent arg0) {
+		((DefaultTableModel) mainTable.getModel()).setRowCount(0);
 		populateList();
 	}
 }
