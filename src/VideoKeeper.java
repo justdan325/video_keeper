@@ -398,7 +398,6 @@ public class VideoKeeper {
 						database = model.getDatabaseFile();
 						populateList();
 						model.setVideoList(Optional.of(vidNodeList));
-						System.out.println("Set");
 					}
 					
 					try {
