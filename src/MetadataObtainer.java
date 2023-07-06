@@ -275,8 +275,8 @@ public class MetadataObtainer {
 						channel = filterEscapeChars(channel);
 					}
 				} else {
-					String prefix = "content=\"@";
-					String suffix = "\"";
+					String prefix = "content=\"https://odysee.com/@";
+					String suffix = ":";
 					int begin = html.lastIndexOf(prefix) + prefix.length() - 1;
 					int end = html.indexOf(suffix, begin);
 
