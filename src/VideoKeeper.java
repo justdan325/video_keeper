@@ -124,6 +124,23 @@ public class VideoKeeper {
 		}
 	}
 	
+	public void open(int index, boolean removeFromList) {
+		if(vidNodeList.size() >= index - 1) {
+			Optional<VideoDataNode> node = vidNodeList.peek(index);
+			
+			if (node.isPresent()) {
+				if (removeFromList) {
+					vidNodeList.pop(index);
+					prev = node.get();
+				}
+				
+				handleLink(node.get().getUrl());
+			}
+			
+			refreshCurrInSepThread(true);
+		}
+	}
+	
 	public void deleteCurr() {
 		if(vidNodeList.size() > 0) {
 			prev = vidNodeList.popCurr().get();

@@ -422,6 +422,8 @@ public class MainGui extends JFrame implements WindowListener {
 		Thread thread = new Thread(new Runnable() {
 			@Override
 			public void run() {
+				model.setVideoKeeper(keeper);
+				
 				for(;;) {
 					while(locked) {
 						try {

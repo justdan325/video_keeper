@@ -2,6 +2,7 @@ import java.util.Optional;
 
 public class DataModel {
 	private Optional<VideoList> videoList;
+	private VideoKeeper videoKeeper;
 	private String databaseFile;
 	private String handleLinks;
 	private String previousHandleLinks;
@@ -10,6 +11,7 @@ public class DataModel {
 	
 	public DataModel() {
 		this.videoList = Optional.empty();
+		this.videoKeeper = null;
 		this.databaseFile = Main.DEFAULT_DATABASE;
 		this.handleLinks = Main.DEFAULT_HNDL_LNKS;
 		this.autoSaveOnExit = true;
@@ -22,6 +24,14 @@ public class DataModel {
 
 	public synchronized void setVideoList(Optional<VideoList> videoList) {
 		this.videoList = videoList;
+	}
+
+	public VideoKeeper getVideoKeeper() {
+		return videoKeeper;
+	}
+
+	public void setVideoKeeper(VideoKeeper videoKeeper) {
+		this.videoKeeper = videoKeeper;
 	}
 
 	public synchronized String getDatabaseFile() {
