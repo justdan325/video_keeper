@@ -11,12 +11,6 @@ import java.util.Optional;
 import java.util.Vector;
 
 import javax.swing.*;
-import javax.swing.event.ListDataListener;
-import javax.swing.event.MenuKeyEvent;
-import javax.swing.event.MenuKeyListener;
-import javax.swing.event.PopupMenuEvent;
-import javax.swing.event.PopupMenuListener;
-import javax.swing.plaf.DimensionUIResource;
 import javax.swing.table.DefaultTableModel;
 
 @SuppressWarnings("serial")
