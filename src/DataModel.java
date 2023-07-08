@@ -8,6 +8,7 @@ public class DataModel {
 	private String previousHandleLinks;
 	private boolean autoSaveOnExit;
 	private boolean checkForDupl;
+	private boolean requestSaveButtonEn;
 	
 	public DataModel() {
 		this.videoList = Optional.empty();
@@ -16,6 +17,7 @@ public class DataModel {
 		this.handleLinks = Main.DEFAULT_HNDL_LNKS;
 		this.autoSaveOnExit = true;
 		this.checkForDupl = true;
+		this.requestSaveButtonEn = false;
 	}
 	
 	public synchronized Optional<VideoList> getVideoList() {
@@ -72,5 +74,13 @@ public class DataModel {
 
 	public synchronized void setCheckForDupl(boolean checkForDupl) {
 		this.checkForDupl = checkForDupl;
+	}
+
+	public boolean isRequestSaveButtonEn() {
+		return requestSaveButtonEn;
+	}
+
+	public void setRequestSaveButtonEn(boolean setSaveButtonEn) {
+		this.requestSaveButtonEn = setSaveButtonEn;
 	}
 }

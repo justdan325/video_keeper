@@ -432,6 +432,12 @@ public class MainGui extends JFrame implements WindowListener {
 						}
 					}
 					
+					if(model.isRequestSaveButtonEn()) {
+						saveButton.setEnabled(true);
+						saveButton.setBackground(PROG_COLOR_BTN_EN);
+						model.setRequestSaveButtonEn(false);
+					}
+					
 					File dbFile = new File(model.getDatabaseFile());
 					
 					if (dbFile.exists()) {
@@ -545,7 +551,7 @@ public class MainGui extends JFrame implements WindowListener {
 		
 		thread.start();
 	}
-
+	
 	private void urlFieldFocusGained(final FocusEvent focusEvent) {
         urlField.selectAll();
     }

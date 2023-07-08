@@ -37,9 +37,6 @@ public class SearchDialog extends JDialog implements WindowListener {
 	private static final String TAIL_BTN_TITLE		= "Move to Tail";
 	private static final int 	WIN_X 				= 1050;
 	private static final int 	WIN_Y 				= 600;
-	private static final int 	OPTION_BTN_X 		= 150;
-	private static final int 	OPTION_BTN_Y 		= 25;
-	private static final int	OPTION_PNL_HGAP		= 5;
 	private static final int	SEARCH_BAR_X		= 50;
 	private static final int	ROWS_DEFAULT		= 0;
 	private static final int	COLS_DEFAULT		= 5;
@@ -53,8 +50,6 @@ public class SearchDialog extends JDialog implements WindowListener {
 	private JPanel mainPanel;
 	private JButton searchButton;
 	private JButton clearButton;
-	private JButton refreshAllButton;
-	private JButton openOpButton;
 	private JButton playButton;
 	private JButton copyUrlButton;
     private JButton editButton;
@@ -62,11 +57,10 @@ public class SearchDialog extends JDialog implements WindowListener {
     private JButton refreshButton;
     private JButton moveToHeadButton;
     private JButton moveToTailButton;
-	private JCheckBox autoSaveCheckbox;
+	@SuppressWarnings("unused")
 	private Component parent;
 	private DataModel model;
-	private boolean locked;
-	private boolean childDialogOpen;
+	private boolean refreshing;
 	
 	public static void main(String[] args) {
 		SearchDialog application = new SearchDialog(new DataModel(), null);
@@ -74,30 +68,19 @@ public class SearchDialog extends JDialog implements WindowListener {
 	}
 	
 	public SearchDialog(DataModel model, Component parent) {
-//		this.dbFileTextField = new JTextField();
-//		this.dbFileButton = new JButton(BROWSE_BTN_TITLE);
-//		this.exportButton = new JButton(EXPORT_TITLE);
-//		this.refreshAllButton = new JButton(REFRESH_TITLE);
-//		this.openOpButton = new JButton(OPEN_OP_TITLE);
-//		this.autoSaveCheckbox = new JCheckBox(AUTO_SAVE_TITLE);
 		this.mainPanel = new JPanel(new BorderLayout());
 		this.parent = parent;
 		this.model = model;
-//		this.locked = false;
-//		this.childDialogOpen = false;
+		this.refreshing = false;
 		
 		mainPanel.setBackground(MainGui.PROG_COLOR_BKRND);
 		
 		mainPanel.add(makeSearchPanel(), BorderLayout.NORTH);
 		mainPanel.add(makeTablePanel(), BorderLayout.CENTER);
 		mainPanel.add(makeOptionPanel(), BorderLayout.EAST);
-//		mainPanel.add(makeTextFieldPanel());
-//		mainPanel.add(makeCheckboxPanel());
-//		mainPanel.add(makeButtonPanel());
 		
 		this.add(mainPanel);
 		
-//		addListeners();
 		setOptionsLocked(true);
 		monitor();
 		
@@ -174,9 +157,36 @@ public class SearchDialog extends JDialog implements WindowListener {
 								videoList.get().prepend(toMove.get());
 								populateList();
 							}
+							
+							model.setRequestSaveButtonEn(true);
 						}
 					}
 				}).start();
+			}
+		});
+		
+		refreshButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				new Thread(new Runnable() {
+					@Override
+					public void run() {
+						refreshing = true;
+						model.getVideoKeeper().refresh(mainTable.getSelectedRow());
+						populateList();
+						model.setRequestSaveButtonEn(true);
+						refreshing = true;
+					}
+				}).start();
+			}
+		});
+		
+		deleteButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				model.getVideoList().get().pop(mainTable.getSelectedRow());
+				populateList();
+				model.setRequestSaveButtonEn(true);
 			}
 		});
 		
@@ -195,17 +205,11 @@ public class SearchDialog extends JDialog implements WindowListener {
 								videoList.get().append(toMove.get());
 								populateList();
 							}
+							
+							model.setRequestSaveButtonEn(true);
 						}
 					}
 				}).start();
-			}
-		});
-		
-		deleteButton.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				model.getVideoList().get().pop(mainTable.getSelectedRow());
-				populateList();
 			}
 		});
 		
@@ -361,7 +365,13 @@ public class SearchDialog extends JDialog implements WindowListener {
 			Vector<String> row = new Vector<String>();
 			
 		    row.add("" + (((DefaultTableModel) mainTable.getModel()).getRowCount() + 1));
-		    row.add(node.getTitle());
+		    
+			if (node.getTitle() != null && node.getTitle().length() > 0) {
+				row.add(node.getTitle());
+			} else {
+				row.add(node.getUrl());
+			}
+			
 		    row.add(node.getChannel());
 		    row.add(node.getDate());
 		    
@@ -417,7 +427,7 @@ public class SearchDialog extends JDialog implements WindowListener {
 			public void run() {
 				for(;;) {
 					try {
-						if (mainTable.getSelectedRow() >= 0 && mainTable.getSelectedColumn() >= 0) {
+						if (mainTable.getSelectedRow() >= 0 && refreshing == false) {
 							setOptionsLocked(false);
 						} else {
 							setOptionsLocked(true);
@@ -428,6 +438,12 @@ public class SearchDialog extends JDialog implements WindowListener {
 				}
 			}
 		}).start();
+	}
+	
+	@Override
+	public void setVisible(boolean visible) {
+		populateList();
+		super.setVisible(visible);
 	}
 
 	@Override

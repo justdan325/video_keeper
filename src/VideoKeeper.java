@@ -249,6 +249,36 @@ public class VideoKeeper {
 		}
 	}
 	
+	public void refresh(int index) {
+		if(vidNodeList.size() > 0) {
+			Optional<VideoDataNode> opt = vidNodeList.peek(index);
+
+			if(opt.isPresent()) {
+				VideoDataNode temp = opt.get();
+				
+				if(temp.getTitle().length() < 1 || temp.getDate().length() < 1 || temp.getChannel().length() < 1) {
+					MetadataObtainer obtainer = new MetadataObtainer(temp.getUrl());
+
+					if(temp.getTitle().length() < 1) {
+						temp.setTitle(obtainer.getTitle());
+					}
+
+					if(temp.getDate().length() < 1) {
+						temp.setDate(obtainer.getDate());
+					}
+
+					if(temp.getChannel().length() < 1) {
+						temp.setChannel(obtainer.getChannel());
+					}
+					
+					if(temp.getTime().length() < 1) {
+						temp.setTime(obtainer.getTime());
+					}
+				}
+			}
+		}
+	}
+	
 	public void refreshAll() {
 		ProgressBar progBar = new ProgressBar(mainGui);
 		
