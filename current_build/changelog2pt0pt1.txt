@@ -1,0 +1,9 @@
+VIDEO KEEPER CHANGE LOG -- VERSION 2.0.1
+
+BUG FIX: Obtaining the author on Rumble has been fixed.
+BUG FIX: Obtaining date stamps on Rumble has been fixed.
+BUG FIX: Odysee channel name no longer comes in as "@OdyseeTeam" for all videos.
+
+-Progress indicator for Twitch is now functional.
+-Progress indicator for Odysee is now functional.
+-Progress indicator for Vimeo is now functional.
