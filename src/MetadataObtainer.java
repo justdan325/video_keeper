@@ -43,7 +43,7 @@ public class MetadataObtainer {
 	
 	public static void main(String[] args){
 //		System.out.println(fetchHtml("https://odysee.com/win11:6d73df3083e0f634b18f54521763184b47980d8a"));
-		MetadataObtainer o = new MetadataObtainer("https://www.youtube.com/watch?v=s1JfjEqBG8o");
+		MetadataObtainer o = new MetadataObtainer("");
 		System.out.println(o.getTitle());
 		System.out.println(o.getDate());
 		System.out.println(o.getChannel());
@@ -275,8 +275,8 @@ public class MetadataObtainer {
 						channel = filterEscapeChars(channel);
 					}
 				} else {
-					String prefix = "content=\"@";
-					String suffix = "\"";
+					String prefix = "content=\"https://odysee.com/@";
+					String suffix = ":";
 					int begin = html.lastIndexOf(prefix) + prefix.length() - 1;
 					int end = html.indexOf(suffix, begin);
 
@@ -321,8 +321,8 @@ public class MetadataObtainer {
 				channel += " on BITCHUTE";
 			//Rumble
 			} else if(urlStr.startsWith(RUMBLE_PREFIX)) {
-				String prefix = "<button data-title=";
-				String suffix = " data-slug=";
+				String prefix = "data-title=\"";
+				String suffix = "\"";
 				int begin = html.indexOf(prefix) + prefix.length();
 				int end = html.indexOf(suffix, begin);
 				
@@ -408,16 +408,33 @@ public class MetadataObtainer {
 					date = html.substring(begin, end);
 					date = date.replaceAll("\n", "");
 				}
-			//Rumble
+				//Rumble
 			} else if(urlStr.startsWith(RUMBLE_PREFIX)) {
-				String prefix = "<div class=\"media-published\" title=\"";
-				String suffix = "\">";
-				int begin = html.indexOf(prefix) + prefix.length();
-				int end = html.indexOf(suffix, begin);
+				final String STREAM_INDICATOR = "<div class=\"streamed-on\">";
 				
-				if (begin != -1 && end != -1) {
-					date = html.substring(begin, end);
-					date = date.replaceAll("\n", "");
+				//Stream on Rumble have the date located in a different tag
+				if (html.contains(STREAM_INDICATOR)) {
+					String prefix = ">";
+					String suffix = "</time>";
+					int begin = html.indexOf(STREAM_INDICATOR) + STREAM_INDICATOR.length();
+					String htmlTrimmed = html.substring(begin);
+
+					begin = htmlTrimmed.indexOf(prefix) + 1;
+					int end = htmlTrimmed.indexOf(suffix, begin);
+
+					if (begin != -1 && end != -1) {
+						date = "Streamed on " + htmlTrimmed.substring(begin, end).trim();
+					}
+				} else {
+					String prefix = "<div class=\"media-published\" title=\"";
+					String suffix = "\">";
+					int begin = html.indexOf(prefix) + prefix.length();
+					int end = html.indexOf(suffix, begin);
+
+					if (begin != -1 && end != -1) {
+						date = html.substring(begin, end);
+						date = date.replaceAll("\n", "");
+					}
 				}
 			}
 			/*//Twitch
@@ -481,8 +498,8 @@ public class MetadataObtainer {
 						time = convertSecondsToTimeStr(seconds);
 					}
 				}
-				
-				if(atTime.isPresent()) {
+
+				if (atTime.isPresent()) {
 					time += " (in progress " + convertSecondsToTimeStr(Integer.parseInt(atTime.get())) + ")";
 				}
 			//Odysee and Twitch (not 100% Reliable for Twitch)
@@ -491,7 +508,7 @@ public class MetadataObtainer {
 				String suffix = "\"/";
 				int begin = html.indexOf(prefix) + prefix.length();
 				int end = html.indexOf(suffix, begin);
-				
+
 				if (begin != -1 && end != -1) {
 					time = html.substring(begin, end);
 				}
@@ -503,7 +520,36 @@ public class MetadataObtainer {
 				}
 				
 				time = convertSecondsToTimeStr(seconds);
-			} 
+				
+				if (atTime.isPresent() && urlStr.startsWith(TWITCH_PREFIX_MOB)) {
+					String progress = atTime.get();
+
+					progress = progress.replace("h", ":");
+					progress = progress.replace("m", ":");
+					progress = progress.replace("s", "");
+
+					time += " (in progress " + progress + ")";
+				} else if (atTime.isPresent() && urlStr.startsWith(ODYSEE_PREFIX)) {
+					try {
+						time += " (in progress " + convertSecondsToTimeStr(Integer.parseInt(atTime.get())) + ")";
+					} catch (Exception e) {
+						time += " (in progress)";
+					}
+				}
+			//Vimeo (only gets the progress of the video)
+			} else if (urlStr.startsWith(VIMEO_PREFIX)) {
+				final String TIME_Q_PARAM = "#t=";
+				
+				if(urlStr.contains(TIME_Q_PARAM)) {
+					time = urlStr.substring(urlStr.indexOf(TIME_Q_PARAM) + TIME_Q_PARAM.length(), urlStr.lastIndexOf("s"));
+					
+					try {
+						time = " In progress at " + convertSecondsToTimeStr(Integer.parseInt(time));
+					} catch(Exception e) {
+						time = "Video is in progress.";
+					}
+				}
+			}
 		}
 		
 		return time;
@@ -586,8 +632,8 @@ public class MetadataObtainer {
 			
 			sanitized = sanitizeYoutube(sanitized);
 		//Twitch
-		} else if(sanitized.startsWith(TWITCH_PREFIX_W) || sanitized.startsWith(TWITCH_PREFIX_MOB)) {
-			sanitized = sanitizeTwitch(sanitized);
+		} else if(sanitized.startsWith(TWITCH_PREFIX_W) || sanitized.startsWith(TWITCH_PREFIX_MOB) || sanitized.startsWith(ODYSEE_PREFIX)) {
+			sanitized = sanitizeTwitchAndOdysee(sanitized);
 		}
 		
 		return sanitized;
@@ -623,13 +669,22 @@ public class MetadataObtainer {
 		return sanitized;
 	}
 
-	private static String sanitizeTwitch(String urlStr) {
+	private String sanitizeTwitchAndOdysee(String urlStr) {
+		final String TIME_Q_PARAM = "?t=";
 		String sanitized = urlStr;
 		
 		//normal twitch video id i.e. https://www.twitch.tv/videos/997396590
 		//must convert to mobile to get data
 		if(urlStr.startsWith(TWITCH_PREFIX_W)) {
 			sanitized = urlStr.replaceFirst(TWITCH_PREFIX_W, TWITCH_PREFIX_MOB);
+			
+			if(sanitized.contains(TIME_Q_PARAM)) {
+				atTime = Optional.of(sanitized.substring(sanitized.indexOf(TIME_Q_PARAM) + TIME_Q_PARAM.length(), sanitized.lastIndexOf("s") + 1));
+			}
+		} else if(urlStr.contains(ODYSEE_PREFIX)) {
+			if(urlStr.contains(TIME_Q_PARAM)) {
+				atTime = Optional.of(sanitized.substring(sanitized.indexOf(TIME_Q_PARAM) + TIME_Q_PARAM.length()));
+			}
 		}
 
 		return sanitized;

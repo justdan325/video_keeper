@@ -5,6 +5,8 @@ import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.awt.event.FocusAdapter;
 import java.awt.event.WindowListener;
 import java.awt.event.WindowEvent;
@@ -28,7 +30,7 @@ import java.awt.Dimension;
 @SuppressWarnings("serial")
 public class MainGui extends JFrame implements WindowListener {
 	public  static final String PROG_NAME 			= "Video Keeper";
-	public  static final String PROG_VER			= "2.0";
+	public  static final String PROG_VER			= "2.0.1";
 	public  static final String PROG_FONT			= "Arial";
 	public	static final Color 	PROG_COLOR_BKRND	= new Color(3156004);
 	public	static final Color	PROG_COLOR_BTN_EN	= new Color(8388608);
@@ -172,7 +174,7 @@ public class MainGui extends JFrame implements WindowListener {
 		addLabel.setHorizontalAlignment(JLabel.CENTER);
 		addLabel.setForeground(PROG_COLOR_TXT_LT);
 		pasteButton.setBackground(PROG_COLOR_BTN_EN);
-		addButton.setBackground(PROG_COLOR_BTN_EN);
+		addButton.setBackground(PROG_COLOR_BTN_DIS);
 		pasteButton.setToolTipText(TOOLTIP_PASTE);
 		addButton.setToolTipText(TOOLTIP_ADD);
 		
@@ -185,6 +187,8 @@ public class MainGui extends JFrame implements WindowListener {
 		
 		center.add(addLabel, BorderLayout.NORTH);
 		center.add(urlPanel, BorderLayout.CENTER);
+		
+		addButton.setEnabled(false);
 		
 		return center;
 	}
@@ -281,6 +285,8 @@ public class MainGui extends JFrame implements WindowListener {
 				if (contents != null) {
 					try {
 						urlField.setText((String) contents.getTransferData(DataFlavor.stringFlavor));
+						addButton.setEnabled(true);
+						addButton.setBackground(PROG_COLOR_BTN_EN);
 					} catch (Exception f) {
 						f.printStackTrace();
 					}
@@ -293,6 +299,25 @@ public class MainGui extends JFrame implements WindowListener {
 				add();
 			}
 		}));
+		
+		urlField.addKeyListener(new KeyListener() {
+			@Override
+			public void keyTyped(KeyEvent e) {}
+			
+			@Override
+			public void keyReleased(KeyEvent e) {
+				if(urlField.getText().trim().equals(PASTE_MESS) == false && urlField.getText().trim().length() > 0) {
+					addButton.setEnabled(true);
+					addButton.setBackground(PROG_COLOR_BTN_EN);
+				} else {
+					addButton.setEnabled(false);
+					addButton.setBackground(PROG_COLOR_BTN_DIS);
+				}
+			}
+			
+			@Override
+			public void keyPressed(KeyEvent e) {}
+		});
 		
 		urlField.addFocusListener(new FocusAdapter() {
 			@Override
