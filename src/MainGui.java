@@ -29,10 +29,10 @@ public class MainGui extends JFrame implements WindowListener {
 	public  static final String PROG_NAME 			= "Video Keeper";
 	public  static final String PROG_VER			= "3.0a1";
 	public  static final String PROG_FONT			= "Arial";
-	public	static final Color 	PROG_COLOR_BKRND	= new Color(3156004);
-	public	static final Color	PROG_COLOR_BTN_EN	= new Color(8388608);
-	public	static final Color	PROG_COLOR_BTN_DIS	= new Color(4013114);
-	public	static final Color	PROG_COLOR_TXT_LT	= Color.WHITE;
+	public	static final Color 	PROG_COLOR_BKRND	= Main.OS_MAC ? Color.LIGHT_GRAY : new Color(3156004);
+	public	static final Color	PROG_COLOR_BTN_EN	= Main.OS_MAC ? Color.WHITE : new Color(8388608);
+	public	static final Color	PROG_COLOR_BTN_DIS	= Main.OS_MAC ? Color.LIGHT_GRAY : new Color(4013114);
+	public	static final Color	PROG_COLOR_TXT_LT	= Main.OS_MAC ? Color.BLACK : Color.WHITE;
 	public	static final Color	PROG_COLOR_TXT_DRK	= Color.BLACK;
 	
 	private static final String PASTE_MESS 			= "<Paste Video Link Here>";
@@ -49,7 +49,6 @@ public class MainGui extends JFrame implements WindowListener {
 	private static final String REFR_BUTTON_TXT 	= "Refresh";
 	private static final String DEL_BUTTON_TXT 		= "Delete";
 	private static final String SEARCH_BUTTON_TXT 	= "Search";
-//	private static final String TO_WATCH_TXT 		= "Videos:";
 	private static final String UP_NEXT_TXT			= " -- Up Next -- ";
 	private static final String EMPTY_QUEUE_TXT		= "~ No Video Links in Watch List ~";
 	private static final String TOOLTIP_PASTE		= "Paste a video link from the clip board.";
@@ -61,7 +60,7 @@ public class MainGui extends JFrame implements WindowListener {
 	private static final String TOOLTIP_SEARCH		= "Search through the list of videos.";
 	private static final String CHANNEL_PREFIX 		= "By: ";
 	private static final int 	WIN_X 				= 600;
-	private static final int 	WIN_Y 				= 400;
+	private static final int 	WIN_Y 				= Main.OS_MAC ? 425 : 400;
 	private static final int 	URL_FIELD_X			= 465;
 	private static final int 	URL_FIELD_Y			= 40;
 	private static final int 	UP_NEXT_FONT_SIZE 	= 20;
@@ -206,9 +205,6 @@ public class MainGui extends JFrame implements WindowListener {
 		buttonPanel.setBackground(PROG_COLOR_BKRND);
 		addLabel.setBackground(PROG_COLOR_BKRND);
 		urlField.setPreferredSize(new Dimension(URL_FIELD_X, URL_FIELD_Y));
-//		settButton.setPreferredSize(new Dimension(URL_FIELD_Y, URL_FIELD_Y));
-//		settButton.setToolTipText(TOOLTIP_SETTINGS);
-//		settButton.setBackground(PROG_COLOR_BTN_EN);
 		addLabel.setFont(new Font(PROG_FONT, Font.PLAIN, VID_DATA_FONT_SIZE-2));
 		addLabel.setHorizontalAlignment(JLabel.CENTER);
 		addLabel.setForeground(PROG_COLOR_TXT_LT);
@@ -220,7 +216,6 @@ public class MainGui extends JFrame implements WindowListener {
 		buttonPanel.add(pasteButton);
 		buttonPanel.add(addButton);
 		
-//		urlPanel.add(settButton);
 		urlPanel.add(urlField);
 		urlPanel.add(buttonPanel);
 		

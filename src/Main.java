@@ -5,8 +5,10 @@ import javax.swing.JOptionPane;
 import javax.swing.UIManager;
 
 public class Main {
-	public  static final String DEFAULT_DATABASE 		= "database.txt";
-	public  static final String DEFAULT_HNDL_LNKS 		= "DEFAULT";
+	public static final String 		DEFAULT_DATABASE 		= "database.txt";
+	public static final String 		DEFAULT_HNDL_LNKS 		= "DEFAULT";
+	public static final boolean 	OS_MAC					= System.getProperty("os.name").contains("Mac");
+	
 	private static final String PROP_KEY_DATABASE		= "database";
 	private static final String PROP_KEY_AUTO_SAVE		= "autoSave";
 	private static final String PROP_KEY_CHECK_DUPL		= "checkDuplicates";

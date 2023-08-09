@@ -458,6 +458,7 @@ public class VideoKeeper {
 		thread.start();
 	}
 	
+	@SuppressWarnings("deprecation")
 	private void handleLink(String s) {
 		//open the webpage in default browser. Cache as a backup.
 		if (model.getHandleLinks().equalsIgnoreCase(LNK_HNDL_DEFAULT)) {
