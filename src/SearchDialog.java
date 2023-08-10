@@ -19,7 +19,8 @@ public class SearchDialog extends JDialog implements WindowListener {
 	private static final String COL_TITLE_TITLE		= "Title";
 	private static final String COL_TITLE_AUTH		= "Author";
 	private static final String COL_TITLE_DATE		= "Date";
-	private static final String SEARCH_BTN_TITLE 	= "Search";
+//	private static final String SEARCH_BTN_TITLE 	= "Search";
+	private static final String SEARCH_BTN_TITLE 	= "🔎";
 	private static final String CLEAR_BTN_TITLE		= "X";
 	private static final String PLAY_BTN_TITLE 		= "Play";
 	private static final String CPY_URL_BTN_TITLE	= "Copy URL";

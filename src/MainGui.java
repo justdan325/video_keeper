@@ -27,7 +27,7 @@ import java.awt.Dimension;
 @SuppressWarnings("serial")
 public class MainGui extends JFrame implements WindowListener {
 	public  static final String PROG_NAME 			= "Video Keeper";
-	public  static final String PROG_VER			= "3.0a1";
+	public  static final String PROG_VER			= "3.0a2";
 	public  static final String PROG_FONT			= "Arial";
 	public	static final Color 	PROG_COLOR_BKRND	= Main.OS_MAC ? Color.LIGHT_GRAY : new Color(3156004);
 	public	static final Color	PROG_COLOR_BTN_EN	= Main.OS_MAC ? Color.WHITE : new Color(8388608);
@@ -38,17 +38,23 @@ public class MainGui extends JFrame implements WindowListener {
 	private static final String PASTE_MESS 			= "<Paste Video Link Here>";
 	private static final String NEXT_BUTTON_TXT 	= "Play Next";
 	private static final String PREV_BUTTON_TXT 	= "Play Prev.";
-	private static final String FWRD_BUTTON_TXT 	= ">";
-	private static final String BKWRD_BUTTON_TXT 	= "<";
+//	private static final String FWRD_BUTTON_TXT 	= ">";
+	private static final String FWRD_BUTTON_TXT 	= "➡️";
+//	private static final String BKWRD_BUTTON_TXT 	= "<";
+	private static final String BKWRD_BUTTON_TXT 	= "⬅️";
 	private static final String HEAD_BUTTON_TXT 	= "Head";
 	private static final String SETT_BUTTON_TXT 	= "*";
 	private static final String ADD_BUTTON_TXT 		= "Add";
 	private static final String ADD_LABEL_TXT 		= "Add Video Links to Watch List.";
 	private static final String PASTE_BUTTON_TXT 	= "Paste";
-	private static final String SAVE_BUTTON_TXT 	= "Save";
-	private static final String REFR_BUTTON_TXT 	= "Refresh";
-	private static final String DEL_BUTTON_TXT 		= "Delete";
-	private static final String SEARCH_BUTTON_TXT 	= "Search";
+//	private static final String SAVE_BUTTON_TXT 	= "Save";
+	private static final String SAVE_BUTTON_TXT 	= "💾";
+//	private static final String REFR_BUTTON_TXT 	= "Refresh";
+	private static final String REFR_BUTTON_TXT 	= "🔄";
+//	private static final String DEL_BUTTON_TXT 		= "Delete";
+	private static final String DEL_BUTTON_TXT 		= "🗑️";
+//	private static final String SEARCH_BUTTON_TXT 	= "Search";
+	private static final String SEARCH_BUTTON_TXT 	= "🔎";
 	private static final String UP_NEXT_TXT			= " -- Up Next -- ";
 	private static final String EMPTY_QUEUE_TXT		= "~ No Video Links in Watch List ~";
 	private static final String TOOLTIP_PASTE		= "Paste a video link from the clip board.";
@@ -58,6 +64,7 @@ public class MainGui extends JFrame implements WindowListener {
 	private static final String TOOLTIP_REFRESH		= "Refresh video metadata for the next video.";
 	private static final String TOOLTIP_DELETE		= "Delete current video from the list.";
 	private static final String TOOLTIP_SEARCH		= "Search through the list of videos.";
+	private static final String TOOLTIP_SAVE		= "Save changes to the watch list.";
 	private static final String CHANNEL_PREFIX 		= "By: ";
 	private static final int 	WIN_X 				= 600;
 	private static final int 	WIN_Y 				= Main.OS_MAC ? 425 : 400;
@@ -168,6 +175,7 @@ public class MainGui extends JFrame implements WindowListener {
 		refreshButton.setToolTipText(TOOLTIP_REFRESH);
 		deleteButton.setToolTipText(TOOLTIP_DELETE);
 		searchButton.setToolTipText(TOOLTIP_SEARCH);
+		saveButton.setToolTipText(TOOLTIP_SAVE);
 		settButton.setToolTipText(TOOLTIP_SETTINGS);
 		settButton.setBackground(PROG_COLOR_BTN_EN);
 		
@@ -252,9 +260,9 @@ public class MainGui extends JFrame implements WindowListener {
 		nextButton.setBackground(PROG_COLOR_BTN_EN);
 		nextButton.setPreferredSize(new Dimension(BUTTON_LENGTH, BUTTON_WIDTH));
 		fwrdButton.setBackground(PROG_COLOR_BTN_EN);
-		fwrdButton.setPreferredSize(new Dimension(BUTTON_LENGTH/2 - 5, BUTTON_WIDTH));
+		fwrdButton.setPreferredSize(new Dimension(BUTTON_LENGTH/2 - 7, BUTTON_WIDTH));
 		bkwrdButton.setBackground(PROG_COLOR_BTN_EN);
-		bkwrdButton.setPreferredSize(new Dimension(BUTTON_LENGTH/2 - 5, BUTTON_WIDTH));
+		bkwrdButton.setPreferredSize(new Dimension(BUTTON_LENGTH/2 - 7, BUTTON_WIDTH));
 		headButton.setBackground(PROG_COLOR_BTN_EN);
 		headButton.setPreferredSize(new Dimension(BUTTON_LENGTH/2 + 20, BUTTON_WIDTH));
 		headButton.setToolTipText(TOOLTIP_HEAD);
