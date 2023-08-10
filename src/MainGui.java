@@ -260,9 +260,9 @@ public class MainGui extends JFrame implements WindowListener {
 		nextButton.setBackground(PROG_COLOR_BTN_EN);
 		nextButton.setPreferredSize(new Dimension(BUTTON_LENGTH, BUTTON_WIDTH));
 		fwrdButton.setBackground(PROG_COLOR_BTN_EN);
-		fwrdButton.setPreferredSize(new Dimension(BUTTON_LENGTH/2 - 7, BUTTON_WIDTH));
+		fwrdButton.setPreferredSize(new Dimension(BUTTON_LENGTH/2 - 5, BUTTON_WIDTH));
 		bkwrdButton.setBackground(PROG_COLOR_BTN_EN);
-		bkwrdButton.setPreferredSize(new Dimension(BUTTON_LENGTH/2 - 7, BUTTON_WIDTH));
+		bkwrdButton.setPreferredSize(new Dimension(BUTTON_LENGTH/2 - 5, BUTTON_WIDTH));
 		headButton.setBackground(PROG_COLOR_BTN_EN);
 		headButton.setPreferredSize(new Dimension(BUTTON_LENGTH/2 + 20, BUTTON_WIDTH));
 		headButton.setToolTipText(TOOLTIP_HEAD);
