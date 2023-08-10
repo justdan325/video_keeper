@@ -43,7 +43,7 @@ public class MainGui extends JFrame implements WindowListener {
 //	private static final String BKWRD_BUTTON_TXT 	= "<";
 	private static final String BKWRD_BUTTON_TXT 	= "⬅️";
 	private static final String HEAD_BUTTON_TXT 	= "Head";
-	private static final String SETT_BUTTON_TXT 	= "*";
+	private static final String SETT_BUTTON_TXT 	= "⚙️";
 	private static final String ADD_BUTTON_TXT 		= "Add";
 	private static final String ADD_LABEL_TXT 		= "Add Video Links to Watch List.";
 	private static final String PASTE_BUTTON_TXT 	= "Paste";
