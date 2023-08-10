@@ -1,0 +1,5 @@
+VIDEO KEEPER CHANGE LOG -- VERSION 3.0a2
+
+BUG FIX:
+
+-Using emoticons for certain button lables.
