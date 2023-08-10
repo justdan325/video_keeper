@@ -6,7 +6,6 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
-import java.util.ArrayList;
 import java.util.Optional;
 import java.util.Vector;
 
@@ -120,7 +119,7 @@ public class SearchDialog extends JDialog implements WindowListener {
 				Optional<VideoDataNode> curr = getCorrespondingNodeFromSelectedCell();
 				
 				if(curr.isPresent()) {
-					model.getVideoKeeper().open(mainTable.getSelectedRow(), false);
+					model.getVideoKeeper().open(curr, false);
 				}
 			}
 		});
@@ -145,10 +144,16 @@ public class SearchDialog extends JDialog implements WindowListener {
 						Optional<VideoList> videoList = model.getVideoList();
 						
 						if (videoList.isPresent() && videoList.get().size() > 0) {
-							Optional<VideoDataNode> toMove = videoList.get().pop(mainTable.getSelectedRow());
+							Optional<VideoDataNode> currInList = videoList.get().peekCurr();
+							Optional<VideoDataNode> toMove = videoList.get().pop(getCorrespondingIndex());
 
 							if (toMove.isPresent()) {
 								videoList.get().prepend(toMove.get());
+								
+								if(currInList.isPresent()) {
+									videoList.get().setIndex(model.getVideoKeeper().getIndexOfNode(currInList));
+								}
+								
 								populateList();
 							}
 							
@@ -166,10 +171,10 @@ public class SearchDialog extends JDialog implements WindowListener {
 					@Override
 					public void run() {
 						refreshing = true;
-						model.getVideoKeeper().refresh(mainTable.getSelectedRow());
+						model.getVideoKeeper().refresh(getCorrespondingIndex());
 						populateList();
 						model.setRequestSaveButtonEn(true);
-						refreshing = true;
+						refreshing = false;
 					}
 				}).start();
 			}
@@ -178,7 +183,7 @@ public class SearchDialog extends JDialog implements WindowListener {
 		deleteButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				model.getVideoList().get().pop(mainTable.getSelectedRow());
+				model.getVideoList().get().pop(getCorrespondingIndex());
 				populateList();
 				model.setRequestSaveButtonEn(true);
 			}
@@ -193,10 +198,16 @@ public class SearchDialog extends JDialog implements WindowListener {
 						Optional<VideoList> videoList = model.getVideoList();
 						
 						if (videoList.isPresent() && videoList.get().size() > 0) {
-							Optional<VideoDataNode> toMove = videoList.get().pop(mainTable.getSelectedRow());
+							Optional<VideoDataNode> currInList = videoList.get().peekCurr();
+							Optional<VideoDataNode> toMove = videoList.get().pop(getCorrespondingIndex());
 
 							if (toMove.isPresent()) {
 								videoList.get().append(toMove.get());
+								
+								if(currInList.isPresent()) {
+									videoList.get().setIndex(model.getVideoKeeper().getIndexOfNode(currInList));
+								}
+								
 								populateList();
 							}
 							
@@ -292,8 +303,6 @@ public class SearchDialog extends JDialog implements WindowListener {
 	}
 	
 	private void searchAndSet(String query) {
-		ArrayList<VideoDataNode> results = new ArrayList<>();
-		
 		clearButton.setVisible(true);
 		
 		if (model.getVideoList().isPresent() && query.length() > 0) {
@@ -301,28 +310,27 @@ public class SearchDialog extends JDialog implements WindowListener {
 			VideoList videoList = null;
 
 			if (videoListOpt.isPresent()) {
+				int count = 0;
 				//make a copy
 				videoList = new VideoList(videoListOpt.get());
+				
+				((DefaultTableModel) mainTable.getModel()).setRowCount(0);
 
 				while (videoList.size() > 0) {
 					Optional<VideoDataNode> curr = videoList.popCurr();
+					
+					count++;
 
 					if (curr.isPresent()) {
 						if (curr.get().getTitle().contains(query.trim())
 								|| curr.get().getChannel().contains(query.trim())
 								|| curr.get().getDate().contains(query.trim())) {
 							
-							results.add(curr.get());
+							addToListNonContiguous(curr.get(), count);
 						}
 					}
 				}
 			}
-		}
-		
-		((DefaultTableModel) mainTable.getModel()).setRowCount(0);
-		
-		for(VideoDataNode node : results) {
-			addToList(node);
 		}
 	}
 	
@@ -342,6 +350,9 @@ public class SearchDialog extends JDialog implements WindowListener {
 			if (videoListOpt.isPresent()) {
 				//make a copy
 				videoList = new VideoList(videoListOpt.get());
+				
+				//list should be in order from 0 to n, not from index to 0.
+				videoList.resetIndex();
 
 				while (videoList.size() > 0) {
 					Optional<VideoDataNode> curr = videoList.popCurr();
@@ -373,6 +384,25 @@ public class SearchDialog extends JDialog implements WindowListener {
 		}
 	}
 	
+	private void addToListNonContiguous(VideoDataNode node, int listNum) {
+		if(node.isEmpty() == false) {
+			Vector<String> row = new Vector<String>();
+			
+		    row.add("" + listNum);
+		    
+			if (node.getTitle() != null && node.getTitle().length() > 0) {
+				row.add(node.getTitle());
+			} else {
+				row.add(node.getUrl());
+			}
+			
+		    row.add(node.getChannel());
+		    row.add(node.getDate());
+		    
+			((DefaultTableModel) mainTable.getModel()).addRow(row);
+		}
+	}
+	
 	private Optional<VideoDataNode> getCorrespondingNodeFromSelectedCell() {
 		Optional<VideoDataNode> node = Optional.empty();
 		
@@ -385,6 +415,20 @@ public class SearchDialog extends JDialog implements WindowListener {
 		}
 		
 		return node;
+	}
+	
+	private int getCorrespondingIndex() {
+		int index = 0;
+		
+		if (mainTable.getSelectedRow() >= 0) {
+			Object valueAt = ((DefaultTableModel) mainTable.getModel()).getValueAt(mainTable.getSelectedRow(), 0);
+			
+			if (model.getVideoList().isPresent()) {
+				index = Integer.parseInt(((String) valueAt).trim()) - 1;
+			}
+		}
+		
+		return index;
 	}
 	
 	private void setOptionsLocked(boolean locked) {

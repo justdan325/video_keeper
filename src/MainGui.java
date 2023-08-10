@@ -449,6 +449,7 @@ public class MainGui extends JFrame implements WindowListener {
 					
 					count = keeper.getSize();
 					index = keeper.getCurrIndex() + 1;
+					notAtHead = index > 1 ? true : false;
 					counterLabel.setText(index + " / " + count);
 					
 					if(urlField.getText().trim().equals(PASTE_MESS) == false && urlField.getText().trim().length() > 0) {

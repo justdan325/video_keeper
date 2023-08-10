@@ -125,19 +125,52 @@ public class VideoKeeper {
 	}
 	
 	public void open(int index, boolean removeFromList) {
-		if(vidNodeList.size() >= index - 1) {
+		if (vidNodeList.size() >= index - 1) {
 			Optional<VideoDataNode> node = vidNodeList.peek(index);
-			
+
 			if (node.isPresent()) {
 				if (removeFromList) {
 					vidNodeList.pop(index);
 					prev = node.get();
 				}
-				
+
 				handleLink(node.get().getUrl());
 			}
-			
-			refreshCurrInSepThread(true);
+
+			if (removeFromList) {
+				refreshCurrInSepThread(true);
+			}
+		}
+	}
+	
+	public void open(Optional<VideoDataNode> node, boolean removeFromList) {
+		if (vidNodeList.size() > 0) {
+			if (node.isPresent()) {
+				VideoList copy = new VideoList(vidNodeList);
+				String url = node.get().getUrl();
+
+				if (url != null && url.length() > 0) {
+					copy.resetIndex();
+
+					for (int i = 0; i < copy.size(); i++) {
+						String urlFromList = copy.peek(i).get().getUrl();
+
+						if (urlFromList != null && urlFromList.length() > 0 && urlFromList.equals(url)) {
+							if (removeFromList) {
+								vidNodeList.pop(i);
+								prev = node.get();
+							}
+
+							handleLink(url);
+							break;
+						}
+					}
+				}
+			}
+
+			if (removeFromList) {
+				refreshCurrInSepThread(true);
+			}
 		}
 	}
 	
@@ -185,6 +218,32 @@ public class VideoKeeper {
 		}
 		
 		return atHead;
+	}
+	
+	public int getIndexOfNode(Optional<VideoDataNode> node) {
+		int indexLoc = -1;
+		
+		if(vidNodeList.size() > 0) {
+			if (node.isPresent()) {
+				VideoList copy = new VideoList(vidNodeList);
+				String url = node.get().getUrl();
+				
+				if(url != null && url.length() > 0) {
+					copy.resetIndex();
+					
+					for(int i = 0; i < copy.size(); i++) {
+						String urlFromList = copy.peek(i).get().getUrl();
+						
+						if(urlFromList != null && urlFromList.length() > 0 && urlFromList.equals(url)) {
+							indexLoc = i;
+							break;
+						}
+					}
+				}
+			}
+		}
+		
+		return indexLoc;
 	}
 	
 //	public synchronized void addSkipped() {
