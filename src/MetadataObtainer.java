@@ -586,7 +586,11 @@ public class MetadataObtainer {
 
 				time += seconds;
 			} else {
-				time = "0:" + seconds;
+				if (seconds > 10) {
+					time = "00:" + seconds;
+				} else {
+					time = "00:0" + seconds;
+				}
 			}
 		}
 		
@@ -640,6 +644,11 @@ public class MetadataObtainer {
 	}
 	
 	private String sanitizeYoutube(String urlStr) {
+		final String TIME_PARAM_1 = "&t=";
+		final String TIME_PARAM_2 = "?t=";
+		final String LIST_PARAM = "&list=";
+		final String DIS_POLY_PARAM = "&disable_polymer=1";
+		final String PIC_PREVIEW_PARAM = "&pp=";
 		String sanitized = urlStr;
 		
 		//convert to non-abbreviated link
@@ -648,22 +657,48 @@ public class MetadataObtainer {
 		}
 		
 		//remove playlist data
-		if(urlStr.contains("&list=")) {
-			sanitized = sanitized.substring(0, sanitized.indexOf("&list="));
+		if(urlStr.contains(LIST_PARAM)) {
+			sanitized = sanitized.substring(0, sanitized.indexOf(LIST_PARAM));
 		}
 		
 		//remove polymer disable
-		if(urlStr.contains("&disable_polymer=1")) {
-			sanitized = sanitized.replaceAll("&disable_polymer=1", "");
+		if(urlStr.contains(DIS_POLY_PARAM)) {
+			sanitized = sanitized.replaceAll(DIS_POLY_PARAM, "");
+		}
+		
+		//remove picture preview param
+		if(urlStr.contains(PIC_PREVIEW_PARAM)) {
+			int picPreParamInd = urlStr.indexOf(PIC_PREVIEW_PARAM);
+			String trailingStr = urlStr.substring(picPreParamInd);
+			
+			//keep other query parameters in case they're start time or something else useful.
+			if (trailingStr.contains("?") || trailingStr.substring(1).contains("&")) {
+				//determine the innermost parameter beginning
+				int questionInd = trailingStr.indexOf("?", 1);
+				int ampersandInd = trailingStr.indexOf("&", 1);
+				
+				//if str is not present, set largest to give appearance of being outermost.
+				questionInd = questionInd == -1 ? trailingStr.length() : questionInd;
+				ampersandInd = ampersandInd == -1 ? trailingStr.length() : ampersandInd;
+				
+				if (questionInd < ampersandInd) {
+					sanitized = sanitized.substring(0, picPreParamInd) + trailingStr.substring(questionInd);
+				} else if (ampersandInd < questionInd) {
+					sanitized = sanitized.substring(0, picPreParamInd) + trailingStr.substring(ampersandInd);
+				} else {
+					//TODO: Should never be able to make it into this block. Remove in the future once stress testing is complete. -DJM 1/9/24 
+					System.err.println("ERROR: Logic for determining whether to split string at \"?\" or \"&\" is not sound.");
+				}
+			}
 		}
 		
 		//remove time tags
-		if(urlStr.contains("&t=")) {
-			this.atTime = Optional.of(sanitized.substring(sanitized.indexOf("&t=") + 3));
-			sanitized = sanitized.substring(0, sanitized.indexOf("&t="));
-		} else if(urlStr.contains("?t=")) {
-			this.atTime = Optional.of(sanitized.substring(sanitized.indexOf("?t=") + 3));
-			sanitized = sanitized.substring(0, sanitized.indexOf("?t="));
+		if(urlStr.contains(TIME_PARAM_1)) {
+			this.atTime = Optional.of(sanitized.substring(sanitized.indexOf(TIME_PARAM_1) + TIME_PARAM_1.length()));
+			sanitized = sanitized.substring(0, sanitized.indexOf(TIME_PARAM_1));
+		} else if(urlStr.contains(TIME_PARAM_2)) {
+			this.atTime = Optional.of(sanitized.substring(sanitized.indexOf(TIME_PARAM_2) + TIME_PARAM_2.length()));
+			sanitized = sanitized.substring(0, sanitized.indexOf(TIME_PARAM_2));
 		}
 		
 		return sanitized;
