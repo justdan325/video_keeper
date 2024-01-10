@@ -586,7 +586,7 @@ public class MetadataObtainer {
 
 				time += seconds;
 			} else {
-				if (seconds > 10) {
+				if (seconds >= 10) {
 					time = "00:" + seconds;
 				} else {
 					time = "00:0" + seconds;
@@ -689,6 +689,8 @@ public class MetadataObtainer {
 					//TODO: Should never be able to make it into this block. Remove in the future once stress testing is complete. -DJM 1/9/24 
 					System.err.println("ERROR: Logic for determining whether to split string at \"?\" or \"&\" is not sound.");
 				}
+			} else {
+				sanitized = sanitized.substring(0, picPreParamInd);
 			}
 		}
 		
