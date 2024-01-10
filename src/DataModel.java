@@ -1,7 +1,8 @@
 import java.util.Optional;
 
 public class DataModel {
-	private Optional<VideoList> videoList;
+	private volatile Optional<VideoList> videoList;
+	
 	private VideoKeeper videoKeeper;
 	private String databaseFile;
 	private String handleLinks;

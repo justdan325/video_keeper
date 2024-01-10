@@ -2,8 +2,8 @@ import java.util.ArrayList;
 import java.util.Optional;
 
 public class VideoList {
-	private ArrayList<VideoDataNode> list;
-	private int index = -1;
+	private volatile ArrayList<VideoDataNode> list;
+	private volatile int index = -1;
 
 	public VideoList() {
 		this.list = new ArrayList<>();
