@@ -154,15 +154,45 @@ public class SearchDialog extends JDialog implements WindowListener {
 					@Override
 					public void run() {
 						Optional<VideoList> videoList = model.getVideoList();
+						int indexOfToMove = getCorrespondingIndex();
 						
-						if (videoList.isPresent() && videoList.get().size() > 0) {
-							int indexOfToMove = getCorrespondingIndex();
+						if (videoList.isPresent() && videoList.get().size() > 0 && indexOfToMove > 0) {
+							int newIndex = indexOfToMove - 1;
 							Optional<VideoDataNode> toMove = videoList.get().pop(indexOfToMove);
 
-							if (toMove.isPresent() && indexOfToMove > 0) {
-								videoList.get().insert(indexOfToMove-1, toMove.get());
+							if (toMove.isPresent()) {
+								videoList.get().insert(newIndex, toMove.get());
 								
 								populateList();
+								mainTable.setRowSelectionInterval(newIndex, newIndex);
+								
+								model.setRequestSaveButtonEn(true);
+							}
+							
+						}
+					}
+				}).start();
+			}
+		});
+		
+		moveDownButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				new Thread(new Runnable() {
+					@Override
+					public void run() {
+						Optional<VideoList> videoList = model.getVideoList();
+						int indexOfToMove = getCorrespondingIndex();
+						int newIndex = indexOfToMove + 1;
+						
+						if (videoList.isPresent() && videoList.get().size() > 0 && indexOfToMove < videoList.get().size()-1) {
+							Optional<VideoDataNode> toMove = videoList.get().pop(indexOfToMove);
+
+							if (toMove.isPresent()) {
+								videoList.get().insert(newIndex, toMove.get());
+								
+								populateList();
+								mainTable.setRowSelectionInterval(newIndex, newIndex);
 							}
 							
 							model.setRequestSaveButtonEn(true);
