@@ -19,7 +19,7 @@ public class EditDialog extends JDialog implements WindowListener{
 	private static final int 	WIN_Y 				= 325;
 	private static final int	TEXT_FIELD_X		= 400;
 	private static final int	TEXT_FIELD_Y		= 25;
-	private static final String	DIALOG_TITLE		= MainGui.PROG_NAME + "--Edit Video Metadata";
+	private static final String	DIALOG_TITLE		= MainGui.PROG_NAME + " -- Edit Video Metadata";
 	private static final String	URL_FLD_TITLE		= "URL         ";
 	private static final String	TTL_FLD_TITLE		= "Title        ";
 	private static final String	DATE_FLD_TITLE		= "Date        ";
