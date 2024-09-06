@@ -61,6 +61,7 @@ public class SearchDialog extends JDialog implements WindowListener {
 	@SuppressWarnings("unused")
 	private Component parent;
 	private DataModel model;
+	private EditDialog editor;
 	private boolean refreshing;
 	
 	public static void main(String[] args) {
@@ -72,6 +73,7 @@ public class SearchDialog extends JDialog implements WindowListener {
 		this.mainPanel = new JPanel(new BorderLayout());
 		this.parent = parent;
 		this.model = model;
+		this.editor = new EditDialog(this);
 		this.refreshing = false;
 		
 		mainPanel.setBackground(MainGui.PROG_COLOR_BKRND);
@@ -227,6 +229,19 @@ public class SearchDialog extends JDialog implements WindowListener {
 						}
 					}
 				}).start();
+			}
+		});
+		
+		editButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				Optional<VideoDataNode> node = model.getVideoList().get().peek(getCorrespondingIndex());
+				
+				if (node.isPresent()) {
+					editor.editNode(node.get());
+					populateList();
+					model.setRequestSaveButtonEn(true);
+				}
 			}
 		});
 		
