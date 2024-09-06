@@ -6,6 +6,7 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
+import java.time.DayOfWeek;
 import java.util.Optional;
 import java.util.Vector;
 
@@ -29,6 +30,9 @@ public class SearchDialog extends JDialog implements WindowListener {
 	private static final String REFR_BTN_TITLE		= "Resresh";
 	private static final String HEAD_BTN_TITLE		= "Move to Head";
 	private static final String TAIL_BTN_TITLE		= "Move to Tail";
+	private static final String INDEX_BTN_TITLE		= "Move to Index";
+	private static final String UP_BTN_TITLE		= "️⬆️";
+	private static final String DOWN_BTN_TITLE		= "⬇️";
 	private static final int 	WIN_X 				= 1050;
 	private static final int 	WIN_Y 				= 600;
 	private static final int	SEARCH_BAR_X		= 50;
@@ -51,6 +55,9 @@ public class SearchDialog extends JDialog implements WindowListener {
     private JButton refreshButton;
     private JButton moveToHeadButton;
     private JButton moveToTailButton;
+    private JButton moveToIndexButton;
+    private JButton moveUpButton;
+    private JButton moveDownButton;
 	@SuppressWarnings("unused")
 	private Component parent;
 	private DataModel model;
@@ -91,14 +98,16 @@ public class SearchDialog extends JDialog implements WindowListener {
 		searchBar.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				searchAndSet(searchBar.getText());
+				//TODO: Need to implement search options in the GUI
+				searchAndSet(searchBar.getText(), false, true, true, true);
 			}
 		});
 		
 		searchButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				searchAndSet(searchBar.getText());
+				//TODO: Need to implement search options in the GUI
+				searchAndSet(searchBar.getText(), false, true, true, true);
 			}
 		});
 		
@@ -147,12 +156,13 @@ public class SearchDialog extends JDialog implements WindowListener {
 						if (videoList.isPresent() && videoList.get().size() > 0) {
 							Optional<VideoDataNode> currInList = videoList.get().peekCurr();
 							Optional<VideoDataNode> toMove = videoList.get().pop(getCorrespondingIndex());
+							int indexOfCurr = model.getVideoKeeper().getIndexOfNode(currInList);
 
 							if (toMove.isPresent()) {
 								videoList.get().prepend(toMove.get());
 								
 								if(currInList.isPresent()) {
-									videoList.get().setIndex(model.getVideoKeeper().getIndexOfNode(currInList));
+									videoList.get().setIndex(indexOfCurr);
 								}
 								
 								populateList();
@@ -201,12 +211,13 @@ public class SearchDialog extends JDialog implements WindowListener {
 						if (videoList.isPresent() && videoList.get().size() > 0) {
 							Optional<VideoDataNode> currInList = videoList.get().peekCurr();
 							Optional<VideoDataNode> toMove = videoList.get().pop(getCorrespondingIndex());
+							int indexOfCurr = model.getVideoKeeper().getIndexOfNode(currInList);
 
 							if (toMove.isPresent()) {
 								videoList.get().append(toMove.get());
 								
 								if(currInList.isPresent()) {
-									videoList.get().setIndex(model.getVideoKeeper().getIndexOfNode(currInList));
+									videoList.get().setIndex(indexOfCurr);
 								}
 								
 								populateList();
@@ -235,10 +246,10 @@ public class SearchDialog extends JDialog implements WindowListener {
 			@Override
 			public void mouseClicked(MouseEvent e) {
 				if(e.getClickCount() == 2) {
-					Optional<VideoDataNode> curr = getCorrespondingNodeFromSelectedCell();
+					Optional<VideoDataNode> curr = getCorrespondingNodeFromSelectedCell(); 
 					
 					if(curr.isPresent()) {
-						model.getVideoKeeper().open(mainTable.getSelectedRow(), false);
+						model.getVideoKeeper().open(getCorrespondingIndex(), false);
 					}
 				}
 			}
@@ -282,13 +293,16 @@ public class SearchDialog extends JDialog implements WindowListener {
 	}
 	
 	private JPanel makeOptionPanel() {
-		JPanel optionPanel = new JPanel(new GridLayout(7, 1));
+		JPanel optionPanel = new JPanel(new GridLayout(10, 1));
 		
 		this.playButton = new JButton(PLAY_BTN_TITLE);
         this.copyUrlButton = new JButton(CPY_URL_BTN_TITLE);
         this.editButton = new JButton(EDIT_BTN_TITLE);
         this.deleteButton = new JButton(DEL_BTN_TITLE);
         this.refreshButton = new JButton(REFR_BTN_TITLE);
+        this.moveUpButton = new JButton(UP_BTN_TITLE);
+        this.moveDownButton = new JButton(DOWN_BTN_TITLE);
+        this.moveToIndexButton = new JButton(INDEX_BTN_TITLE);
         this.moveToHeadButton = new JButton(HEAD_BTN_TITLE);
         this.moveToTailButton = new JButton(TAIL_BTN_TITLE);
         
@@ -297,13 +311,16 @@ public class SearchDialog extends JDialog implements WindowListener {
 		optionPanel.add(editButton);
 		optionPanel.add(deleteButton);
 		optionPanel.add(refreshButton);
+		optionPanel.add(moveUpButton);
+		optionPanel.add(moveDownButton);
+		optionPanel.add(moveToIndexButton);
 		optionPanel.add(moveToHeadButton);
 		optionPanel.add(moveToTailButton);
 		
 		return optionPanel;
 	}
 	
-	private void searchAndSet(String query) {
+	private void searchAndSet(String query, boolean caseSensitive, boolean searchByTitle, boolean searchByChannel, boolean searchByDate) {
 		clearButton.setVisible(true);
 		
 		if (model.getVideoList().isPresent() && query.length() > 0) {
@@ -318,15 +335,20 @@ public class SearchDialog extends JDialog implements WindowListener {
 				((DefaultTableModel) mainTable.getModel()).setRowCount(0);
 
 				while (videoList.size() > 0) {
-					Optional<VideoDataNode> curr = videoList.popCurr();
+					Optional<VideoDataNode> curr = videoList.pop(count);
+					String title = caseSensitive ? curr.get().getTitle().trim() : curr.get().getTitle().trim().toLowerCase();
+					String channel = caseSensitive ? curr.get().getChannel().trim() : curr.get().getChannel().trim().toLowerCase();
+					String date = caseSensitive ? curr.get().getDate().trim() : curr.get().getDate().trim().toLowerCase();
+					
+					query = caseSensitive ? query.trim() : query.toLowerCase().trim();
 					
 					count++;
 
 					if (curr.isPresent()) {
-						if (curr.get().getTitle().contains(query.trim())
-								|| curr.get().getChannel().contains(query.trim())
-								|| curr.get().getDate().contains(query.trim())) {
-							
+						if ((searchByTitle && title.contains(query))
+								|| (searchByChannel && channel.contains(query))
+								|| (searchByDate && date.contains(query.trim()))) {
+
 							addToListNonContiguous(curr.get(), count);
 						}
 					}
@@ -438,6 +460,9 @@ public class SearchDialog extends JDialog implements WindowListener {
 		editButton.setEnabled(!locked);
 		deleteButton.setEnabled(!locked);
 		refreshButton.setEnabled(!locked);
+		moveUpButton.setEnabled(!locked);
+		moveDownButton.setEnabled(!locked);
+		moveToIndexButton.setEnabled(!locked);
 		moveToHeadButton.setEnabled(!locked);
 		moveToTailButton.setEnabled(!locked);
 		
@@ -447,6 +472,9 @@ public class SearchDialog extends JDialog implements WindowListener {
 			editButton.setBackground(MainGui.PROG_COLOR_BTN_DIS);
 			deleteButton.setBackground(MainGui.PROG_COLOR_BTN_DIS);
 			refreshButton.setBackground(MainGui.PROG_COLOR_BTN_DIS);
+			moveUpButton.setBackground(MainGui.PROG_COLOR_BTN_DIS);
+			moveDownButton.setBackground(MainGui.PROG_COLOR_BTN_DIS);
+			moveToIndexButton.setBackground(MainGui.PROG_COLOR_BTN_DIS);
 			moveToHeadButton.setBackground(MainGui.PROG_COLOR_BTN_DIS);
 			moveToTailButton.setBackground(MainGui.PROG_COLOR_BTN_DIS);
 		} else {
@@ -455,6 +483,9 @@ public class SearchDialog extends JDialog implements WindowListener {
 			editButton.setBackground(MainGui.PROG_COLOR_BTN_EN);
 			deleteButton.setBackground(MainGui.PROG_COLOR_BTN_EN);
 			refreshButton.setBackground(MainGui.PROG_COLOR_BTN_EN);
+			moveUpButton.setBackground(MainGui.PROG_COLOR_BTN_EN);
+			moveDownButton.setBackground(MainGui.PROG_COLOR_BTN_EN);
+			moveToIndexButton.setBackground(MainGui.PROG_COLOR_BTN_EN);
 			moveToHeadButton.setBackground(MainGui.PROG_COLOR_BTN_EN);
 			moveToTailButton.setBackground(MainGui.PROG_COLOR_BTN_EN);
 		}
