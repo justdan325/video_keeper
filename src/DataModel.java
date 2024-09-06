@@ -10,6 +10,11 @@ public class DataModel {
 	private boolean autoSaveOnExit;
 	private boolean checkForDupl;
 	private boolean requestSaveButtonEn;
+	private boolean caseSensitive;
+	private boolean searchThruTitles;
+	private boolean searchThruDates;
+	private boolean searchThruChannels;
+	private boolean playAndDelete;
 	
 	public DataModel() {
 		this.videoList = Optional.empty();
@@ -19,6 +24,11 @@ public class DataModel {
 		this.autoSaveOnExit = true;
 		this.checkForDupl = true;
 		this.requestSaveButtonEn = false;
+		this.caseSensitive = false;
+		this.searchThruTitles = true;
+		this.searchThruDates = true;
+		this.searchThruChannels = true;
+		this.playAndDelete = true;
 	}
 	
 	public synchronized Optional<VideoList> getVideoList() {
@@ -83,5 +93,45 @@ public class DataModel {
 
 	public void setRequestSaveButtonEn(boolean setSaveButtonEn) {
 		this.requestSaveButtonEn = setSaveButtonEn;
+	}
+
+	public boolean isCaseSensitive() {
+		return caseSensitive;
+	}
+
+	public void setCaseSensitive(boolean caseSensitive) {
+		this.caseSensitive = caseSensitive;
+	}
+
+	public boolean isSearchThruTitles() {
+		return searchThruTitles;
+	}
+
+	public void setSearchThruTitles(boolean searchThruTitles) {
+		this.searchThruTitles = searchThruTitles;
+	}
+
+	public boolean isSearchThruDates() {
+		return searchThruDates;
+	}
+
+	public void setSearchThruDates(boolean searchThruDates) {
+		this.searchThruDates = searchThruDates;
+	}
+
+	public boolean isSearchThruChannels() {
+		return searchThruChannels;
+	}
+
+	public void setSearchThruChannels(boolean searchThruChannels) {
+		this.searchThruChannels = searchThruChannels;
+	}
+
+	public boolean isPlayAndDelete() {
+		return playAndDelete;
+	}
+
+	public void setPlayAndDelete(boolean playAndDelete) {
+		this.playAndDelete = playAndDelete;
 	}
 }

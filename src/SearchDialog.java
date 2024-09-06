@@ -6,7 +6,6 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
-import java.time.DayOfWeek;
 import java.util.Optional;
 import java.util.Vector;
 
@@ -22,6 +21,7 @@ public class SearchDialog extends JDialog implements WindowListener {
 	private static final String COL_TITLE_DATE		= "Date";
 //	private static final String SEARCH_BTN_TITLE 	= "Search";
 	private static final String SEARCH_BTN_TITLE 	= "🔎";
+	private static final String OPTIONS_BTN_TITLE 	= "⚙️";
 	private static final String CLEAR_BTN_TITLE		= "X";
 	private static final String PLAY_BTN_TITLE 		= "Play";
 	private static final String CPY_URL_BTN_TITLE	= "Copy URL";
@@ -48,6 +48,7 @@ public class SearchDialog extends JDialog implements WindowListener {
 	private JPanel mainPanel;
 	private JButton searchButton;
 	private JButton clearButton;
+	private JButton optionsButton;
 	private JButton playButton;
 	private JButton copyUrlButton;
     private JButton editButton;
@@ -62,6 +63,7 @@ public class SearchDialog extends JDialog implements WindowListener {
 	private Component parent;
 	private DataModel model;
 	private EditDialog editor;
+	private OptionsDialog optionsDialog;
 	private boolean refreshing;
 	
 	public static void main(String[] args) {
@@ -74,6 +76,7 @@ public class SearchDialog extends JDialog implements WindowListener {
 		this.parent = parent;
 		this.model = model;
 		this.editor = new EditDialog(this);
+		this.optionsDialog = new OptionsDialog(model, this);
 		this.refreshing = false;
 		
 		mainPanel.setBackground(MainGui.PROG_COLOR_BKRND);
@@ -100,16 +103,14 @@ public class SearchDialog extends JDialog implements WindowListener {
 		searchBar.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				//TODO: Need to implement search options in the GUI
-				searchAndSet(searchBar.getText(), false, true, true, true);
+				searchAndSet(searchBar.getText(), model.isCaseSensitive(), model.isSearchThruTitles(), model.isSearchThruChannels(), model.isSearchThruDates());
 			}
 		});
 		
 		searchButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				//TODO: Need to implement search options in the GUI
-				searchAndSet(searchBar.getText(), false, true, true, true);
+				searchAndSet(searchBar.getText(), model.isCaseSensitive(), model.isSearchThruTitles(), model.isSearchThruChannels(), model.isSearchThruDates());
 			}
 		});
 		
@@ -133,7 +134,7 @@ public class SearchDialog extends JDialog implements WindowListener {
 				int indexToMoveTo = getCorrespondingIndex();
 				
 				if(curr.isPresent()) {
-					model.getVideoKeeper().open(curr, true);
+					model.getVideoKeeper().open(curr, model.isPlayAndDelete());
 					populateList();
 					
 					if (listSize > 0) {
@@ -326,6 +327,13 @@ public class SearchDialog extends JDialog implements WindowListener {
 			}
 		});
 		
+		optionsButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				optionsDialog.setVisible(true);
+			}
+		});
+		
 		mainTable.addMouseListener(new MouseListener() {
 			@Override
 			public void mouseReleased(MouseEvent e) {}
@@ -358,9 +366,11 @@ public class SearchDialog extends JDialog implements WindowListener {
 		this.searchBar = new JTextField();
 		this.clearButton = new JButton(CLEAR_BTN_TITLE);
 		this.searchButton = new JButton(SEARCH_BTN_TITLE);
+		this.optionsButton = new JButton(OPTIONS_BTN_TITLE);
 		
 		clearButton.setVisible(false);
 		searchBar.setColumns(SEARCH_BAR_X);
+		searchPanel.add(optionsButton);
 		searchPanel.add(searchBar);
 		searchPanel.add(clearButton);
 		searchPanel.add(searchButton);
