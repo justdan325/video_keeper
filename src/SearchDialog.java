@@ -428,20 +428,23 @@ public class SearchDialog extends JDialog implements WindowListener {
 				//make a copy
 				videoList = new VideoList(videoListOpt.get());
 				
+				//reset index
+				videoList.resetIndex();
+
 				((DefaultTableModel) mainTable.getModel()).setRowCount(0);
 
 				while (videoList.size() > 0) {
-					Optional<VideoDataNode> curr = videoList.pop(count);
+					Optional<VideoDataNode> curr = videoList.popCurr();
 					String title = caseSensitive ? curr.get().getTitle().trim() : curr.get().getTitle().trim().toLowerCase();
 					String channel = caseSensitive ? curr.get().getChannel().trim() : curr.get().getChannel().trim().toLowerCase();
 					String date = caseSensitive ? curr.get().getDate().trim() : curr.get().getDate().trim().toLowerCase();
-					
+
 					query = caseSensitive ? query.trim() : query.toLowerCase().trim();
-					
+
 					count++;
 
 					if (curr.isPresent()) {
-						if ((searchByTitle && title.contains(query))
+						if ((searchByTitle && title.contains(query)) 
 								|| (searchByChannel && channel.contains(query))
 								|| (searchByDate && date.contains(query.trim()))) {
 
