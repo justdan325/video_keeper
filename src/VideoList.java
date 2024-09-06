@@ -48,7 +48,7 @@ public class VideoList {
 	public synchronized boolean insert(int index, VideoDataNode node) {
 		boolean added = false;
 
-		if (index >= 0 && index <= this.index) {
+		if (index >= 0) {
 			list.add(index, node);
 
 			if (index <= this.index) {
