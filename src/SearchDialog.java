@@ -147,6 +147,31 @@ public class SearchDialog extends JDialog implements WindowListener {
 			}
 		});
 		
+		moveUpButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				new Thread(new Runnable() {
+					@Override
+					public void run() {
+						Optional<VideoList> videoList = model.getVideoList();
+						
+						if (videoList.isPresent() && videoList.get().size() > 0) {
+							int indexOfToMove = getCorrespondingIndex();
+							Optional<VideoDataNode> toMove = videoList.get().pop(indexOfToMove);
+
+							if (toMove.isPresent() && indexOfToMove > 0) {
+								videoList.get().insert(indexOfToMove-1, toMove.get());
+								
+								populateList();
+							}
+							
+							model.setRequestSaveButtonEn(true);
+						}
+					}
+				}).start();
+			}
+		});
+		
 		moveToHeadButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
