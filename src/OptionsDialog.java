@@ -6,7 +6,6 @@ import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-import javax.swing.ButtonGroup;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JDialog;
@@ -83,10 +82,20 @@ public class OptionsDialog extends JDialog {
 		this.playDeleteCheckbox = new JCheckBox(PLAY_DEL_CHKBX_LBL);
 		
 		caseSensitiveCheckBox.setSelected(mainModel.isCaseSensitive());
+		caseSensitiveCheckBox.setBackground(MainGui.PROG_COLOR_BKRND);
+		caseSensitiveCheckBox.setForeground(MainGui.PROG_COLOR_TXT_LT);
 		searchTitleCheckBox.setSelected(mainModel.isSearchThruTitles());
+		searchTitleCheckBox.setBackground(MainGui.PROG_COLOR_BKRND);
+		searchTitleCheckBox.setForeground(MainGui.PROG_COLOR_TXT_LT);
 		searchDateCheckBox.setSelected(mainModel.isSearchThruDates());
+		searchDateCheckBox.setBackground(MainGui.PROG_COLOR_BKRND);
+		searchDateCheckBox.setForeground(MainGui.PROG_COLOR_TXT_LT);
 		searchChannelCheckBox.setSelected(mainModel.isSearchThruChannels());
+		searchChannelCheckBox.setBackground(MainGui.PROG_COLOR_BKRND);
+		searchChannelCheckBox.setForeground(MainGui.PROG_COLOR_TXT_LT);
 		playDeleteCheckbox.setSelected(mainModel.isPlayAndDelete());
+		playDeleteCheckbox.setBackground(MainGui.PROG_COLOR_BKRND);
+		playDeleteCheckbox.setForeground(MainGui.PROG_COLOR_TXT_LT);
 		
 		checkBoxPanel.add(caseSensitiveCheckBox);
 		checkBoxPanel.add(searchTitleCheckBox);
