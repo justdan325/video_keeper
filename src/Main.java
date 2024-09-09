@@ -57,13 +57,13 @@ public class Main {
 	
 	@SuppressWarnings("static-access")
 	private void setUiColorScheme() {
-		 UIManager UI = new UIManager();
-		 UI.put("OptionPane.messageForeground", MainGui.PROG_COLOR_TXT_LT);
-		 UI.put("OptionPane.background", MainGui.PROG_COLOR_BKRND);
-		 UI.put("Button.background", MainGui.PROG_COLOR_BTN_EN);
-		 UI.put("Button.foreground", MainGui.PROG_COLOR_TXT_LT);
-		 UI.put("Panel.background", MainGui.PROG_COLOR_BKRND);
-		 UI.put("Label.foreground", MainGui.PROG_COLOR_TXT_LT);
+		UIManager UI = new UIManager();
+		UI.put("OptionPane.messageForeground", MainGui.PROG_COLOR_TXT_LT);
+		UI.put("OptionPane.background", MainGui.PROG_COLOR_BKRND);
+		UI.put("Button.background", MainGui.PROG_COLOR_BTN_EN);
+		UI.put("Button.foreground", MainGui.PROG_COLOR_TXT_LT);
+		UI.put("Panel.background", MainGui.PROG_COLOR_BKRND);
+		UI.put("Label.foreground", MainGui.PROG_COLOR_TXT_LT);
 	}
 
 	private void init() {
@@ -75,19 +75,19 @@ public class Main {
 		File databaseFile;
 		
 		//get database
-		if(!props.containsProp(PROP_KEY_DATABASE)) {
+		if (!props.containsProp(PROP_KEY_DATABASE)) {
 			props.set(PROP_KEY_DATABASE, database);
 		} else {
 			database = props.get(PROP_KEY_DATABASE);
 		}
 		
 		//get auto save
-		if(!props.containsProp(PROP_KEY_AUTO_SAVE)) {
+		if (!props.containsProp(PROP_KEY_AUTO_SAVE)) {
 			props.set(PROP_KEY_AUTO_SAVE, autoSave);
 		} else {
 			autoSave = props.get(PROP_KEY_AUTO_SAVE);
-			
-			if(autoSave.trim().equals("1")) {
+
+			if (autoSave.trim().equals("1")) {
 				model.setAutoSaveOnExit(true);
 			} else {
 				model.setAutoSaveOnExit(false);
@@ -95,12 +95,12 @@ public class Main {
 		}
 		
 		//get check duplicates
-		if(!props.containsProp(PROP_KEY_CHECK_DUPL)) {
+		if (!props.containsProp(PROP_KEY_CHECK_DUPL)) {
 			props.set(PROP_KEY_CHECK_DUPL, checkDuplicates);
 		} else {
 			checkDuplicates = props.get(PROP_KEY_CHECK_DUPL);
-			
-			if(checkDuplicates.trim().equals("1")) {
+
+			if (checkDuplicates.trim().equals("1")) {
 				model.setCheckForDupl(true);
 			} else {
 				model.setCheckForDupl(false);
@@ -108,14 +108,14 @@ public class Main {
 		}
 		
 		//get handle links 
-		if(!props.containsProp(PROP_KEY_HNDL_LNKS)) {
+		if (!props.containsProp(PROP_KEY_HNDL_LNKS)) {
 			props.set(PROP_KEY_HNDL_LNKS, handleLinks);
 		} else {
 			handleLinks = props.get(PROP_KEY_HNDL_LNKS);
 		}
 		
 		//get prev handle links 
-		if(!props.containsProp(PROP_KEY_PREV_HNDL_LNKS)) {
+		if (!props.containsProp(PROP_KEY_PREV_HNDL_LNKS)) {
 			props.set(PROP_KEY_PREV_HNDL_LNKS, previousHandleLinks);
 		} else {
 			previousHandleLinks = props.get(PROP_KEY_PREV_HNDL_LNKS);
@@ -125,9 +125,9 @@ public class Main {
 		model.setDatabaseFile(databaseFile.getAbsolutePath());
 		model.setHandleLinks(handleLinks);
 		model.setPreviousHandleLinks(previousHandleLinks);
-		
+
 		monitorProperties();
-		
+
 		new MainGui(model);
 	}
 	
@@ -135,28 +135,28 @@ public class Main {
 		Thread thread = new Thread(new Runnable() {
 			@Override
 			public void run() {
-				for(;;) {
+				for (;;) {
 					//Check to see if model data differs from props. If so, save the props.
-					if(strToBool(props.get(PROP_KEY_AUTO_SAVE)) != model.isAutoSaveOnExit()) {
+					if (strToBool(props.get(PROP_KEY_AUTO_SAVE)) != model.isAutoSaveOnExit()) {
 						props.set(PROP_KEY_AUTO_SAVE, boolToStr(model.isAutoSaveOnExit()));
 					}
 					
-					if(strToBool(props.get(PROP_KEY_CHECK_DUPL)) != model.isCheckForDupl()) {
+					if (strToBool(props.get(PROP_KEY_CHECK_DUPL)) != model.isCheckForDupl()) {
 						props.set(PROP_KEY_CHECK_DUPL, boolToStr(model.isCheckForDupl()));
 					}
-					
-					if(!props.get(PROP_KEY_DATABASE).trim().equals(model.getDatabaseFile().trim())) {
+
+					if (!props.get(PROP_KEY_DATABASE).trim().equals(model.getDatabaseFile().trim())) {
 						props.set(PROP_KEY_DATABASE, model.getDatabaseFile().trim());
 					}
-					
-					if(!props.get(PROP_KEY_HNDL_LNKS).trim().equals(model.getHandleLinks().trim())) {
+
+					if (!props.get(PROP_KEY_HNDL_LNKS).trim().equals(model.getHandleLinks().trim())) {
 						props.set(PROP_KEY_HNDL_LNKS, model.getHandleLinks().trim());
 					}
-					
-					if(!props.get(PROP_KEY_PREV_HNDL_LNKS).trim().equals(model.getPreviousHandleLinks().trim())) {
+
+					if (!props.get(PROP_KEY_PREV_HNDL_LNKS).trim().equals(model.getPreviousHandleLinks().trim())) {
 						props.set(PROP_KEY_PREV_HNDL_LNKS, model.getPreviousHandleLinks().trim());
 					}
-					
+
 					try {
 						Thread.sleep(30);
 					} catch (InterruptedException e) {
@@ -172,7 +172,7 @@ public class Main {
 	private File getOrCreatePropsFile() {
 		File propsFile = new File(PROP_FILE);
 		
-		if(!propsFile.exists()) {
+		if (!propsFile.exists()) {
 			try {
 				propsFile.createNewFile();
 			} catch (IOException e) {
@@ -186,7 +186,7 @@ public class Main {
 	private boolean strToBool(String str) {
 		return str.trim().equals("1") ? true : false;
 	}
-	
+
 	private String boolToStr(boolean bool) {
 		return bool ? "1" : "0";
 	}
