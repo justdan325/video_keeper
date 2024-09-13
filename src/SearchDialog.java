@@ -61,6 +61,7 @@ public class SearchDialog extends JDialog implements WindowListener {
     private JButton moveDownButton;
 	@SuppressWarnings("unused")
 	private Component parent;
+	private JDialog thisDialog;
 	private DataModel model;
 	private EditDialog editor;
 	private OptionsDialog optionsDialog;
@@ -75,6 +76,7 @@ public class SearchDialog extends JDialog implements WindowListener {
 	public SearchDialog(DataModel model, Component parent) {
 		this.mainPanel = new JPanel(new BorderLayout());
 		this.parent = parent;
+		this.thisDialog = this;
 		this.model = model;
 		this.editor = new EditDialog(this);
 		this.optionsDialog = new OptionsDialog(model, this);
@@ -292,6 +294,44 @@ public class SearchDialog extends JDialog implements WindowListener {
 					}
 					
 					mainTable.setRowSelectionInterval(indexToMoveTo, indexToMoveTo);
+				}
+			}
+		});
+		
+		moveToIndexButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				Optional<VideoList> videoList = model.getVideoList();
+				
+				if (videoList.isPresent() && videoList.get().size() > 0) {
+					Optional<VideoDataNode> toMove = videoList.get().pop(getCorrespondingIndex());
+					String indexStr = JOptionPane.showInputDialog(thisDialog, "Move to:", MainGui.PROG_NAME + " -- Move to Index", JOptionPane.QUESTION_MESSAGE);
+					int index = -1;
+					
+					while (index == -1 && indexStr != null) {
+						try {
+							index = Integer.parseInt(indexStr);
+						} catch (Exception f) {
+							index = -1;
+						}
+						
+						//remember: videoList doesn't contain the video at the head, so need to add 1
+						if (index < 1 || index > videoList.get().size() + 1) {
+							index = -1;
+							indexStr = JOptionPane.showInputDialog(thisDialog, "Enter a valid index:", MainGui.PROG_NAME + " -- Move to Index", JOptionPane.WARNING_MESSAGE);
+						}
+					}
+					
+					//compensate for user entry being off by one
+					index--;
+
+					//indexStr != null is here in case user selected cancel in input dialog
+					if (toMove.isPresent() && indexStr != null) {
+						videoList.get().insert(index, toMove.get());
+						populateList();
+					}
+					
+					model.setRequestSaveButtonEn(true);
 				}
 			}
 		});
