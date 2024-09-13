@@ -55,6 +55,7 @@ public class MainGui extends JFrame implements WindowListener {
 	private static final String DEL_BUTTON_TXT 		= "🗑️";
 //	private static final String SEARCH_BUTTON_TXT 	= "Search";
 	private static final String SEARCH_BUTTON_TXT 	= "🔎";
+	private static final String EDIT_BUTTON_TXT 	= "📝";
 	private static final String UP_NEXT_TXT			= " -- Up Next -- ";
 	private static final String EMPTY_QUEUE_TXT		= "~ No Video Links in Watch List ~";
 	private static final String TOOLTIP_PASTE		= "Paste a video link from the clip board.";
@@ -64,6 +65,7 @@ public class MainGui extends JFrame implements WindowListener {
 	private static final String TOOLTIP_REFRESH		= "Refresh video metadata for the next video.";
 	private static final String TOOLTIP_DELETE		= "Delete current video from the list.";
 	private static final String TOOLTIP_SEARCH		= "Search through the list of videos.";
+	private static final String TOOLTIP_EDIT		= "Edit current video metadata.";
 	private static final String TOOLTIP_SAVE		= "Save changes to the watch list.";
 	private static final String CHANNEL_PREFIX 		= "By: ";
 	private static final int 	WIN_X 				= 600;
@@ -76,6 +78,7 @@ public class MainGui extends JFrame implements WindowListener {
 	private DataModel model;
 	private VideoKeeper keeper;
 	private SettingsDialog settings;
+	private EditDialog editor;
 	private SearchDialog searchDialog;
 	private MainGui mainGui;
 	private JButton nextButton;
@@ -89,6 +92,7 @@ public class MainGui extends JFrame implements WindowListener {
 	private JButton saveButton;
 	private JButton refreshButton;
 	private JButton deleteButton;
+	private JButton editButton;
 	private JButton searchButton;
 	private JLabel upNextLabel;
 	private JLabel counterLabel;
@@ -108,6 +112,7 @@ public class MainGui extends JFrame implements WindowListener {
 		this.keeper = new VideoKeeper(model, this);
 		this.mainGui = this;
 		this.settings = new SettingsDialog(this, model);
+		this.editor = new EditDialog(this);
 		this.searchDialog = new SearchDialog(model, this);
 		this.nextButton = new JButton(NEXT_BUTTON_TXT);
 		this.prevButton = new JButton(PREV_BUTTON_TXT);
@@ -120,6 +125,7 @@ public class MainGui extends JFrame implements WindowListener {
 		this.saveButton = new JButton(SAVE_BUTTON_TXT);
 		this.refreshButton = new JButton(REFR_BUTTON_TXT);
 		this.deleteButton = new JButton(DEL_BUTTON_TXT);
+		this.editButton = new JButton(EDIT_BUTTON_TXT);
 		this.searchButton = new JButton(SEARCH_BUTTON_TXT);
 		this.upNextLabel = new JLabel();
 		this.counterLabel = new JLabel("0");
@@ -174,6 +180,7 @@ public class MainGui extends JFrame implements WindowListener {
 		channelLabel.setForeground(PROG_COLOR_TXT_DRK);
 		refreshButton.setToolTipText(TOOLTIP_REFRESH);
 		deleteButton.setToolTipText(TOOLTIP_DELETE);
+		editButton.setToolTipText(TOOLTIP_EDIT);
 		searchButton.setToolTipText(TOOLTIP_SEARCH);
 		saveButton.setToolTipText(TOOLTIP_SAVE);
 		settButton.setToolTipText(TOOLTIP_SETTINGS);
@@ -185,6 +192,7 @@ public class MainGui extends JFrame implements WindowListener {
 		topPanel.add(saveButton);
 		topPanel.add(refreshButton);
 		topPanel.add(deleteButton);
+		topPanel.add(editButton);
 		topPanel.add(searchButton);
 		
 		north.add(topPanel);
@@ -394,6 +402,13 @@ public class MainGui extends JFrame implements WindowListener {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				keeper.deleteCurr();
+			}
+		});
+		
+		editButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				editor.editNode(model.getVideoList().get().peek(keeper.getCurrIndex()).get());
 			}
 		});
 		
