@@ -336,6 +336,8 @@ public class SettingsDialog extends JDialog implements WindowListener {
 			options = new String[] {"Open link in default browser", "Copy link to clip board", "Custom command", "Previous custom command"};
 		}
 		
+		this.childDialogOpen = true;
+		
 		Object selection = JOptionPane.showInputDialog(parent, MESS, MainGui.PROG_NAME + " -- Set Open Operation", JOptionPane.QUESTION_MESSAGE, null, options, initialSelection);
 		
 		if (selection != null) {
@@ -394,6 +396,8 @@ public class SettingsDialog extends JDialog implements WindowListener {
 				}
 			}
 		}
+		
+		this.childDialogOpen = false;
 	}
 	
 	private void monitor() {
