@@ -644,6 +644,8 @@ public class SearchDialog extends JDialog implements WindowListener {
 		((DefaultTableModel) mainTable.getModel()).setRowCount(0);
 		populateList();
 		this.setVisible(false);
+		this.editor.setVisible(false);
+		this.editor.dispose();
 		this.dispose();
 	}
 
