@@ -7,6 +7,7 @@ public class DataModel {
 	private String databaseFile;
 	private String handleLinks;
 	private String previousHandleLinks;
+	private String searchOptions;
 	private boolean autoSaveOnExit;
 	private boolean checkForDupl;
 	private boolean requestSaveButtonEn;
@@ -21,6 +22,7 @@ public class DataModel {
 		this.videoKeeper = null;
 		this.databaseFile = Main.DEFAULT_DATABASE;
 		this.handleLinks = Main.DEFAULT_HNDL_LNKS;
+		this.searchOptions = "";
 		this.autoSaveOnExit = true;
 		this.checkForDupl = true;
 		this.requestSaveButtonEn = false;
@@ -69,6 +71,14 @@ public class DataModel {
 
 	public synchronized void setPreviousHandleLinks(String previousHandleLinks) {
 		this.previousHandleLinks = previousHandleLinks;
+	}
+
+	public String getSearchOptions() {
+		return searchOptions;
+	}
+
+	public void setSearchOptions(String searchOptions) {
+		this.searchOptions = searchOptions;
 	}
 
 	public synchronized boolean isAutoSaveOnExit() {

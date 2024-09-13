@@ -42,7 +42,7 @@ public class OptionsDialog extends JDialog {
 	
 	public static void main(String[] args) {
 		OptionsDialog dialog = new OptionsDialog(new DataModel(), null);
-
+		
 		dialog.setVisible(true);
 	}
 	
@@ -52,6 +52,8 @@ public class OptionsDialog extends JDialog {
 		this.mainPanel = new JPanel(new BorderLayout());
 		this.primaryOptionsPanel = new JPanel();
 		this.okButton = new JButton(OK_BTN_TTITLE);
+		
+		parseAndSetSearchOptions();
 		
 		JLabel titleDialog = new JLabel(DIALOG_TITLE);
 		titleDialog.setHorizontalAlignment(JLabel.CENTER);
@@ -114,34 +116,6 @@ public class OptionsDialog extends JDialog {
 	}
 	
 	private void addActionListeners() {
-		caseSensitiveCheckBox.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent arg0) {
-				
-			}
-		});
-		
-		searchTitleCheckBox.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent arg0) {
-				
-			}
-		});
-		
-		searchDateCheckBox.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent arg0) {
-				
-			}
-		});
-		
-		searchChannelCheckBox.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent arg0) {
-				
-			}
-		});
-		
 		okButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
@@ -150,20 +124,51 @@ public class OptionsDialog extends JDialog {
 		});
 	}
 	
+	private void parseAndSetSearchOptions() {
+		//bits should be in order of how options appear on the dialog
+		String bits = mainModel.getSearchOptions().trim();
+		boolean caseSensitive;
+		boolean searchThruTitles;
+		boolean searchThruDates;
+		boolean searchThruChannels;
+		boolean playAndDelete;
+		
+		//if not set, the default values are set in the constructor of the model
+		if (bits.length() == 5) {
+			caseSensitive = bits.charAt(0) == '1' ? true : false;
+			searchThruTitles = bits.charAt(1) == '1' ? true : false;
+			searchThruDates = bits.charAt(2) == '1' ? true : false;
+			searchThruChannels = bits.charAt(3) == '1' ? true : false;
+			playAndDelete = bits.charAt(4) == '1' ? true : false;
+			
+			mainModel.setCaseSensitive(caseSensitive);
+			mainModel.setSearchThruTitles(searchThruTitles);
+			mainModel.setSearchThruDates(searchThruDates);
+			mainModel.setSearchThruChannels(searchThruChannels);
+			mainModel.setPlayAndDelete(playAndDelete);
+		}
+	}
+	
 	private void ok() {
 		boolean caseSensitive = caseSensitiveCheckBox.isSelected() ? true : false;
 		boolean searchThruTitles = searchTitleCheckBox.isSelected() ? true : false;
 		boolean searchThruDates = searchDateCheckBox.isSelected() ? true : false;
 		boolean searchThruChannels = searchChannelCheckBox.isSelected() ? true : false;
 		boolean playAndDelete = playDeleteCheckbox.isSelected() ? true : false;
+		String bits = "" + boolToChar(caseSensitive) + boolToChar(searchThruTitles) + boolToChar(searchThruDates) + boolToChar(searchThruChannels) + boolToChar(playAndDelete);
 		
 		mainModel.setCaseSensitive(caseSensitive);
 		mainModel.setSearchThruTitles(searchThruTitles);
 		mainModel.setSearchThruDates(searchThruDates);
 		mainModel.setSearchThruChannels(searchThruChannels);
 		mainModel.setPlayAndDelete(playAndDelete);
+		mainModel.setSearchOptions(bits);
 		
 		this.dispose();
 		
+	}
+	
+	private char boolToChar(boolean bool) {
+		return bool ? '1' : '0';
 	}
 }

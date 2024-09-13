@@ -14,6 +14,7 @@ public class Main {
 	private static final String PROP_KEY_CHECK_DUPL		= "checkDuplicates";
 	private static final String PROP_KEY_HNDL_LNKS		= "handleLinks";
 	private static final String PROP_KEY_PREV_HNDL_LNKS	= "prevHandleLinks";
+	private static final String PROP_KEY_SRCH_OPTS		= "searchOptions";
 	private static final String PROP_FILE				= "videokeeper.properties";
 	
 	private PropsFileUtil props;
@@ -72,6 +73,7 @@ public class Main {
 		String checkDuplicates = "1";
 		String handleLinks = DEFAULT_HNDL_LNKS;
 		String previousHandleLinks = "";
+		String searchOptions = "";
 		File databaseFile;
 		
 		//get database
@@ -121,10 +123,18 @@ public class Main {
 			previousHandleLinks = props.get(PROP_KEY_PREV_HNDL_LNKS);
 		}
 		
+		//get search options
+		if (!props.containsProp(PROP_KEY_SRCH_OPTS)) {
+			props.set(PROP_KEY_SRCH_OPTS, searchOptions);
+		} else {
+			searchOptions = props.get(PROP_KEY_SRCH_OPTS);
+		}
+		
 		databaseFile = new File(database);
 		model.setDatabaseFile(databaseFile.getAbsolutePath());
 		model.setHandleLinks(handleLinks);
 		model.setPreviousHandleLinks(previousHandleLinks);
+		model.setSearchOptions(searchOptions);
 
 		monitorProperties();
 
@@ -156,7 +166,11 @@ public class Main {
 					if (!props.get(PROP_KEY_PREV_HNDL_LNKS).trim().equals(model.getPreviousHandleLinks().trim())) {
 						props.set(PROP_KEY_PREV_HNDL_LNKS, model.getPreviousHandleLinks().trim());
 					}
-
+					
+					if (!props.get(PROP_KEY_SRCH_OPTS).trim().equals(model.getSearchOptions().trim())) {
+						props.set(PROP_KEY_SRCH_OPTS, model.getSearchOptions().trim());
+					}
+					
 					try {
 						Thread.sleep(30);
 					} catch (InterruptedException e) {
