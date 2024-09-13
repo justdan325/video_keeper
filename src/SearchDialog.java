@@ -65,6 +65,7 @@ public class SearchDialog extends JDialog implements WindowListener {
 	private EditDialog editor;
 	private OptionsDialog optionsDialog;
 	private boolean refreshing;
+	private boolean displayingSearchResults;
 	
 	public static void main(String[] args) {
 		SearchDialog application = new SearchDialog(new DataModel(), null);
@@ -78,6 +79,7 @@ public class SearchDialog extends JDialog implements WindowListener {
 		this.editor = new EditDialog(this);
 		this.optionsDialog = new OptionsDialog(model, this);
 		this.refreshing = false;
+		this.displayingSearchResults = false;
 		
 		mainPanel.setBackground(MainGui.PROG_COLOR_BKRND);
 		
@@ -87,7 +89,7 @@ public class SearchDialog extends JDialog implements WindowListener {
 		
 		this.add(mainPanel);
 		
-		setOptionsLocked(true);
+		setOptionsLocked(true, displayingSearchResults);
 		monitor();
 		
 		this.getContentPane().setBackground(MainGui.PROG_COLOR_BKRND);
@@ -103,6 +105,7 @@ public class SearchDialog extends JDialog implements WindowListener {
 		searchBar.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
+				displayingSearchResults = true;
 				searchAndSet(searchBar.getText(), model.isCaseSensitive(), model.isSearchThruTitles(), model.isSearchThruChannels(), model.isSearchThruDates());
 			}
 		});
@@ -110,6 +113,7 @@ public class SearchDialog extends JDialog implements WindowListener {
 		searchButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
+				displayingSearchResults = true;
 				searchAndSet(searchBar.getText(), model.isCaseSensitive(), model.isSearchThruTitles(), model.isSearchThruChannels(), model.isSearchThruDates());
 			}
 		});
@@ -119,6 +123,7 @@ public class SearchDialog extends JDialog implements WindowListener {
 			public void actionPerformed(ActionEvent e) {
 				((DefaultTableModel) mainTable.getModel()).setRowCount(0);
 				
+				displayingSearchResults = false;
 				populateList();
 				
 				searchBar.setText("");
@@ -132,10 +137,15 @@ public class SearchDialog extends JDialog implements WindowListener {
 				Optional<VideoDataNode> curr = getCorrespondingNodeFromSelectedCell();
 				int listSize = model.getVideoList().get().size();
 				int indexToMoveTo = getCorrespondingIndex();
+				boolean isPlayAndDelete = model.isPlayAndDelete();
 				
 				if(curr.isPresent()) {
-					model.getVideoKeeper().open(curr, model.isPlayAndDelete());
-					populateList();
+					model.getVideoKeeper().open(curr, isPlayAndDelete);
+					
+					if (isPlayAndDelete) {
+						populateList();
+						displayingSearchResults = false;
+					}
 					
 					if (listSize > 0) {
 						if (indexToMoveTo >= listSize - 1) {
@@ -257,6 +267,7 @@ public class SearchDialog extends JDialog implements WindowListener {
 						populateList();
 						model.setRequestSaveButtonEn(true);
 						refreshing = false;
+						displayingSearchResults = false;
 						
 						mainTable.setRowSelectionInterval(indexToMoveTo, indexToMoveTo);
 					}
@@ -271,7 +282,8 @@ public class SearchDialog extends JDialog implements WindowListener {
 				int listSize = model.getVideoList().get().size();
 				
 				model.getVideoList().get().pop(indexToMoveTo);
-				populateList();
+//				displayingSearchResults = false;
+//				populateList();
 				model.setRequestSaveButtonEn(true);
 				
 				if (listSize > 0) {
@@ -321,7 +333,7 @@ public class SearchDialog extends JDialog implements WindowListener {
 				
 				if (node.isPresent()) {
 					editor.editNode(node.get());
-					populateList();
+//					populateList();
 					model.setRequestSaveButtonEn(true);
 				}
 			}
@@ -563,41 +575,37 @@ public class SearchDialog extends JDialog implements WindowListener {
 		return index;
 	}
 	
-	private void setOptionsLocked(boolean locked) {
+	private void setOptionsLocked(boolean locked, boolean displayingSearchRes) {
 		playButton.setEnabled(!locked);
 		copyUrlButton.setEnabled(!locked);
 		editButton.setEnabled(!locked);
 		deleteButton.setEnabled(!locked);
 		refreshButton.setEnabled(!locked);
-		moveUpButton.setEnabled(!locked);
-		moveDownButton.setEnabled(!locked);
-		moveToIndexButton.setEnabled(!locked);
-		moveToHeadButton.setEnabled(!locked);
-		moveToTailButton.setEnabled(!locked);
 		
-		if(locked) {
-			playButton.setBackground(MainGui.PROG_COLOR_BTN_DIS);
-			copyUrlButton.setBackground(MainGui.PROG_COLOR_BTN_DIS);
-			editButton.setBackground(MainGui.PROG_COLOR_BTN_DIS);
-			deleteButton.setBackground(MainGui.PROG_COLOR_BTN_DIS);
-			refreshButton.setBackground(MainGui.PROG_COLOR_BTN_DIS);
-			moveUpButton.setBackground(MainGui.PROG_COLOR_BTN_DIS);
-			moveDownButton.setBackground(MainGui.PROG_COLOR_BTN_DIS);
-			moveToIndexButton.setBackground(MainGui.PROG_COLOR_BTN_DIS);
-			moveToHeadButton.setBackground(MainGui.PROG_COLOR_BTN_DIS);
-			moveToTailButton.setBackground(MainGui.PROG_COLOR_BTN_DIS);
+		if (displayingSearchRes) {
+			moveUpButton.setEnabled(false);
+			moveDownButton.setEnabled(false);
+			moveToIndexButton.setEnabled(false);
+			moveToHeadButton.setEnabled(false);
+			moveToTailButton.setEnabled(false);
 		} else {
-			playButton.setBackground(MainGui.PROG_COLOR_BTN_EN);
-			copyUrlButton.setBackground(MainGui.PROG_COLOR_BTN_EN);
-			editButton.setBackground(MainGui.PROG_COLOR_BTN_EN);
-			deleteButton.setBackground(MainGui.PROG_COLOR_BTN_EN);
-			refreshButton.setBackground(MainGui.PROG_COLOR_BTN_EN);
-			moveUpButton.setBackground(MainGui.PROG_COLOR_BTN_EN);
-			moveDownButton.setBackground(MainGui.PROG_COLOR_BTN_EN);
-			moveToIndexButton.setBackground(MainGui.PROG_COLOR_BTN_EN);
-			moveToHeadButton.setBackground(MainGui.PROG_COLOR_BTN_EN);
-			moveToTailButton.setBackground(MainGui.PROG_COLOR_BTN_EN);
+			moveUpButton.setEnabled(!locked);
+			moveDownButton.setEnabled(!locked);
+			moveToIndexButton.setEnabled(!locked);
+			moveToHeadButton.setEnabled(!locked);
+			moveToTailButton.setEnabled(!locked);
 		}
+		
+		playButton.setBackground(playButton.isEnabled() ? MainGui.PROG_COLOR_BTN_EN : MainGui.PROG_COLOR_BTN_DIS);
+		copyUrlButton.setBackground(copyUrlButton.isEnabled() ? MainGui.PROG_COLOR_BTN_EN : MainGui.PROG_COLOR_BTN_DIS);
+		editButton.setBackground(editButton.isEnabled() ? MainGui.PROG_COLOR_BTN_EN : MainGui.PROG_COLOR_BTN_DIS);
+		deleteButton.setBackground(deleteButton.isEnabled() ? MainGui.PROG_COLOR_BTN_EN : MainGui.PROG_COLOR_BTN_DIS);
+		refreshButton.setBackground(refreshButton.isEnabled() ? MainGui.PROG_COLOR_BTN_EN : MainGui.PROG_COLOR_BTN_DIS);
+		moveUpButton.setBackground(moveUpButton.isEnabled() ? MainGui.PROG_COLOR_BTN_EN : MainGui.PROG_COLOR_BTN_DIS);
+		moveDownButton.setBackground(moveDownButton.isEnabled() ? MainGui.PROG_COLOR_BTN_EN : MainGui.PROG_COLOR_BTN_DIS);
+		moveToIndexButton.setBackground(moveToIndexButton.isEnabled() ? MainGui.PROG_COLOR_BTN_EN : MainGui.PROG_COLOR_BTN_DIS);
+		moveToHeadButton.setBackground(moveToHeadButton.isEnabled() ? MainGui.PROG_COLOR_BTN_EN : MainGui.PROG_COLOR_BTN_DIS);
+		moveToTailButton.setBackground(moveToTailButton.isEnabled() ? MainGui.PROG_COLOR_BTN_EN : MainGui.PROG_COLOR_BTN_DIS);
 	}
 	
 	private void monitor() {
@@ -607,9 +615,9 @@ public class SearchDialog extends JDialog implements WindowListener {
 				for(;;) {
 					try {
 						if (mainTable.getSelectedRow() >= 0 && refreshing == false) {
-							setOptionsLocked(false);
+							setOptionsLocked(false, displayingSearchResults);
 						} else {
-							setOptionsLocked(true);
+							setOptionsLocked(true, displayingSearchResults);
 						}
 						
 						Thread.sleep(30);
