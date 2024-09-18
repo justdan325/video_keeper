@@ -492,6 +492,8 @@ public class MainGui extends JFrame implements WindowListener {
 						dateAndTimeLabel.setText(keeper.getCurrDateAndTime());
 						deleteButton.setEnabled(true);
 						deleteButton.setBackground(PROG_COLOR_BTN_EN);
+						editButton.setEnabled(true);
+						editButton.setBackground(PROG_COLOR_BTN_EN);
 						searchButton.setEnabled(true);
 						searchButton.setBackground(PROG_COLOR_BTN_EN);
 						
@@ -515,6 +517,8 @@ public class MainGui extends JFrame implements WindowListener {
 						channelLabel.setText(" ");
 						deleteButton.setEnabled(false);
 						deleteButton.setBackground(PROG_COLOR_BTN_DIS);
+						editButton.setEnabled(false);
+						editButton.setBackground(PROG_COLOR_BTN_DIS);
 						searchButton.setEnabled(false);
 						searchButton.setBackground(PROG_COLOR_BTN_DIS);
 						
