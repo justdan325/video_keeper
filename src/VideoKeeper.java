@@ -80,6 +80,12 @@ public class VideoKeeper {
 					   || item.getChannel().length() < 1) {
 						
 						MetadataObtainer obtainer = new MetadataObtainer(item.getUrl());
+						Optional<String> sanitizedUrl = obtainer.sanitizeForStorage(item.getUrl());
+						
+						//insert sanitized URL if supported
+						if (sanitizedUrl.isPresent()) {
+							item.setUrl(sanitizedUrl.get());
+						}
 
 						if(item.getTitle().length() < 1) {
 							item.setTitle(obtainer.getTitle());

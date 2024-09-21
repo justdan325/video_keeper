@@ -646,9 +646,9 @@ public class MetadataObtainer {
 
 		//YouTube
 		if(sanitized.startsWith(YOUTUBE_PREFIX) || sanitized.startsWith(YOUTUBE_PREFIX_W) 
-		   || sanitized.startsWith(YOUTUBE_PREFIX_ABBR)) {
+		   || sanitized.startsWith(YOUTUBE_PREFIX_ABBR) || sanitized.contains(YOUTUBE_PLAYLIST_TOKEN)) {
 			
-			sanitized = sanitizeYoutube(sanitized);
+			sanitized = sanitizeYoutube(sanitized, false);
 		//Twitch
 		} else if(sanitized.startsWith(TWITCH_PREFIX_W) || sanitized.startsWith(TWITCH_PREFIX_MOB) || sanitized.startsWith(ODYSEE_PREFIX)) {
 			sanitized = sanitizeTwitchAndOdysee(sanitized);
@@ -657,33 +657,125 @@ public class MetadataObtainer {
 		return sanitized;
 	}
 	
-	private String sanitizeYoutube(String urlStr) {
+	/*
+	 * Remove unwanted metadata from URL to store in DB file. Currently will only support YouTube as of 9/21/24.
+	 */
+	public Optional<String> sanitizeForStorage(String url) {
+		Optional<String> sanitized = Optional.empty();
+		
+		//YouTube
+		if(url.startsWith(YOUTUBE_PREFIX) || url.startsWith(YOUTUBE_PREFIX_W) 
+		   || url.startsWith(YOUTUBE_PREFIX_ABBR) || url.contains(YOUTUBE_PLAYLIST_TOKEN)) {
+			
+			sanitized = Optional.of(sanitizeYoutube(url, true));
+		}
+		
+		return sanitized;
+	}
+	
+	/*
+	 * TODO: This method does not account for the possibility of "?" or "&" being in the value itself
+	 */
+	private Optional<String> findEndOfArgKeyValuePair(String url, String param) {
+		Optional<String> restOfUrl = Optional.empty();
+		String temp = "";
+		int paramLoc = -1;
+		int nextIndexQuery = -1;
+		int nextIndexParam = -1;
+		int endOfKeyValuePair = -1;
+
+		paramLoc = url.indexOf(param) + 1;
+
+		if (paramLoc > 0) {
+			temp = url.substring(paramLoc);
+			nextIndexQuery = temp.indexOf("?");
+			nextIndexParam = temp.indexOf("&");
+
+			if (nextIndexQuery > 0 || nextIndexParam > 0) {
+				if (nextIndexParam > 0 && ((nextIndexQuery > 0 && nextIndexParam < nextIndexQuery) || nextIndexQuery <= 0)) {
+					endOfKeyValuePair = nextIndexParam;
+				} else {
+					endOfKeyValuePair = nextIndexQuery;
+				}
+			}
+			
+			if (endOfKeyValuePair > -1) {
+				restOfUrl = Optional.of(temp.substring(endOfKeyValuePair));
+			}
+		}
+
+		return restOfUrl;
+	}
+	
+	/*
+	 * boolean keepCritialData : useful for wanting to keep time param, but get rid of preview & list data, for example
+	 */
+	private String sanitizeYoutube(String urlStr, boolean keepCritialData) {
 		final String TIME_PARAM_1 = "&t=";
 		final String TIME_PARAM_2 = "?t=";
-		final String LIST_PARAM = "&list=";
+		final String LIST_PARAM_1 = "&list=";
+		final String LIST_PARAM_2 = "?list=";
+		final String INDX_PARAM_1 = "&index=";
+		final String INDX_PARAM_2 = "&index=";
 		final String DIS_POLY_PARAM = "&disable_polymer=1";
 		final String PIC_PREVIEW_PARAM = "&pp=";
 		String sanitized = urlStr;
 		
 		//convert to non-abbreviated link
-		if(urlStr.startsWith(YOUTUBE_PREFIX_ABBR)) {
+		if(sanitized.startsWith(YOUTUBE_PREFIX_ABBR)) {
 			sanitized = YOUTUBE_PREFIX_W + sanitized.substring(YOUTUBE_PREFIX_ABBR.length());
 		}
 		
-		//remove playlist data if individual video was navigated to from a playlist
-		if(urlStr.contains(LIST_PARAM)) {
-			sanitized = sanitized.substring(0, sanitized.indexOf(LIST_PARAM));
+		//remove playlist data if individual video was navigated to from a playlist but is not a playlist link itself
+		if (sanitized.contains(YOUTUBE_PLAYLIST_TOKEN) == false) {
+			Optional<String> restOfUrl;
+			
+			if (sanitized.contains(LIST_PARAM_1)) {
+				restOfUrl = findEndOfArgKeyValuePair(sanitized, LIST_PARAM_1);
+				
+				if (restOfUrl.isPresent()) {
+					sanitized = sanitized.substring(0, sanitized.indexOf(LIST_PARAM_1)) + restOfUrl.get();
+				} else {
+					sanitized = sanitized.substring(0, sanitized.indexOf(LIST_PARAM_1));
+				}
+			} else if (sanitized.contains(LIST_PARAM_2)) {
+				restOfUrl = findEndOfArgKeyValuePair(sanitized, LIST_PARAM_2);
+
+				if (restOfUrl.isPresent()) {
+					sanitized = sanitized.substring(0, sanitized.indexOf(LIST_PARAM_2)) + restOfUrl.get();
+				} else {
+					sanitized = sanitized.substring(0, sanitized.indexOf(LIST_PARAM_2));
+				}
+			}
+			
+			if (sanitized.contains(INDX_PARAM_1)) {
+				restOfUrl = findEndOfArgKeyValuePair(sanitized, INDX_PARAM_1);
+				
+				if (restOfUrl.isPresent()) {
+					sanitized = sanitized.substring(0, sanitized.indexOf(INDX_PARAM_1)) + restOfUrl.get();
+				} else {
+					sanitized = sanitized.substring(0, sanitized.indexOf(INDX_PARAM_1));
+				}
+			} else if (sanitized.contains(INDX_PARAM_2)) {
+				restOfUrl = findEndOfArgKeyValuePair(sanitized, INDX_PARAM_2);
+
+				if (restOfUrl.isPresent()) {
+					sanitized = sanitized.substring(0, sanitized.indexOf(INDX_PARAM_2)) + restOfUrl.get();
+				} else {
+					sanitized = sanitized.substring(0, sanitized.indexOf(INDX_PARAM_2));
+				}
+			}
 		}
 		
 		//remove polymer disable
-		if(urlStr.contains(DIS_POLY_PARAM)) {
+		if(sanitized.contains(DIS_POLY_PARAM)) {
 			sanitized = sanitized.replaceAll(DIS_POLY_PARAM, "");
 		}
 		
 		//remove picture preview param
-		if(urlStr.contains(PIC_PREVIEW_PARAM)) {
-			int picPreParamInd = urlStr.indexOf(PIC_PREVIEW_PARAM);
-			String trailingStr = urlStr.substring(picPreParamInd);
+		if(sanitized.contains(PIC_PREVIEW_PARAM)) {
+			int picPreParamInd = sanitized.indexOf(PIC_PREVIEW_PARAM);
+			String trailingStr = sanitized.substring(picPreParamInd);
 			
 			//keep other query parameters in case they're start time or something else useful.
 			if (trailingStr.contains("?") || trailingStr.substring(1).contains("&")) {
@@ -708,13 +800,15 @@ public class MetadataObtainer {
 			}
 		}
 		
-		//remove time tags
-		if(urlStr.contains(TIME_PARAM_1)) {
-			this.atTime = Optional.of(sanitized.substring(sanitized.indexOf(TIME_PARAM_1) + TIME_PARAM_1.length()));
-			sanitized = sanitized.substring(0, sanitized.indexOf(TIME_PARAM_1));
-		} else if(urlStr.contains(TIME_PARAM_2)) {
-			this.atTime = Optional.of(sanitized.substring(sanitized.indexOf(TIME_PARAM_2) + TIME_PARAM_2.length()));
-			sanitized = sanitized.substring(0, sanitized.indexOf(TIME_PARAM_2));
+		if (keepCritialData == false) {
+			//remove time tags
+			if (sanitized.contains(TIME_PARAM_1)) {
+				this.atTime = Optional.of(sanitized.substring(sanitized.indexOf(TIME_PARAM_1) + TIME_PARAM_1.length()));
+				sanitized = sanitized.substring(0, sanitized.indexOf(TIME_PARAM_1));
+			} else if (sanitized.contains(TIME_PARAM_2)) {
+				this.atTime = Optional.of(sanitized.substring(sanitized.indexOf(TIME_PARAM_2) + TIME_PARAM_2.length()));
+				sanitized = sanitized.substring(0, sanitized.indexOf(TIME_PARAM_2));
+			}
 		}
 		
 		return sanitized;
