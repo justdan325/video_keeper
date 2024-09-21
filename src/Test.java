@@ -3,6 +3,7 @@
  * Regression test to ensure that supported URL metadata still gets obtained. Useful for detecting changes in site DOM as well as program bugs.
  */
 public class Test {
+	//YouTube
 	private static final String URL_YT_NORMAL 		= "https://www.youtube.com/watch?v=UTosKh0M42o";
 	private static final String TYPE_YT_NORMAL 		= "YouTube Normal";
 	private static final String TTL_YT_NORMAL 		= "I Bought A $500 Gaming PC From Temu...";
@@ -45,6 +46,14 @@ public class Test {
 	private static final String CHNL_YT_PREVIEW 	= "The B1M on YouTube";
 	private static final String TIME_YT_PREVIEW 	= "06:34";
 	
+	//Odysee
+	private static final String URL_OD_NORMAL		= "https://odysee.com/@MeekerExtreme:9/ebox-2.0-v2-is-the-only-mini-bike-you:3";
+	private static final String TYPE_OD_NORMAL 		= "Odysee Normal";
+	private static final String TTL_OD_NORMAL 		= "EBOX 2.0 V2 is the ONLY Mini Bike You Should Consider";
+	private static final String DATE_OD_NORMAL 		= "Friday, September 20, 2024 at 7:00:41 AM EDT";
+	private static final String CHNL_OD_NORMAL	 	= "@MeekerExtreme on Odysee";
+	private static final String TIME_OD_NORMAL 		= "07:20";
+	
 	
 	public static void main(String[] args) {
 		new Test();
@@ -57,6 +66,8 @@ public class Test {
 		continueIfSuccess(testLink(URL_YT_LIST_TM, TYPE_YT_LIST_TM, TTL_YT_LIST_TM, DATE_YT_LIST_TM, CHNL_YT_LIST_TM, TIME_YT_LIST_TM), TYPE_YT_LIST_TM);
 		continueIfSuccess(testLink(URL_YT_TIMESTMP, TYPE_YT_TIMESTMP, TTL_YT_TIMESTMP, DATE_YT_TIMESTMP, CHNL_YT_TIMESTMP, TIME_YT_TIMESTMP), TYPE_YT_TIMESTMP);
 		continueIfSuccess(testLink(URL_YT_PREVIEW, TYPE_YT_PREVIEW, TTL_YT_PREVIEW, DATE_YT_PREVIEW, CHNL_YT_PREVIEW, TIME_YT_PREVIEW), TYPE_YT_PREVIEW);
+		
+		continueIfSuccess(testLink(URL_OD_NORMAL, TYPE_OD_NORMAL, TTL_OD_NORMAL, DATE_OD_NORMAL, CHNL_OD_NORMAL, TIME_OD_NORMAL), TYPE_OD_NORMAL);
 		
 		System.out.println("\nTest successful!");
 	}
