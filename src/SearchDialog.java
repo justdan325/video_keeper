@@ -78,7 +78,7 @@ public class SearchDialog extends JDialog implements WindowListener {
 		this.parent = parent;
 		this.thisDialog = this;
 		this.model = model;
-		this.editor = new EditDialog(this);
+		this.editor = new EditDialog(this, model);
 		this.optionsDialog = new OptionsDialog(model, this);
 		this.refreshing = false;
 		this.displayingSearchResults = false;

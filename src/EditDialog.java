@@ -41,16 +41,18 @@ public class EditDialog extends JDialog implements WindowListener{
 	private JTextField channelField;
 	private JButton saveButton;
 	private JPanel mainPanel;
+	private DataModel model;
 
 	public static void main(String[] args) {
-		EditDialog dialog = new EditDialog(null);
+		EditDialog dialog = new EditDialog(null, new DataModel());
 		
 		dialog.setVisible(true);
 	}
 	
-	public EditDialog(Component parent) {
+	public EditDialog(Component parent, DataModel model) {
 		this.parent = parent;
 		this.node = Optional.empty();
+		this.model = model;
 		
 		this.getContentPane().setBackground(MainGui.PROG_COLOR_BKRND);
 		this.setTitle(DIALOG_TITLE);
@@ -150,6 +152,8 @@ public class EditDialog extends JDialog implements WindowListener{
 					dateField.setText("");
 					timeField.setText("");
 					channelField.setText("");
+					
+					model.setRequestSaveButtonEn(true);
 				}
 			}
 		});
