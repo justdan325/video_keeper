@@ -45,7 +45,7 @@ public class MetadataObtainer {
 	
 	public static void main(String[] args){
 //		System.out.println(fetchHtml("https://odysee.com/win11:6d73df3083e0f634b18f54521763184b47980d8a"));
-		MetadataObtainer o = new MetadataObtainer("https://rumble.com/v5fqanh-brotherly-love.html?e9s=src_v1_ep");
+		MetadataObtainer o = new MetadataObtainer("https://rumble.com/v5fr7vp-live-elden-ring-mage-build-vs-malenia.html?e9s=src_v1_ucp");
 		System.out.println(o.getTitle());
 		System.out.println(o.getDate());
 		System.out.println(o.getChannel());
@@ -435,21 +435,36 @@ public class MetadataObtainer {
 				}
 			//Rumble
 			} else if(urlStr.startsWith(RUMBLE_PREFIX)) {
-				final String STREAM_INDICATOR = "<div class=\"streamed-on\">";
+				final String STREAM_INDICATOR = "</clipPath></svg>			Streamed on:			<time datetime=\"";
 				
 				//Stream on Rumble have the date located in a different tag
 				if (html.contains(STREAM_INDICATOR)) {
-					String prefix = ">";
-					String suffix = "</time>";
-					int begin = html.indexOf(STREAM_INDICATOR) + STREAM_INDICATOR.length();
-					String htmlTrimmed = html.substring(begin);
-
-					begin = htmlTrimmed.indexOf(prefix) + 1;
-					int end = htmlTrimmed.indexOf(suffix, begin);
+//					String prefix = ">";
+//					String suffix = "</time>";
+//					int begin = html.indexOf(STREAM_INDICATOR) + STREAM_INDICATOR.length();
+//					String htmlTrimmed = html.substring(begin);
+//
+//					begin = htmlTrimmed.indexOf(prefix) + 1;
+//					int end = htmlTrimmed.indexOf(suffix, begin);
+					
+					String prefix = STREAM_INDICATOR;
+					String suffix = "\"";
+					int begin = html.indexOf(prefix) + prefix.length();
+					int end = html.indexOf(suffix, begin);
 
 					if (begin != -1 && end != -1) {
-						date = "Streamed on " + htmlTrimmed.substring(begin, end).trim();
+						date = html.substring(begin, end);
+						date = date.replaceAll("\n", "");
+						
+						//format: 2024-09-21T02:55:15+00:00
+						date = date.substring(0, 10) + " " + date.substring(11, 19);
+						
+						date = "Streamed on " + date;
 					}
+
+//					if (begin != -1 && end != -1) {
+//						date = "Streamed on " + htmlTrimmed.substring(begin, end).trim();
+//					}
 				} else {
 					String prefix = "</clipPath></svg>							<div title=\"";
 					String suffix = "\">";
