@@ -45,7 +45,7 @@ public class MetadataObtainer {
 	
 	public static void main(String[] args){
 //		System.out.println(fetchHtml("https://odysee.com/win11:6d73df3083e0f634b18f54521763184b47980d8a"));
-		MetadataObtainer o = new MetadataObtainer("https://odysee.com/@MeekerExtreme:9/ebox-2.0-v2-is-the-only-mini-bike-you:3");
+		MetadataObtainer o = new MetadataObtainer("https://rumble.com/v5fqanh-brotherly-love.html?e9s=src_v1_ep");
 		System.out.println(o.getTitle());
 		System.out.println(o.getDate());
 		System.out.println(o.getChannel());
@@ -433,7 +433,7 @@ public class MetadataObtainer {
 					date = html.substring(begin, end);
 					date = date.replaceAll("\n", "");
 				}
-				//Rumble
+			//Rumble
 			} else if(urlStr.startsWith(RUMBLE_PREFIX)) {
 				final String STREAM_INDICATOR = "<div class=\"streamed-on\">";
 				
@@ -451,7 +451,7 @@ public class MetadataObtainer {
 						date = "Streamed on " + htmlTrimmed.substring(begin, end).trim();
 					}
 				} else {
-					String prefix = "<div class=\"media-published\" title=\"";
+					String prefix = "</clipPath></svg>							<div title=\"";
 					String suffix = "\">";
 					int begin = html.indexOf(prefix) + prefix.length();
 					int end = html.indexOf(suffix, begin);
@@ -628,6 +628,7 @@ public class MetadataObtainer {
 		
 		try {
 			connection =  new URL(url).openConnection();
+			connection.setRequestProperty("User-Agent", "Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10.4; en-US; rv:1.9.2.2) Gecko/20100316 Firefox/3.6.2");
 			Scanner scanner = new Scanner(connection.getInputStream());
 			scanner.useDelimiter("\\Z");
 			content = scanner.next();
