@@ -45,7 +45,7 @@ public class MetadataObtainer {
 	
 	public static void main(String[] args){
 //		System.out.println(fetchHtml("https://odysee.com/win11:6d73df3083e0f634b18f54521763184b47980d8a"));
-		MetadataObtainer o = new MetadataObtainer("https://rumble.com/v5fr7vp-live-elden-ring-mage-build-vs-malenia.html?e9s=src_v1_ucp");
+		MetadataObtainer o = new MetadataObtainer("https://www.youtube.com/playlist?list=PLT515qV87IFIcL1LvgMVy_IpbWWkiQaXo");
 		System.out.println(o.getTitle());
 		System.out.println(o.getDate());
 		System.out.println(o.getChannel());
@@ -631,7 +631,14 @@ public class MetadataObtainer {
 		
 		try {
 			connection =  new URL(url).openConnection();
-			connection.setRequestProperty("User-Agent", "Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10.4; en-US; rv:1.9.2.2) Gecko/20100316 Firefox/3.6.2");
+			
+			//This user agent screws up YouTube for some reason.
+			if (!url.startsWith(YOUTUBE_PREFIX) && !url.startsWith(YOUTUBE_PREFIX_ABBR) && !url.startsWith(YOUTUBE_PREFIX_W)
+					&& !url.contains(YOUTUBE_PLAYLIST_TOKEN) && !url.contains(YOUTUBE_SHORT_TOKEN)) {
+				connection.setRequestProperty("User-Agent",
+						"Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10.4; en-US; rv:1.9.2.2) Gecko/20100316 Firefox/3.6.2");
+			}
+			
 			Scanner scanner = new Scanner(connection.getInputStream());
 			scanner.useDelimiter("\\Z");
 			content = scanner.next();
