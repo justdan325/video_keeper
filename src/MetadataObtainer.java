@@ -439,14 +439,6 @@ public class MetadataObtainer {
 				
 				//Stream on Rumble have the date located in a different tag
 				if (html.contains(STREAM_INDICATOR)) {
-//					String prefix = ">";
-//					String suffix = "</time>";
-//					int begin = html.indexOf(STREAM_INDICATOR) + STREAM_INDICATOR.length();
-//					String htmlTrimmed = html.substring(begin);
-//
-//					begin = htmlTrimmed.indexOf(prefix) + 1;
-//					int end = htmlTrimmed.indexOf(suffix, begin);
-					
 					String prefix = STREAM_INDICATOR;
 					String suffix = "\"";
 					int begin = html.indexOf(prefix) + prefix.length();
@@ -461,10 +453,6 @@ public class MetadataObtainer {
 						
 						date = "Streamed on " + date;
 					}
-
-//					if (begin != -1 && end != -1) {
-//						date = "Streamed on " + htmlTrimmed.substring(begin, end).trim();
-//					}
 				} else {
 					String prefix = "</clipPath></svg>							<div title=\"";
 					String suffix = "\">";
