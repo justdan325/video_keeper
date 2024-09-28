@@ -45,11 +45,11 @@ public class MetadataObtainer {
 	
 	public static void main(String[] args){
 //		System.out.println(fetchHtml("https://odysee.com/win11:6d73df3083e0f634b18f54521763184b47980d8a"));
-		MetadataObtainer o = new MetadataObtainer("https://www.youtube.com/playlist?list=PLT515qV87IFIcL1LvgMVy_IpbWWkiQaXo");
+		MetadataObtainer o = new MetadataObtainer("");
 		System.out.println("[" + o.getTitle() + "]");
-		System.out.println(o.getDate());
-		System.out.println(o.getChannel());
-		System.out.println(o.getTime());
+		System.out.println("[" + o.getDate() + "]");
+		System.out.println("[" + o.getChannel() + "]");
+		System.out.println("[" + o.getTime() + "]");
 	}
 	
 	public static boolean isSupported(String urlStr) {
@@ -440,11 +440,13 @@ public class MetadataObtainer {
 				date = "--";
 			//Rumble
 			} else if(urlStr.startsWith(RUMBLE_PREFIX)) {
-				final String STREAM_INDICATOR = "</clipPath></svg>			Streamed on:			<time datetime=\"";
+				final String STREAMED_INDICATOR = "</clipPath></svg>			Streamed on:			<time datetime=\"";
+				final String STREAMING_INDICATOR = "/clipPath></svg>				Streaming now\n"
+						+ "									</div>";
 				
 				//Stream on Rumble have the date located in a different tag
-				if (html.contains(STREAM_INDICATOR)) {
-					String prefix = STREAM_INDICATOR;
+				if (html.contains(STREAMED_INDICATOR)) {
+					String prefix = STREAMED_INDICATOR;
 					String suffix = "\"";
 					int begin = html.indexOf(prefix) + prefix.length();
 					int end = html.indexOf(suffix, begin);
@@ -458,6 +460,8 @@ public class MetadataObtainer {
 						
 						date = "Streamed on " + date;
 					}
+				} else if (html.contains(STREAMING_INDICATOR)) {
+					date = "Streaming Now";
 				} else {
 					String prefix = "</clipPath></svg>							<div title=\"";
 					String suffix = "\">";
