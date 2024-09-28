@@ -322,17 +322,19 @@ public class MetadataObtainer {
 				channel += " on Dailymotion";
 			//Bitchute
 			} else if(urlStr.startsWith(BITCHUTE_PREFIX) || urlStr.startsWith(BITCHUTE_PREFIX_W)) {
-				String prefix = "<a href=\"/channel/";
-				String suffix = "/";
-				int begin = html.indexOf(prefix) + prefix.length();
-				int end = html.indexOf(suffix, begin);
-				
-				if (begin != -1 && end != -1) {
-					channel = html.substring(begin, end);
-					channel = filterEscapeChars(channel);
-				}
-				
-				channel += " on BITCHUTE";
+				//Note: BITCHUTE's DOM has changed, and this can no longer be obtained without JS rendering. 9/28/24
+//				String prefix = "<a href=\"/channel/";
+//				String suffix = "/";
+//				int begin = html.indexOf(prefix) + prefix.length();
+//				int end = html.indexOf(suffix, begin);
+//				
+//				if (begin != -1 && end != -1) {
+//					channel = html.substring(begin, end);
+//					channel = filterEscapeChars(channel);
+//				}
+//				
+//				channel += " on BITCHUTE";
+				channel = "an author on BITCHUTE";
 			//Rumble
 			} else if(urlStr.startsWith(RUMBLE_PREFIX)) {
 				String prefix = "data-title=\"";
@@ -424,15 +426,18 @@ public class MetadataObtainer {
 				}
 			//Bitchute
 			} else if(urlStr.startsWith(BITCHUTE_PREFIX) || urlStr.startsWith(BITCHUTE_PREFIX_W)) {
-				String prefix = "<div class=\"video-publish-date\">";
-				String suffix = "</div>";
-				int begin = html.indexOf(prefix) + prefix.length();
-				int end = html.indexOf(suffix, begin);
+				//Note: BITCHUTE's DOM has changed, and this can no longer be obtained without JS rendering. -DJM 9/28/24
+//				String prefix = "<div class=\"video-publish-date\">";
+//				String suffix = "</div>";
+//				int begin = html.indexOf(prefix) + prefix.length();
+//				int end = html.indexOf(suffix, begin);
+//				
+//				if (begin != -1 && end != -1) {
+//					date = html.substring(begin, end);
+//					date = date.replaceAll("\n", "");
+//				}
 				
-				if (begin != -1 && end != -1) {
-					date = html.substring(begin, end);
-					date = date.replaceAll("\n", "");
-				}
+				date = "--";
 			//Rumble
 			} else if(urlStr.startsWith(RUMBLE_PREFIX)) {
 				final String STREAM_INDICATOR = "</clipPath></svg>			Streamed on:			<time datetime=\"";
