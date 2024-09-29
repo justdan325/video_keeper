@@ -3,6 +3,8 @@
  * Regression test to ensure that supported URL metadata still gets obtained. Useful for detecting changes in site DOM as well as program bugs.
  */
 public class Test {
+	private static final boolean EXIT_UPON_FAILURE = false; //if true, will exit testing when a link fails. Setting false can be handy when testing wonky sites.
+	
 	//YouTube
 	private static final String URL_YT_NORMAL 		= "https://www.youtube.com/watch?v=UTosKh0M42o";
 	private static final String TYPE_YT_NORMAL 		= "YouTube Normal";
@@ -62,34 +64,47 @@ public class Test {
 	private static final String CHNL_TWI_MOBILE	 	= "king_yenzala on Twitch";
 	private static final String TIME_TWI_MOBILE 	= "1:50:42";
 	
+	private boolean failureOccured;
+	
 	public static void main(String[] args) {
 		new Test();
 	}
 	
 	public Test() {
+		this.failureOccured = false;
+		
 		//YouTube
-		continueIfSuccess(testLink(URL_YT_NORMAL, TYPE_YT_NORMAL, TTL_YT_NORMAL, DATE_YT_NORMAL, CHNL_YT_NORMAL, TIME_YT_NORMAL), TYPE_YT_NORMAL);
-		continueIfSuccess(testLink(URL_YT_SHORT, TYPE_YT_SHORT, TTL_YT_SHORT, DATE_YT_SHORT, CHNL_YT_SHORT, TIME_YT_SHORT), TYPE_YT_SHORT);
-		continueIfSuccess(testLink(URL_YT_PLYLST, TYPE_YT_PLYLST, TTL_YT_PLYLST, DATE_YT_PLYLST, CHNL_YT_PLYLST, TIME_YT_PLYLST), TYPE_YT_PLYLST);
-		continueIfSuccess(testLink(URL_YT_LIST_TM, TYPE_YT_LIST_TM, TTL_YT_LIST_TM, DATE_YT_LIST_TM, CHNL_YT_LIST_TM, TIME_YT_LIST_TM), TYPE_YT_LIST_TM);
-		continueIfSuccess(testLink(URL_YT_TIMESTMP, TYPE_YT_TIMESTMP, TTL_YT_TIMESTMP, DATE_YT_TIMESTMP, CHNL_YT_TIMESTMP, TIME_YT_TIMESTMP), TYPE_YT_TIMESTMP);
-		continueIfSuccess(testLink(URL_YT_PREVIEW, TYPE_YT_PREVIEW, TTL_YT_PREVIEW, DATE_YT_PREVIEW, CHNL_YT_PREVIEW, TIME_YT_PREVIEW), TYPE_YT_PREVIEW);
+		runTest(testLink(URL_YT_NORMAL, TYPE_YT_NORMAL, TTL_YT_NORMAL, DATE_YT_NORMAL, CHNL_YT_NORMAL, TIME_YT_NORMAL), TYPE_YT_NORMAL);
+		runTest(testLink(URL_YT_SHORT, TYPE_YT_SHORT, TTL_YT_SHORT, DATE_YT_SHORT, CHNL_YT_SHORT, TIME_YT_SHORT), TYPE_YT_SHORT);
+		runTest(testLink(URL_YT_PLYLST, TYPE_YT_PLYLST, TTL_YT_PLYLST, DATE_YT_PLYLST, CHNL_YT_PLYLST, TIME_YT_PLYLST), TYPE_YT_PLYLST);
+		runTest(testLink(URL_YT_LIST_TM, TYPE_YT_LIST_TM, TTL_YT_LIST_TM, DATE_YT_LIST_TM, CHNL_YT_LIST_TM, TIME_YT_LIST_TM), TYPE_YT_LIST_TM);
+		runTest(testLink(URL_YT_TIMESTMP, TYPE_YT_TIMESTMP, TTL_YT_TIMESTMP, DATE_YT_TIMESTMP, CHNL_YT_TIMESTMP, TIME_YT_TIMESTMP), TYPE_YT_TIMESTMP);
+		runTest(testLink(URL_YT_PREVIEW, TYPE_YT_PREVIEW, TTL_YT_PREVIEW, DATE_YT_PREVIEW, CHNL_YT_PREVIEW, TIME_YT_PREVIEW), TYPE_YT_PREVIEW);
 		
 		//Odysee
-		continueIfSuccess(testLink(URL_OD_NORMAL, TYPE_OD_NORMAL, TTL_OD_NORMAL, DATE_OD_NORMAL, CHNL_OD_NORMAL, TIME_OD_NORMAL), TYPE_OD_NORMAL);
+		runTest(testLink(URL_OD_NORMAL, TYPE_OD_NORMAL, TTL_OD_NORMAL, DATE_OD_NORMAL, CHNL_OD_NORMAL, TIME_OD_NORMAL), TYPE_OD_NORMAL);
 		
 		//Twitch
-		continueIfSuccess(testLink(URL_TWI_MOBILE, TYPE_TWI_MOBILE, TTL_TWI_MOBILE, DATE_TWI_MOBILE, CHNL_TWI_MOBILE, TIME_TWI_MOBILE), TYPE_TWI_MOBILE);
+		runTest(testLink(URL_TWI_MOBILE, TYPE_TWI_MOBILE, TTL_TWI_MOBILE, DATE_TWI_MOBILE, CHNL_TWI_MOBILE, TIME_TWI_MOBILE), TYPE_TWI_MOBILE);
 		
-		System.out.println("\nTest successful!");
+		if (failureOccured) {
+			System.err.println("\nFailure(s) occured while testing!");
+		} else {
+			System.out.println("\nTest successful!");
+		}
 	}
 	
-	private void continueIfSuccess(boolean success, String type) {
+	private void runTest(boolean success, String type) {
 		if (success) {
 			System.out.println(type + " : SUCCESS!");
 		} else {
 			System.err.println(type + " : FAILED!");
-			System.exit(-1);
+			
+			this.failureOccured = true;
+			
+			if (EXIT_UPON_FAILURE) {
+				System.exit(-1);
+			}
 		}
 		
 		try {
