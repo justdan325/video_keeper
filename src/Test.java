@@ -54,12 +54,20 @@ public class Test {
 	private static final String CHNL_OD_NORMAL	 	= "@MeekerExtreme on Odysee";
 	private static final String TIME_OD_NORMAL 		= "07:20";
 	
+	//Twitch
+	private static final String URL_TWI_MOBILE		= "https://m.twitch.tv/videos/2255480841";
+	private static final String TYPE_TWI_MOBILE 	= "Twitch Mobile (and normal since normal gets converted to mobile)";
+	private static final String TTL_TWI_MOBILE 		= "Final Valhiem stream D:";
+	private static final String DATE_TWI_MOBILE 	= "";
+	private static final String CHNL_TWI_MOBILE	 	= "king_yenzala on Twitch";
+	private static final String TIME_TWI_MOBILE 	= "1:50:42";
 	
 	public static void main(String[] args) {
 		new Test();
 	}
 	
 	public Test() {
+		//YouTube
 		continueIfSuccess(testLink(URL_YT_NORMAL, TYPE_YT_NORMAL, TTL_YT_NORMAL, DATE_YT_NORMAL, CHNL_YT_NORMAL, TIME_YT_NORMAL), TYPE_YT_NORMAL);
 		continueIfSuccess(testLink(URL_YT_SHORT, TYPE_YT_SHORT, TTL_YT_SHORT, DATE_YT_SHORT, CHNL_YT_SHORT, TIME_YT_SHORT), TYPE_YT_SHORT);
 		continueIfSuccess(testLink(URL_YT_PLYLST, TYPE_YT_PLYLST, TTL_YT_PLYLST, DATE_YT_PLYLST, CHNL_YT_PLYLST, TIME_YT_PLYLST), TYPE_YT_PLYLST);
@@ -67,7 +75,11 @@ public class Test {
 		continueIfSuccess(testLink(URL_YT_TIMESTMP, TYPE_YT_TIMESTMP, TTL_YT_TIMESTMP, DATE_YT_TIMESTMP, CHNL_YT_TIMESTMP, TIME_YT_TIMESTMP), TYPE_YT_TIMESTMP);
 		continueIfSuccess(testLink(URL_YT_PREVIEW, TYPE_YT_PREVIEW, TTL_YT_PREVIEW, DATE_YT_PREVIEW, CHNL_YT_PREVIEW, TIME_YT_PREVIEW), TYPE_YT_PREVIEW);
 		
+		//Odysee
 		continueIfSuccess(testLink(URL_OD_NORMAL, TYPE_OD_NORMAL, TTL_OD_NORMAL, DATE_OD_NORMAL, CHNL_OD_NORMAL, TIME_OD_NORMAL), TYPE_OD_NORMAL);
+		
+		//Twitch
+		continueIfSuccess(testLink(URL_TWI_MOBILE, TYPE_TWI_MOBILE, TTL_TWI_MOBILE, DATE_TWI_MOBILE, CHNL_TWI_MOBILE, TIME_TWI_MOBILE), TYPE_TWI_MOBILE);
 		
 		System.out.println("\nTest successful!");
 	}
@@ -78,6 +90,12 @@ public class Test {
 		} else {
 			System.err.println(type + " : FAILED!");
 			System.exit(-1);
+		}
+		
+		try {
+			Thread.sleep(750);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
 		}
 	}
 	

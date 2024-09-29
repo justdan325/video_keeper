@@ -45,7 +45,7 @@ public class MetadataObtainer {
 	
 	public static void main(String[] args){
 //		System.out.println(fetchHtml("https://odysee.com/win11:6d73df3083e0f634b18f54521763184b47980d8a"));
-		MetadataObtainer o = new MetadataObtainer("");
+		MetadataObtainer o = new MetadataObtainer("https://m.twitch.tv/videos/2255480841");
 		System.out.println("[" + o.getTitle() + "]");
 		System.out.println("[" + o.getDate() + "]");
 		System.out.println("[" + o.getChannel() + "]");
@@ -111,21 +111,24 @@ public class MetadataObtainer {
 				}
 			//Twitch
 			} else if(urlStr.startsWith(TWITCH_PREFIX_MOB)) {
-				String prefix = "<title>";
-				String suffix = "</title>";
+				String prefix = "\"/><meta property=\"og:title\" content=\"";
+				String suffix = " on Twitch\"/><meta ";
 				int begin = html.indexOf(prefix) + prefix.length();
 				int end = html.indexOf(suffix, begin);
 				
 				if (begin != -1 && end != -1) {
 					title = html.substring(begin, end);
-					title = filterEscapeChars(title);
-				}
-				
-				//title is first part
-				String[] strArr = title.split(" - ");
-				
-				if(strArr.length >= 1) {
-					title = strArr[0];
+					//using lastIndexOf doesn't work because reasons...
+					end -= 2;
+
+					if (begin != -1 && end != -1) {
+						while (html.substring(end, end + 3).equals(" - ") == false) {
+							end--;
+						}
+
+						title = html.substring(begin, end);
+						title = filterEscapeChars(title);
+					}
 				}
 			//Vimeo
 			} else if(urlStr.startsWith(VIMEO_PREFIX)) {
@@ -187,7 +190,7 @@ public class MetadataObtainer {
 			}
 		}
 		
-		if(title.length() > 125) {
+		if (title.length() > 125) {
 			title = urlStr;
 		}
 		
@@ -240,25 +243,41 @@ public class MetadataObtainer {
 				channel += " on YouTube";
 			//Twitch
 			} else if(urlStr.startsWith(TWITCH_PREFIX_MOB)) {
-				String prefix = "<title>";
-				String suffix = "</title>";
+				String prefix = "name=\"description\"/><meta name=\"title\" content=\"";
+				String suffix = " on Twitch\"/><meta ";
 				int begin = html.indexOf(prefix) + prefix.length();
 				int end = html.indexOf(suffix, begin);
 				
 				if (begin != -1 && end != -1) {
 					channel = html.substring(begin, end);
-					channel = filterEscapeChars(channel);
+					//using lastIndexOf doesn't work because reasons...
+					begin = end - 2;
+
+					if (begin != -1 && end != -1) {
+						while (html.substring(begin, begin + 3).equals(" - ") == false) {
+							begin--;
+						}
+
+						begin += 3;
+						channel = html.substring(begin, end);
+						channel = filterEscapeChars(channel);
+					}
 				}
 				
-				//channel is second part
-				String[] strArr = channel.split(" - ");
-				
-				if(strArr.length >= 2) {
-					channel = strArr[1];
+				if (channel.trim().equals("")) {
+					prefix = "<meta property=\"og:type\" content=\"video.other\"/><meta content=\"";
+					suffix = " went live on Twitch.";
+					
+					begin = html.indexOf(prefix) + prefix.length();
+					end = html.indexOf(suffix, begin);
+					
+					if (begin != -1 && end != -1) {
+						channel = html.substring(begin, end);
+						channel = filterEscapeChars(channel);
+					}
 				}
 				
-				//This is already contained in the title on Twitch
-//				channel += " on Twitch";
+				channel += " on Twitch";
 			//Vimeo
 			} else if(urlStr.startsWith(VIMEO_PREFIX)) {
 				String prefix = "<span class=\"userlink userlink--md\">";
@@ -308,32 +327,9 @@ public class MetadataObtainer {
 			//Dailymotion
 			} else if(urlStr.startsWith(DAILYMOTION_PREFIX) || urlStr.startsWith(DAILYMOTION_PREFIX_W)
 					|| urlStr.startsWith(DAILYMOTION_PREFIX_MOB)) {
-				
-				String prefix = "<meta property=\"video:director\" content=\"https://www.dailymotion.com/";
-				String suffix = "\"  />";
-				int begin = html.indexOf(prefix) + prefix.length();
-				int end = html.indexOf(suffix, begin);
-				
-				if (begin != -1 && end != -1) {
-					channel = html.substring(begin, end);
-					channel = filterEscapeChars(channel);
-				}
-				
-				channel += " on Dailymotion";
+				channel += "an author on Dailymotion";
 			//Bitchute
 			} else if(urlStr.startsWith(BITCHUTE_PREFIX) || urlStr.startsWith(BITCHUTE_PREFIX_W)) {
-				//Note: BITCHUTE's DOM has changed, and this can no longer be obtained without JS rendering. 9/28/24
-//				String prefix = "<a href=\"/channel/";
-//				String suffix = "/";
-//				int begin = html.indexOf(prefix) + prefix.length();
-//				int end = html.indexOf(suffix, begin);
-//				
-//				if (begin != -1 && end != -1) {
-//					channel = html.substring(begin, end);
-//					channel = filterEscapeChars(channel);
-//				}
-//				
-//				channel += " on BITCHUTE";
 				channel = "an author on BITCHUTE";
 			//Rumble
 			} else if(urlStr.startsWith(RUMBLE_PREFIX)) {
@@ -426,17 +422,6 @@ public class MetadataObtainer {
 				}
 			//Bitchute
 			} else if(urlStr.startsWith(BITCHUTE_PREFIX) || urlStr.startsWith(BITCHUTE_PREFIX_W)) {
-				//Note: BITCHUTE's DOM has changed, and this can no longer be obtained without JS rendering. -DJM 9/28/24
-//				String prefix = "<div class=\"video-publish-date\">";
-//				String suffix = "</div>";
-//				int begin = html.indexOf(prefix) + prefix.length();
-//				int end = html.indexOf(suffix, begin);
-//				
-//				if (begin != -1 && end != -1) {
-//					date = html.substring(begin, end);
-//					date = date.replaceAll("\n", "");
-//				}
-				
 				date = "--";
 			//Rumble
 			} else if(urlStr.startsWith(RUMBLE_PREFIX)) {
@@ -474,24 +459,6 @@ public class MetadataObtainer {
 					}
 				}
 			}
-			/*//Twitch
-			} else if(urlStr.startsWith(TWITCH_PREFIX_MOB)) {
-				String find = " days ago";
-				int index = html.indexOf(find);
-				
-				if(index != -1) {
-					String dateStr = html.substring(index-10, index);
-					String prefix = "-->";
-
-					int begin = dateStr.indexOf(prefix) + prefix.length();
-
-					//number of days ago
-					dateStr = dateStr.substring(begin);
-
-					date = dateStr + " days ago";
-					date = determineDateOnTwitch(date);
-				}
-			}*/
 		}
 		
 		if(date.length() > 100) {
