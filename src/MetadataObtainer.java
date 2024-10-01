@@ -798,15 +798,17 @@ public class MetadataObtainer {
 			}
 		}
 		
+		//Oddly YouTube provides links with the progress time stamp, yet when going to them in the browser, it chops the timestamp off
+		//and redirects to the regular URL when using the question mark. This began happening recently, but using the ampersand seems to
+		//work fine, so we're subbing it in here on our end. -9/30/24
+		sanitized = sanitized.replace(TIME_PARAM_2, TIME_PARAM_1);
+		
 		if (keepCritialData == false) {
 			//remove time tags
 			if (sanitized.contains(TIME_PARAM_1)) {
 				this.atTime = Optional.of(sanitized.substring(sanitized.indexOf(TIME_PARAM_1) + TIME_PARAM_1.length()));
 				sanitized = sanitized.substring(0, sanitized.indexOf(TIME_PARAM_1));
-			} else if (sanitized.contains(TIME_PARAM_2)) {
-				this.atTime = Optional.of(sanitized.substring(sanitized.indexOf(TIME_PARAM_2) + TIME_PARAM_2.length()));
-				sanitized = sanitized.substring(0, sanitized.indexOf(TIME_PARAM_2));
-			}
+			} 
 		}
 		
 		return sanitized;
