@@ -818,16 +818,16 @@ public class MetadataObtainer {
 		final String TIME_Q_PARAM = "?t=";
 		String sanitized = urlStr;
 		
-		//normal twitch video id i.e. https://www.twitch.tv/videos/997396590
+		//normal twitch video id e.g. https://www.twitch.tv/videos/997396590
 		//must convert to mobile to get data
-		if(urlStr.startsWith(TWITCH_PREFIX_W)) {
+		if (urlStr.startsWith(TWITCH_PREFIX_W)) {
 			sanitized = urlStr.replaceFirst(TWITCH_PREFIX_W, TWITCH_PREFIX_MOB);
-			
-			if(sanitized.contains(TIME_Q_PARAM)) {
+
+			if (sanitized.contains(TIME_Q_PARAM)) {
 				atTime = Optional.of(sanitized.substring(sanitized.indexOf(TIME_Q_PARAM) + TIME_Q_PARAM.length(), sanitized.lastIndexOf("s") + 1));
 			}
-		} else if(urlStr.contains(ODYSEE_PREFIX)) {
-			if(urlStr.contains(TIME_Q_PARAM)) {
+		} else if (urlStr.contains(ODYSEE_PREFIX)) {
+			if (urlStr.contains(TIME_Q_PARAM)) {
 				atTime = Optional.of(sanitized.substring(sanitized.indexOf(TIME_Q_PARAM) + TIME_Q_PARAM.length()));
 			}
 		}
