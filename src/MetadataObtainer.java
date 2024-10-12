@@ -45,7 +45,7 @@ public class MetadataObtainer {
 	
 	public static void main(String[] args){
 //		System.out.println(fetchHtml("https://odysee.com/win11:6d73df3083e0f634b18f54521763184b47980d8a"));
-		MetadataObtainer o = new MetadataObtainer("https://m.twitch.tv/videos/2255480841");
+		MetadataObtainer o = new MetadataObtainer("https://www.youtube.com/playlist?list=PLT515qV87IFIcL1LvgMVy_IpbWWkiQaXo");
 		System.out.println("[" + o.getTitle() + "]");
 		System.out.println("[" + o.getDate() + "]");
 		System.out.println("[" + o.getChannel() + "]");
@@ -230,8 +230,8 @@ public class MetadataObtainer {
 				
 				channel += " on YouTube";
 			} else if (urlStr.contains(YOUTUBE_PLAYLIST_TOKEN)) {
-				String prefix = "\"ownerText\":{\"runs\":[{\"text\":\"";
-				String suffix = "\",\"navigationEn";
+				String prefix = "\"shortBylineText\":{\"runs\":[{\"text\":\"";
+				String suffix = "\",";
 				int begin = html.indexOf(prefix) + prefix.length();
 				int end = html.indexOf(suffix, begin);
 
