@@ -18,6 +18,26 @@ public class VideoDataNode {
 		clear();
 		decodeStr(str);
 	}
+	
+	public boolean equals(VideoDataNode other) {
+		boolean equal = false;
+		
+		if (url.equals(other.getUrl())) {
+			if (title.equals(other.getTitle())) {
+				if (date.equals(other.getDate())) {
+					if (channel.equals(other.getChannel())) {
+						if (time.equals(other.getTime())) {
+							if (empty == other.isEmpty()) {
+								equal = true;
+							}
+						}
+					}
+				}
+			}
+		}
+		
+		return equal;
+	}
 
 	private void decodeStr(String str) {
 		String[] contents = str.split( "\\" + DELIM);

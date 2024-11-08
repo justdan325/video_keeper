@@ -43,7 +43,7 @@ public class MetadataObtainer {
 		}
 	}
 	
-	public static void main(String[] args){
+	public static void main(String[] args) {
 //		System.out.println(fetchHtml("https://odysee.com/win11:6d73df3083e0f634b18f54521763184b47980d8a"));
 		MetadataObtainer o = new MetadataObtainer("https://m.twitch.tv/videos/2273915886");
 		System.out.println("[" + o.getTitle() + "]");
