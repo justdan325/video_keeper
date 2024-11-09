@@ -41,6 +41,7 @@ public class EditDialog extends JDialog implements WindowListener{
 	private JTextField channelField;
 	private JButton saveButton;
 	private JPanel mainPanel;
+	@SuppressWarnings("unused")
 	private DataModel model;
 
 	public static void main(String[] args) {
@@ -153,7 +154,7 @@ public class EditDialog extends JDialog implements WindowListener{
 					timeField.setText("");
 					channelField.setText("");
 					
-					model.setRequestSaveButtonEn(true);
+					((SearchDialog) parent).editingFinished();
 				}
 			}
 		});
