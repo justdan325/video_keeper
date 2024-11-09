@@ -703,7 +703,7 @@ public class SearchDialog extends JDialog implements WindowListener {
 	 * Editor must call this when a video in the list is being finished editing.
 	 */
 	protected void editingFinished() {
-		populateList(searchResultsOnDisplay.isPresent() ? searchResultsOnDisplay : model.getVideoList(), true);
+		populateList(searchResultsOnDisplay.isPresent() ? Optional.of(new VideoList(searchResultsOnDisplay.get())) : model.getVideoList(), true);
 		model.setRequestSaveButtonEn(true);
 	}
 	
