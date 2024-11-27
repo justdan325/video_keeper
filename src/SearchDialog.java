@@ -68,6 +68,7 @@ public class SearchDialog extends JDialog implements WindowListener {
 	private Optional<VideoList> searchResultsOnDisplay;
 	private boolean refreshing;
 	private boolean displayingSearchResults;
+	private boolean currentlyInvisible;
 	
 	public static void main(String[] args) {
 		SearchDialog application = new SearchDialog(new DataModel(), null);
@@ -84,6 +85,7 @@ public class SearchDialog extends JDialog implements WindowListener {
 		this.searchResultsOnDisplay = Optional.empty();
 		this.refreshing = false;
 		this.displayingSearchResults = false;
+		this.currentlyInvisible = true;
 		
 		mainPanel.setBackground(MainGui.PROG_COLOR_BKRND);
 		
@@ -731,14 +733,25 @@ public class SearchDialog extends JDialog implements WindowListener {
 	}
 	
 	@Override
-	public void setVisible(boolean visible) {
-		if (searchResultsOnDisplay.isEmpty()) {
-			populateList(model.getVideoList(), false);
-		} else {
-			populateList(searchResultsOnDisplay, false);
+	public void setVisible(boolean makeVisible) {
+		if (currentlyInvisible && makeVisible) {
+			this.currentlyInvisible = false;
+			
+			if (searchResultsOnDisplay.isEmpty()) {
+				populateList(model.getVideoList(), false);
+			} else {
+				populateList(searchResultsOnDisplay, false);
+			}
+		} else if (currentlyInvisible == false && makeVisible == false) {
+			this.currentlyInvisible = true;
 		}
 		
-		super.setVisible(visible);
+		super.setVisible(makeVisible);
+	}
+	
+	@Override
+	public void dispose() {
+		this.currentlyInvisible = true;
 	}
 
 	@Override
