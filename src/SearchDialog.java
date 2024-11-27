@@ -537,6 +537,7 @@ public class SearchDialog extends JDialog implements WindowListener {
 	
 	private void populateList(Optional<VideoList> providedList, boolean updateSearchResultsOnDisplay) {
 		VideoList videoList;
+		int results;
 		
 		clearList();
 		
@@ -547,6 +548,7 @@ public class SearchDialog extends JDialog implements WindowListener {
 		if (providedList.isPresent()) {
 			//make a copy
 			videoList = new VideoList(providedList.get());
+			results = videoList.size();
 			
 			
 			//list should be in order from 0 to n, not from index to 0.
@@ -558,6 +560,7 @@ public class SearchDialog extends JDialog implements WindowListener {
 				if (curr.isPresent()) {
 					if (updateSearchResultsOnDisplay && searchResultsOnDisplay.isPresent()) {
 						addToListNonContiguous(curr.get(), getIndexOfNodeFromMainList(curr) + 1);
+						this.setTitle(DIALOG_TITLE + " [" + results + " Results]");
 					} else {
 						addToList(curr.get());
 					}
