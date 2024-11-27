@@ -27,7 +27,7 @@ import java.awt.Dimension;
 @SuppressWarnings("serial")
 public class MainGui extends JFrame implements WindowListener {
 	public  static final String PROG_NAME 			= "Video Keeper";
-	public  static final String PROG_VER			= "3.0a4";
+	public  static final String PROG_VER			= "3.0b1";
 	public  static final String PROG_FONT			= "Arial";
 	public	static final Color 	PROG_COLOR_BKRND	= Main.OS_MAC ? Color.LIGHT_GRAY : new Color(3156004);
 	public	static final Color	PROG_COLOR_BTN_EN	= Main.OS_MAC ? Color.WHITE : new Color(8388608);
