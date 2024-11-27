@@ -14,7 +14,7 @@ import javax.swing.JPanel;
 
 @SuppressWarnings("serial")
 public class OptionsDialog extends JDialog {
-	private static final String DIALOG_TITLE 		= "Options";
+	private static final String DIALOG_TITLE 		= "Search List Options";
 	private static final String OK_BTN_TTITLE 		= "Ok";
 	private static final String CASE_SENS_CHKBX_LBL = "case sensitive";
 	private static final String SRCH_TTL_CHKBX_LBL 	= "search through video titles";
