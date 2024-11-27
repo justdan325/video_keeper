@@ -737,17 +737,12 @@ public class SearchDialog extends JDialog implements WindowListener {
 		if (currentlyInvisible && makeVisible) {
 			this.currentlyInvisible = false;
 			
-//			if (searchResultsOnDisplay.isEmpty()) {
-//				populateList(model.getVideoList(), false);
-//			} else {
-//				populateList(searchResultsOnDisplay, false);
-//			}
-			
 			populateList(model.getVideoList(), false);
 			
 			//search results should get cleared when re-opening the window
 			if (searchResultsOnDisplay.isPresent()) {
 				searchResultsOnDisplay = Optional.empty();
+				displayingSearchResults = false;
 				searchBar.setText("");
 				setTitle(DIALOG_TITLE);
 				clearButton.setVisible(false);
