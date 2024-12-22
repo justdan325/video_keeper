@@ -76,33 +76,34 @@ public class VideoKeeper {
 			Thread thread = new Thread(new Runnable() {
 				@Override
 				public void run() {
-					if(item.getTitle().length() < 1 || item.getDate().length() < 1 
-					   || item.getChannel().length() < 1) {
-						
+					if (item.getTitle().length() < 1 || item.getDate().length() < 1 || item.getChannel().length() < 1) {
+
 						MetadataObtainer obtainer = new MetadataObtainer(item.getUrl());
 						Optional<String> sanitizedUrl = obtainer.sanitizeForStorage(item.getUrl());
-						
+
 						//insert sanitized URL if supported
 						if (sanitizedUrl.isPresent()) {
 							item.setUrl(sanitizedUrl.get());
 						}
 
-						if(item.getTitle().length() < 1) {
+						if (item.getTitle().length() < 1) {
 							item.setTitle(obtainer.getTitle());
 						}
 
-						if(item.getDate().length() < 1) {
+						if (item.getDate().length() < 1) {
 							item.setDate(obtainer.getDate());
 						}
 
-						if(item.getChannel().length() < 1) {
+						if (item.getChannel().length() < 1) {
 							item.setChannel(obtainer.getChannel());
 						}
-						
-						if(item.getTime().length() < 1) {
+
+						if (item.getTime().length() < 1) {
 							item.setTime(obtainer.getTime());
 						}
 					}
+					
+					System.gc();
 				}
 			});
 			
