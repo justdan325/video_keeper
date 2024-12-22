@@ -728,7 +728,7 @@ public class MetadataObtainer {
 		}
 		
 		if (sanitized.startsWith(YOUTUBE_LIVE_TOKEN)) {
-			sanitized = YOUTUBE_PREFIX + sanitized.substring(YOUTUBE_LIVE_TOKEN.length());
+			sanitized = YOUTUBE_PREFIX_W + sanitized.substring(YOUTUBE_LIVE_TOKEN.length());
 		} else if (sanitized.startsWith(YOUTUBE_LIVE_TOKEN_W)) {
 			sanitized = YOUTUBE_PREFIX_W + sanitized.substring(YOUTUBE_LIVE_TOKEN_W.length());
 		}
