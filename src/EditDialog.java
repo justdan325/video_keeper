@@ -1,6 +1,9 @@
+import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.Graphics;
 import java.awt.GridLayout;
+import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
@@ -12,19 +15,23 @@ import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+import javax.swing.border.Border;
+import javax.swing.border.EmptyBorder;
+import javax.swing.plaf.basic.BasicBorders;
 
 @SuppressWarnings("serial")
 public class EditDialog extends JDialog implements WindowListener{
 	private static final int 	WIN_X 				= 550;
 	private static final int 	WIN_Y 				= 325;
-	private static final int	TEXT_FIELD_X		= 400;
+	private static final int	TEXT_FIELD_X		= 405;
 	private static final int	TEXT_FIELD_Y		= 25;
+	private static final int	BORDER_SIZE			= 15;
 	private static final String	DIALOG_TITLE		= MainGui.PROG_NAME + " -- Edit Video Metadata";
-	private static final String	URL_FLD_TITLE		= "URL         ";
-	private static final String	TTL_FLD_TITLE		= "Title        ";
-	private static final String	DATE_FLD_TITLE		= "Date        ";
-	private static final String	TIME_FLD_TITLE		= "Duration ";
-	private static final String	CHNL_FLD_TITLE		= "Channel   ";
+	private static final String	URL_FLD_TITLE		= "URL";
+	private static final String	TTL_FLD_TITLE		= "Title";
+	private static final String	DATE_FLD_TITLE		= "Date";
+	private static final String	TIME_FLD_TITLE		= "Duration";
+	private static final String	CHNL_FLD_TITLE		= "Channel";
 	private static final String	SAVE_BUTTON_TTL		= "Save";
 	
 	private Optional<VideoDataNode> node;
@@ -94,7 +101,9 @@ public class EditDialog extends JDialog implements WindowListener{
 		this.timeField = new JTextField();
 		this.channelField = new JTextField();
 		this.saveButton = new JButton(SAVE_BUTTON_TTL);
-		this.mainPanel = new JPanel(new GridLayout(6, 1));
+		this.mainPanel = new JPanel(new BorderLayout(10, 0));
+		
+		mainPanel.setBorder(new EmptyBorder(BORDER_SIZE, BORDER_SIZE, BORDER_SIZE, BORDER_SIZE));
 		
 		urlField.setPreferredSize(new Dimension(TEXT_FIELD_X, TEXT_FIELD_Y));
 		titleField.setPreferredSize(new Dimension(TEXT_FIELD_X, TEXT_FIELD_Y));
@@ -103,6 +112,9 @@ public class EditDialog extends JDialog implements WindowListener{
 		channelField.setPreferredSize(new Dimension(TEXT_FIELD_X, TEXT_FIELD_Y));
 		saveButton.setBackground(MainGui.PROG_COLOR_BTN_EN);
 		
+		JPanel labelPanel = new JPanel(new GridLayout(5, 1));
+		JPanel fieldPanel = new JPanel(new GridLayout(5, 1));
+		JPanel leftSpacerPanel = new JPanel();
 		JPanel urlPanel = new JPanel();
 		JPanel titlePanel = new JPanel();
 		JPanel datePanel = new JPanel();
@@ -110,24 +122,27 @@ public class EditDialog extends JDialog implements WindowListener{
 		JPanel channelPanel = new JPanel();
 		JPanel saveButtonPanel = new JPanel();
 		
-		urlPanel.add(urlLabel);
 		urlPanel.add(urlField);
-		titlePanel.add(titleLabel);
 		titlePanel.add(titleField);
-		datePanel.add(dateLabel);
 		datePanel.add(dateField);
-		timePanel.add(timeLabel);
 		timePanel.add(timeField);
-		channelPanel.add(channelLabel);
 		channelPanel.add(channelField);
 		saveButtonPanel.add(saveButton);
+		labelPanel.add(urlLabel);
+		labelPanel.add(titleLabel);
+		labelPanel.add(dateLabel);
+		labelPanel.add(timeLabel);
+		labelPanel.add(channelLabel);
+		fieldPanel.add(urlPanel);
+		fieldPanel.add(titlePanel);
+		fieldPanel.add(datePanel);
+		fieldPanel.add(timePanel);
+		fieldPanel.add(channelPanel);
 		
-		mainPanel.add(urlPanel);
-		mainPanel.add(titlePanel);
-		mainPanel.add(datePanel);
-		mainPanel.add(timePanel);
-		mainPanel.add(channelPanel);
-		mainPanel.add(saveButtonPanel);
+		mainPanel.add(leftSpacerPanel, BorderLayout.WEST);
+		mainPanel.add(labelPanel, BorderLayout.CENTER);
+		mainPanel.add(fieldPanel, BorderLayout.EAST);
+		mainPanel.add(saveButtonPanel, BorderLayout.SOUTH);
 		
 		this.add(mainPanel);
 		
