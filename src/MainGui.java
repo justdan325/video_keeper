@@ -69,7 +69,7 @@ public class MainGui extends JFrame implements WindowListener {
 	private static final String TOOLTIP_SAVE		= "Save changes to the watch list.";
 	private static final String CHANNEL_PREFIX 		= "By: ";
 	private static final int 	WIN_X 				= 600;
-	private static final int 	WIN_Y 				= Main.OS_MAC ? 425 : 400;
+	private static final int 	WIN_Y 				= Main.OS_MAC ? 425 : 420;
 	private static final int 	URL_FIELD_X			= 465;
 	private static final int 	URL_FIELD_Y			= 40;
 	private static final int 	UP_NEXT_FONT_SIZE 	= 20;
