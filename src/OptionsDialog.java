@@ -112,6 +112,13 @@ public class OptionsDialog extends JDialog {
 			this.setLocationRelativeTo(parent);
 		}
 		
+		//need to do this in case the panel was closed using the X button
+		caseSensitiveCheckBox.setSelected(mainModel.isCaseSensitive());
+		searchTitleCheckBox.setSelected(mainModel.isSearchThruTitles());
+		searchDateCheckBox.setSelected(mainModel.isSearchThruDates());
+		searchChannelCheckBox.setSelected(mainModel.isSearchThruChannels());
+		playDeleteCheckbox.setSelected(mainModel.isPlayAndDelete());
+		
 		super.setVisible(visible);
 	}
 	
