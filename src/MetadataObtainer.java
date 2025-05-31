@@ -27,6 +27,7 @@ public class MetadataObtainer {
 	private static final String BITCHUTE_PREFIX_W		= "https://www.bitchute.com/video/";
 	private static final String BITCHUTE_PREFIX			= "https://bitchute.com/video/";
 	private static final String RUMBLE_PREFIX			= "https://rumble.com/";
+	private static final int	MAX_LEN_TITLE			= 125;
 	
 	private Optional<String> atTime;
 	private String urlStr;
@@ -47,7 +48,7 @@ public class MetadataObtainer {
 	
 	public static void main(String[] args) {
 //		System.out.println(fetchHtml("https://odysee.com/win11:6d73df3083e0f634b18f54521763184b47980d8a"));
-		MetadataObtainer o = new MetadataObtainer("https://youtube.com/live/sNlUQ8RQCn4");
+		MetadataObtainer o = new MetadataObtainer("https://www.youtube.com/watch?v=AWzwHP_dDEU");
 		System.out.println("[" + o.getTitle() + "]");
 		System.out.println("[" + o.getDate() + "]");
 		System.out.println("[" + o.getChannel() + "]");
@@ -93,6 +94,7 @@ public class MetadataObtainer {
 		if (!isUrlError()) {
 			//YouTube Regular Links
 			if (urlStr.startsWith(YOUTUBE_PREFIX) || urlStr.startsWith(YOUTUBE_PREFIX_W) || urlStr.contains(YOUTUBE_SHORT_TOKEN)) {
+				final String WATCH_TAG = "/watch?v=";
 				String prefix = "content=\"" + urlStr.trim() + "\"><meta property=\"og:title\" content=\"";
 				String suffix = "\"><meta property=\"og:image\" content=\"";
 				int begin = html.indexOf(prefix) + prefix.length();
@@ -101,6 +103,18 @@ public class MetadataObtainer {
 				if (begin != -1 && end != -1) {
 					title = html.substring(begin, end);
 					title = filterEscapeChars(title);
+				} 
+				
+				if (title.length() > MAX_LEN_TITLE) { 
+					prefix = "</title><meta name=\"title\" content=\"";
+					suffix = "\"><meta name=\"description\"";
+					begin = html.indexOf(prefix) + prefix.length();
+					end = html.indexOf(suffix, begin);
+					
+					if (begin != -1 && end != -1) {
+						title = html.substring(begin, end);
+						title = filterEscapeChars(title);
+					}
 				}
 			} else if (urlStr.contains(YOUTUBE_PLAYLIST_TOKEN)) {
 				String prefix = "property=\"og:title\" content=\"";
@@ -193,7 +207,7 @@ public class MetadataObtainer {
 			}
 		}
 		
-		if (title.length() > 125) {
+		if (title.length() > MAX_LEN_TITLE) {
 			title = urlStr;
 		}
 		
