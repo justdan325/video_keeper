@@ -1,0 +1,3 @@
+VIDEO KEEPER CHANGE LOG -- VERSION 2.0.3
+
+-Updated video metadata obtaining logic to compensate for DOM changes on various sites.
