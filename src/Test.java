@@ -52,7 +52,7 @@ public class Test {
 	private static final String URL_OD_NORMAL		= "https://odysee.com/@MeekerExtreme:9/ebox-2.0-v2-is-the-only-mini-bike-you:3";
 	private static final String TYPE_OD_NORMAL 		= "Odysee Normal";
 	private static final String TTL_OD_NORMAL 		= "EBOX 2.0 V2 is the ONLY Mini Bike You Should Consider";
-	private static final String DATE_OD_NORMAL 		= "Friday, September 20, 2024 at 7:00:41 AM EDT";
+	private static final String DATE_OD_NORMAL 		= "Friday, September 20, 2024 7:00:41 AM EDT";
 	private static final String CHNL_OD_NORMAL	 	= "@MeekerExtreme on Odysee";
 	private static final String TIME_OD_NORMAL 		= "07:20";
 	
