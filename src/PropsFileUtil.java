@@ -19,7 +19,7 @@ public class PropsFileUtil {
 //	}
 
 	public PropsFileUtil(File propsFile) throws Exception {
-		if(!propsFile.exists()) {
+		if (!propsFile.exists()) {
 			throw new FileNotFoundException("Properties file does not exist!");
 		}
 
@@ -46,9 +46,9 @@ public class PropsFileUtil {
 	public boolean set(String prop, String value) {
 		FileOutputStream out = null;
 		boolean success = true;
-		
+
 		props.setProperty(prop, value);
-		
+
 		try {
 			out = new FileOutputStream(propsFile);
 			props.store(out, null);
@@ -56,7 +56,7 @@ public class PropsFileUtil {
 		} catch (IOException e) {
 			success = false;
 		}
-		
+
 		return success;
 	}
 
@@ -65,7 +65,7 @@ public class PropsFileUtil {
 		Object value = props.remove(prop);
 		boolean removed = false;
 
-		if(value != null) {
+		if (value != null) {
 			try {
 				out = new FileOutputStream(propsFile);
 				props.store(out, null);
@@ -81,9 +81,9 @@ public class PropsFileUtil {
 	public boolean clearAll() {
 		FileOutputStream out = null;
 		boolean cleared = true;
-		
+
 		props.clear();
-		
+
 		try {
 			out = new FileOutputStream(propsFile);
 			props.store(out, null);
@@ -91,7 +91,7 @@ public class PropsFileUtil {
 		} catch (IOException e) {
 			cleared = false;
 		}
-		
+
 		return cleared;
 	}
 
