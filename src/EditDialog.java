@@ -165,7 +165,9 @@ public class EditDialog extends JDialog implements WindowListener{
 					timeField.setText("");
 					channelField.setText("");
 					
-					((SearchDialog) parent).editingFinished();
+					if (parent instanceof SearchDialog) {
+						((SearchDialog) parent).editingFinished();
+					}
 				}
 			}
 		});
