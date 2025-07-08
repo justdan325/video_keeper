@@ -94,7 +94,7 @@ public class MetadataObtainer {
 		if (!isUrlError()) {
 			//YouTube Regular Links
 			if (urlStr.startsWith(YOUTUBE_PREFIX) || urlStr.startsWith(YOUTUBE_PREFIX_W) || urlStr.contains(YOUTUBE_SHORT_TOKEN)) {
-				final String WATCH_TAG = "/watch?v=";
+//				final String WATCH_TAG = "/watch?v=";
 				String prefix = "content=\"" + urlStr.trim() + "\"><meta property=\"og:title\" content=\"";
 				String suffix = "\"><meta property=\"og:image\" content=\"";
 				int begin = html.indexOf(prefix) + prefix.length();

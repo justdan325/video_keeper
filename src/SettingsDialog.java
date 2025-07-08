@@ -144,13 +144,13 @@ public class SettingsDialog extends JDialog implements WindowListener {
 		checkDuplCheckbox.setBackground(MainGui.PROG_COLOR_BKRND);
 		checkDuplCheckbox.setForeground(MainGui.PROG_COLOR_TXT_LT);
 		
-		if(model.isAutoSaveOnExit()) {
+		if (model.isAutoSaveOnExit()) {
 			autoSaveCheckbox.setSelected(true);
 		} else {
 			autoSaveCheckbox.setSelected(false);
 		}
 		
-		if(model.isCheckForDupl()) {
+		if (model.isCheckForDupl()) {
 			checkDuplCheckbox.setSelected(true);
 		} else {
 			checkDuplCheckbox.setSelected(false);
@@ -227,9 +227,9 @@ public class SettingsDialog extends JDialog implements WindowListener {
 		autoSaveCheckbox.addItemListener(new ItemListener() {
 			@Override
 			public void itemStateChanged(ItemEvent arg0) {
-				if(arg0.getStateChange() == ItemEvent.SELECTED) {
+				if (arg0.getStateChange() == ItemEvent.SELECTED) {
 					model.setAutoSaveOnExit(true);
-				} else if(arg0.getStateChange() == ItemEvent.DESELECTED) {
+				} else if (arg0.getStateChange() == ItemEvent.DESELECTED) {
 					model.setAutoSaveOnExit(false);
 				}
 			}
@@ -238,9 +238,9 @@ public class SettingsDialog extends JDialog implements WindowListener {
 		checkDuplCheckbox.addItemListener(new ItemListener() {
 			@Override
 			public void itemStateChanged(ItemEvent arg0) {
-				if(arg0.getStateChange() == ItemEvent.SELECTED) {
+				if (arg0.getStateChange() == ItemEvent.SELECTED) {
 					model.setCheckForDupl(true);
-				} else if(arg0.getStateChange() == ItemEvent.DESELECTED) {
+				} else if (arg0.getStateChange() == ItemEvent.DESELECTED) {
 					model.setCheckForDupl(false);
 				}
 			}
@@ -257,11 +257,11 @@ public class SettingsDialog extends JDialog implements WindowListener {
 				childDialogOpen = true;
 				int option = chooser.showSaveDialog(parent);
 				
-				if(option == JFileChooser.APPROVE_OPTION) {
+				if (option == JFileChooser.APPROVE_OPTION) {
 					destination = Optional.of(chooser.getSelectedFile().getAbsolutePath());
-				} else if(option == JFileChooser.ERROR_OPTION) {
+				} else if (option == JFileChooser.ERROR_OPTION) {
 					String mess = "Error exporting to specified file.";
-					
+
 					JOptionPane.showMessageDialog(parent.getSettingsDialog(), mess, MainGui.PROG_NAME + " -- Export Failure", JOptionPane.ERROR_MESSAGE);
 				}
 				 
@@ -342,13 +342,13 @@ public class SettingsDialog extends JDialog implements WindowListener {
 		
 		if (selection != null) {
 			if (((String) selection).equals(options[0])) {
-				if(initialSelection.equals(options[2])) {
+				if (initialSelection.equals(options[2])) {
 					model.setPreviousHandleLinks(model.getHandleLinks());
 				}
 				
 				model.setHandleLinks(VideoKeeper.LNK_HNDL_DEFAULT);
 			} else if (((String) selection).equals(options[1])) {
-				if(initialSelection.equals(options[2])) {
+				if (initialSelection.equals(options[2])) {
 					model.setPreviousHandleLinks(model.getHandleLinks());
 				}
 				
@@ -385,12 +385,12 @@ public class SettingsDialog extends JDialog implements WindowListener {
 				
 				int choice = JOptionPane.showConfirmDialog(parent, "Use previous custom link operation:\n" + prevOp, MainGui.PROG_NAME, JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null);
 				
-				if(choice == JOptionPane.OK_OPTION) {
+				if (choice == JOptionPane.OK_OPTION) {
 					String currentOp = model.getHandleLinks();
-					
+
 					model.setHandleLinks(model.getPreviousHandleLinks());
-					
-					if(currentOp.startsWith(VideoKeeper.LNK_HNDL_CUST)) {
+
+					if (currentOp.startsWith(VideoKeeper.LNK_HNDL_CUST)) {
 						model.setPreviousHandleLinks(currentOp);
 					}
 				}
@@ -423,15 +423,15 @@ public class SettingsDialog extends JDialog implements WindowListener {
 						} catch (InterruptedException e) {
 						}
 					}
-					
-					if(parent.getCount() != size) {
+
+					if (parent.getCount() != size) {
 						size = parent.getCount();
 						((MainGui) parent).saveEnabled(true);
 //						saveButton.setEnabled(true);
 //						saveButton.setBackground(MainGui.PROG_COLOR_BTN_EN);
 					}
 					
-					if(size > 0) {
+					if (size > 0) {
 						exportButton.setEnabled(true);
 						exportButton.setBackground(MainGui.PROG_COLOR_BTN_EN);
 						refreshAllButton.setEnabled(true);
@@ -442,8 +442,8 @@ public class SettingsDialog extends JDialog implements WindowListener {
 						refreshAllButton.setEnabled(false);
 						refreshAllButton.setBackground(MainGui.PROG_COLOR_BTN_DIS);
 					}
-					
-					if(checkDuplCheckbox.isSelected() != model.isCheckForDupl()) {
+
+					if (checkDuplCheckbox.isSelected() != model.isCheckForDupl()) {
 						checkDuplCheckbox.setSelected(model.isCheckForDupl());
 					}
 					
@@ -486,7 +486,7 @@ public class SettingsDialog extends JDialog implements WindowListener {
 		int option = chooser.showOpenDialog(this);
 		this.childDialogOpen = false;
 		
-		if(option == JFileChooser.APPROVE_OPTION) {
+		if (option == JFileChooser.APPROVE_OPTION) {
 			currDatabase = chooser.getSelectedFile();
 			model.setDatabaseFile(currDatabase.getAbsolutePath());
 			dbFileTextField.setText(currDatabase.getAbsolutePath());
