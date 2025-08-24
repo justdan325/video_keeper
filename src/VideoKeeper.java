@@ -291,7 +291,7 @@ public class VideoKeeper {
 		if(vidNodeList.size() > 0) {
 			Optional<VideoDataNode> opt = vidNodeList.peekCurr();
 
-			if (opt.isPresent() && opt.get().isEmpty() == false) {
+			if (opt.isPresent() && opt.get().isPopulated()) {
 				VideoDataNode temp = opt.get();
 				
 				if (abortIfNotEmpty == false || temp.getTitle().length() < 1 || temp.getDate().length() < 1 || temp.getChannel().length() < 1) {

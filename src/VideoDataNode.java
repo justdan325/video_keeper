@@ -153,6 +153,10 @@ public class VideoDataNode {
 	public boolean isEmpty() {
 		return empty;
 	}
+	
+	public boolean isPopulated() {
+		return !empty;
+	}
 		   
 	public String toString() {
 		String str = "";
