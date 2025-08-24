@@ -482,7 +482,7 @@ public class VideoKeeper {
 			@Override
 			public void run() {
 				for (;;) {
-					//if database changes, save and reload with new database
+					//if selected database file changes, save and reload with new database file contents
 					if (database.equals(model.getDatabaseFile()) == false) {
 						if (model.isAutoSaveOnExit()) {
 							save();
@@ -569,6 +569,7 @@ public class VideoKeeper {
 
 		file = new File(fileName);
 
+		//TODO: Seems like it might be better to let this fail hard with a FileNotFoundException since this should never happen?
 		if (!file.exists()) {
 			return "";
 		}
@@ -585,6 +586,8 @@ public class VideoKeeper {
 		int count = 0;
 		String str = "";
 
+		//TODO: Since this class is the only place where this method is used, it would likely be better to return a list of strings
+		//so that we don't have to split via the newline delimiter later on.
 		while (inputFile.hasNext()) {
 			if (count != 0) {
 				str += '\n';
