@@ -291,33 +291,33 @@ public class VideoKeeper {
 		if(vidNodeList.size() > 0) {
 			Optional<VideoDataNode> opt = vidNodeList.peekCurr();
 
-			if(opt.isPresent() && opt.get().isEmpty() == false) {
+			if (opt.isPresent() && opt.get().isEmpty() == false) {
 				VideoDataNode temp = opt.get();
 				
-				if(abortIfNotEmpty == false || temp.getTitle().length() < 1 || temp.getDate().length() < 1 || temp.getChannel().length() < 1) {
+				if (abortIfNotEmpty == false || temp.getTitle().length() < 1 || temp.getDate().length() < 1 || temp.getChannel().length() < 1) {
 					MetadataObtainer obtainer = new MetadataObtainer(temp.getUrl());
 
-					if(abortIfNotEmpty == false || temp.getTitle().length() < 1) {
+					if (abortIfNotEmpty == false || temp.getTitle().length() < 1) {
 						temp.setTitle(obtainer.getTitle());
 						updated = true;
 					}
 
-					if(abortIfNotEmpty == false || temp.getDate().length() < 1) {
+					if (abortIfNotEmpty == false || temp.getDate().length() < 1) {
 						temp.setDate(obtainer.getDate());
 						updated = true;
 					}
 
-					if(abortIfNotEmpty == false || temp.getChannel().length() < 1) {
+					if (abortIfNotEmpty == false || temp.getChannel().length() < 1) {
 						temp.setChannel(obtainer.getChannel());
 						updated = true;
 					}
-					
-					if(abortIfNotEmpty == false || temp.getTime().length() < 1) {
+
+					if (abortIfNotEmpty == false || temp.getTime().length() < 1) {
 						temp.setTime(obtainer.getTime());
 						updated = true;
 					}
 					
-					if (updated = true) {
+					if (updated) {
 						model.setRequestSaveButtonEn(true);
 					}
 				}
