@@ -49,7 +49,7 @@ public class MetadataObtainer {
 	
 	public static void main(String[] args) {
 //		System.out.println(fetchHtml("https://odysee.com/win11:6d73df3083e0f634b18f54521763184b47980d8a"));
-		final String URL = "https://www.youtube.com/@oompaville/videos";
+		final String URL = "https://www.youtube.com/@harperzilmer";
 		MetadataObtainer o = new MetadataObtainer(URL);
 		System.out.println("URL provided: [" + URL + "]");
 		System.out.println("Is supported: [" + isSupported(URL) + "]");
@@ -416,7 +416,7 @@ public class MetadataObtainer {
 				int begin = end;
 				boolean foundBegin = false;
 				
-				for (int i = 0; i < 10; i++) {
+				for (int i = 0; i < 25; i++) {
 					if (html.charAt(--begin) == prefix.toCharArray()[0]) {
 						foundBegin = true;
 						begin++;
@@ -433,7 +433,7 @@ public class MetadataObtainer {
 					begin = end;
 					foundBegin = false;
 					
-					for (int i = 0; i < 10; i++) {
+					for (int i = 0; i < 25; i++) {
 						if (html.charAt(--begin) == '"') {
 							foundBegin = true;
 							begin++;
