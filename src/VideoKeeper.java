@@ -286,6 +286,8 @@ public class VideoKeeper {
 	}
 	
 	public void refreshCurr(boolean abortIfNotEmpty) {
+		boolean updated = false;
+		
 		if(vidNodeList.size() > 0) {
 			Optional<VideoDataNode> opt = vidNodeList.peekCurr();
 
@@ -297,18 +299,26 @@ public class VideoKeeper {
 
 					if(abortIfNotEmpty == false || temp.getTitle().length() < 1) {
 						temp.setTitle(obtainer.getTitle());
+						updated = true;
 					}
 
 					if(abortIfNotEmpty == false || temp.getDate().length() < 1) {
 						temp.setDate(obtainer.getDate());
+						updated = true;
 					}
 
 					if(abortIfNotEmpty == false || temp.getChannel().length() < 1) {
 						temp.setChannel(obtainer.getChannel());
+						updated = true;
 					}
 					
 					if(abortIfNotEmpty == false || temp.getTime().length() < 1) {
 						temp.setTime(obtainer.getTime());
+						updated = true;
+					}
+					
+					if (updated = true) {
+						model.setRequestSaveButtonEn(true);
 					}
 				}
 			}
