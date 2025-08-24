@@ -55,24 +55,24 @@ public class VideoKeeper {
 	public void add(VideoDataNode item) {
 		boolean addItem = true;
 		
-		if(model.isCheckForDupl() && vidNodeList.contains(item.getUrl())) {
+		if (model.isCheckForDupl() && vidNodeList.contains(item.getUrl())) {
 			int option = JOptionPane.showConfirmDialog(mainGui, "Link is already in watch list. Add anyway?", MainGui.PROG_NAME + " -- Duplicate Video",  JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
 
-			if(option == JOptionPane.YES_OPTION) {
+			if (option == JOptionPane.YES_OPTION) {
 				option = JOptionPane.showConfirmDialog(mainGui, "Check for duplicates going forward?", MainGui.PROG_NAME + " -- Check for Duplicates?",  JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
 
-				if(option == JOptionPane.NO_OPTION) {
+				if (option == JOptionPane.NO_OPTION) {
 					model.setCheckForDupl(false);
 				}
 			} else {
 				addItem = false;
 			}
-		} else if((!item.getUrl().contains(".") && !item.getUrl().contains("/")) || item.getUrl().trim().length() < 3) {
+		} else if ((!item.getUrl().contains(".") && !item.getUrl().contains("/")) || item.getUrl().trim().length() < 3) {
 			addItem = false;
 			JOptionPane.showMessageDialog(mainGui, "Must enter a valid URL.", MainGui.PROG_NAME + " -- Invalid URL", JOptionPane.ERROR_MESSAGE);
 		}
 
-		if(addItem) {
+		if (addItem) {
 			Thread thread = new Thread(new Runnable() {
 				@Override
 				public void run() {
@@ -114,19 +114,19 @@ public class VideoKeeper {
 	}
 		
 	public void openPrev() {
-		if(prev != null && !prev.isEmpty()) {
+		if (prev != null && !prev.isEmpty()) {
 			handleLink(prev.getUrl());
 		}
 	}
 	
 	public void openCurr() {
-		if(vidNodeList.size() > 0) {
+		if (vidNodeList.size() > 0) {
 			prev = vidNodeList.popCurr().get();
-			
-			if(!prev.isEmpty()) {
+
+			if (!prev.isEmpty()) {
 				handleLink(prev.getUrl());
 			}
-			
+
 			refreshCurrInSepThread(true);
 		}
 	}
@@ -182,9 +182,9 @@ public class VideoKeeper {
 	}
 	
 	public void deleteCurr() {
-		if(vidNodeList.size() > 0) {
+		if (vidNodeList.size() > 0) {
 			prev = vidNodeList.popCurr().get();
-			
+
 			refreshCurrInSepThread(true);
 		}
 	}
@@ -229,19 +229,19 @@ public class VideoKeeper {
 	
 	public int getIndexOfNode(Optional<VideoDataNode> node) {
 		int indexLoc = -1;
-		
-		if(vidNodeList.size() > 0) {
+
+		if (vidNodeList.size() > 0) {
 			if (node.isPresent()) {
 				VideoList copy = new VideoList(vidNodeList);
 				String url = node.get().getUrl();
-				
-				if(url != null && url.length() > 0) {
+
+				if (url != null && url.length() > 0) {
 					copy.resetIndex();
-					
-					for(int i = 0; i < copy.size(); i++) {
+
+					for (int i = 0; i < copy.size(); i++) {
 						String urlFromList = copy.peek(i).get().getUrl();
-						
-						if(urlFromList != null && urlFromList.length() > 0 && urlFromList.equals(url)) {
+
+						if (urlFromList != null && urlFromList.length() > 0 && urlFromList.equals(url)) {
 							indexLoc = i;
 							break;
 						}
@@ -249,30 +249,9 @@ public class VideoKeeper {
 				}
 			}
 		}
-		
+
 		return indexLoc;
 	}
-	
-//	public synchronized void addSkipped() {
-//		Queue temp = new Queue();
-//		
-//		if(skipQueue.size() > 0) {
-//			while(skipQueue.size() > 0) {
-//				VideoDataNode node = skipQueue.pop();
-//				temp.push(node);
-//			}
-//
-//			while(mainQueue.size() > 0) {
-//				VideoDataNode node = mainQueue.pop();
-//				temp.push(node);
-//			}
-//
-//			while(temp.size() > 0) {
-//				VideoDataNode node = temp.pop();
-//				mainQueue.push(node);
-//			}
-//		}
-//	}
 	
 	public void refreshCurrInSepThread(boolean abortIfNotEmpty) {
 		Thread thread = new Thread(new Runnable() {
@@ -288,7 +267,7 @@ public class VideoKeeper {
 	public void refreshCurr(boolean abortIfNotEmpty) {
 		boolean updated = false;
 		
-		if(vidNodeList.size() > 0) {
+		if (vidNodeList.size() > 0) {
 			Optional<VideoDataNode> opt = vidNodeList.peekCurr();
 
 			if (opt.isPresent() && opt.get().isPopulated()) {
@@ -326,7 +305,7 @@ public class VideoKeeper {
 	}
 	
 	public void refresh(int index) {
-		if(vidNodeList.size() > 0) {
+		if (vidNodeList.size() > 0) {
 			Optional<VideoDataNode> opt = vidNodeList.peek(index);
 
 			if(opt.isPresent()) {
@@ -357,37 +336,37 @@ public class VideoKeeper {
 	
 	public void refreshAll() {
 		ProgressBar progBar = new ProgressBar(mainGui);
-		
+
 		progBar.setMax(vidNodeList.size());
 		progBar.showProgressBar();
 		vidNodeList.clear();
 		populateList();
 		vidNodeList.resetIndex();
-		
-		if(vidNodeList.size() > 0) {
+
+		if (vidNodeList.size() > 0) {
 			VideoList tempList = new VideoList();
 
-			while(vidNodeList.size() > 0) {
+			while (vidNodeList.size() > 0) {
 				VideoDataNode temp = vidNodeList.popCurr().get();
-				
-				if(temp.isEmpty() == false) {
+
+				if (temp.isEmpty() == false) {
 					MetadataObtainer obtainer = new MetadataObtainer(temp.getUrl());
-					
+
 					temp.setTitle(obtainer.getTitle());
 					temp.setDate(obtainer.getDate());
 					temp.setChannel(obtainer.getChannel());
 					temp.setTime(obtainer.getTime());
 				}
-				
+
 				tempList.append(temp);
 				progBar.progress();
 			}
-			
-			while(tempList.size() > 0) {
+
+			while (tempList.size() > 0) {
 				vidNodeList.append(tempList.popCurr().get());
 			}
 		}
-		
+
 		progBar.kill();
 	}
 	
@@ -408,10 +387,10 @@ public class VideoKeeper {
 	public String getPrevTitle() {
 		String prevTitle = "";
 
-		if(prev != null) {
+		if (prev != null) {
 			prevTitle = prev.getTitle();
 		}
-		
+
 		return prevTitle;
 	}
 	
@@ -432,26 +411,26 @@ public class VideoKeeper {
 	public String getNextChannel() {
 		String nextChannel = "";
 
-		if(vidNodeList.size() > 0) {
+		if (vidNodeList.size() > 0) {
 			nextChannel = vidNodeList.peekCurr().get().getChannel();
 		}
-		
+
 		return nextChannel;
 	}
 	
 	public void populateList() {
 		vidNodeList.clear();
-		
+
 		String[] list = readFile(database).split("\n");
-		
-		for(int i = 0; i < list.length; i++) {
+
+		for (int i = 0; i < list.length; i++) {
 			VideoDataNode node = new VideoDataNode(list[i]);
-			
-			if(!(i == 0 || i == list.length-1) || !node.isEmpty()) {
+
+			if (!(i == 0 || i == list.length - 1) || !node.isEmpty()) {
 				vidNodeList.append(node);
 			}
 		}
-		
+
 		refreshCurrInSepThread(true);
 	}
 	
@@ -460,9 +439,9 @@ public class VideoKeeper {
 		String toWrite = "";
 		boolean saved = false;
 		int i = 0;
-		
+
 		mainCopy.resetIndex();
-		
+
 		while (mainCopy.size() > 0) {
 			if (i > 0) {
 				toWrite += "\n" + mainCopy.popCurr().get().toString();
@@ -472,11 +451,11 @@ public class VideoKeeper {
 
 			i++;
 		}
-		
+
 		clearFile(database);
-		
+
 		saved = writeFile(toWrite, database);
-		
+
 		return saved;
 	}
 	
@@ -484,7 +463,7 @@ public class VideoKeeper {
 		String urls = "";
 		VideoList tempList = new VideoList(vidNodeList);
 		boolean success = true;
-		
+
 		while (tempList.size() > 0) {
 			urls += tempList.popCurr().get().getUrl() + "\n";
 		}
@@ -502,10 +481,10 @@ public class VideoKeeper {
 		Thread thread = new Thread(new Runnable() {
 			@Override
 			public void run() {
-				for(;;) {
+				for (;;) {
 					//if database changes, save and reload with new database
-					if(database.equals(model.getDatabaseFile()) == false) {
-						if(model.isAutoSaveOnExit()) {
+					if (database.equals(model.getDatabaseFile()) == false) {
+						if (model.isAutoSaveOnExit()) {
 							save();
 						} else {
 							String mess = "Would you like to save changes to \nthe current database before switching?";
@@ -534,7 +513,6 @@ public class VideoKeeper {
 		thread.start();
 	}
 	
-	@SuppressWarnings("deprecation")
 	private void handleLink(String s) {
 		//open the webpage in default browser. Cache as a backup.
 		if (model.getHandleLinks().equalsIgnoreCase(LNK_HNDL_DEFAULT)) {
@@ -590,14 +568,14 @@ public class VideoKeeper {
 		String errMess = null;
 
 		file = new File(fileName);
-		
-		if(!file.exists()) {
+
+		if (!file.exists()) {
 			return "";
 		}
 
 		try {
 			inputFile = new Scanner(file);
-		} catch(FileNotFoundException e) {
+		} catch (FileNotFoundException e) {
 			errMess = "\nFileNotFoundException when reading " + fileName + "\n";
 			return "";
 		}
@@ -607,17 +585,17 @@ public class VideoKeeper {
 		int count = 0;
 		String str = "";
 
-		while(inputFile.hasNext()) {
-			if(count != 0) {
+		while (inputFile.hasNext()) {
+			if (count != 0) {
 				str += '\n';
 			}
-			
+
 			str += inputFile.nextLine();
 			count++;
 		}
-		
+
 		inputFile.close();
-		
+
 		return str;
 	}
 
@@ -627,16 +605,16 @@ public class VideoKeeper {
 		File file = new File(destination);
 		PrintWriter outputFile = null;
 
-		if(LENGTH > 0) {
+		if (LENGTH > 0) {
 			try {
-				if(!file.exists()) {
+				if (!file.exists()) {
 					success = file.createNewFile();
 				}
-				
-				if(success) {
+
+				if (success) {
 					outputFile = new PrintWriter(file);
 				}
-			} catch(Exception e) {
+			} catch (Exception e) {
 				success = false;
 			}
 
@@ -656,14 +634,14 @@ public class VideoKeeper {
 				success = false;
 			}
 		}
-		
+
 		return success;
 	}
 	
 	private static void clearFile(String fileName) {
 		final File file = new File(fileName);
 		PrintWriter outputFile;
-		
+
 		try {
 			outputFile = new PrintWriter(file);
 		} catch (FileNotFoundException e) {
@@ -672,5 +650,5 @@ public class VideoKeeper {
 
 		outputFile.write("");
 		outputFile.close();
-    }
+	}
 }
