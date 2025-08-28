@@ -49,7 +49,7 @@ public class MetadataObtainer {
 	
 	public static void main(String[] args) {
 //		System.out.println(fetchHtml("https://odysee.com/win11:6d73df3083e0f634b18f54521763184b47980d8a"));
-		final String URL = "https://www.youtube.com/@harperzilmer";
+		final String URL = "https://vimeo.com/580025019?fl=pl&fe=sh";
 		MetadataObtainer o = new MetadataObtainer(URL);
 		System.out.println("URL provided: [" + URL + "]");
 		System.out.println("Is supported: [" + isSupported(URL) + "]");
@@ -309,21 +309,7 @@ public class MetadataObtainer {
 				channel += " on Twitch";
 			//Vimeo
 			} else if (urlStr.startsWith(VIMEO_PREFIX)) {
-				String prefix = "<span class=\"userlink userlink--md\">";
-				String suffix = "</a>";
-				String htmlSubstr = html.substring(html.indexOf(prefix) + prefix.length());
-				
-				prefix = "\">";
-				
-				int begin = htmlSubstr.indexOf(prefix) + prefix.length();
-				int end = htmlSubstr.indexOf(suffix, begin);
-				
-				if (begin != -1 && end != -1) {
-					channel = htmlSubstr.substring(begin, end);
-					channel = filterEscapeChars(channel);
-				}
-				
-				channel += " on Vimeo";
+				channel += "On Vimeo"; //Channel/user name is rendered via JavaScript
 			//Odysee
 			} else if (urlStr.startsWith(ODYSEE_PREFIX)) {
 				if (urlStr.contains("@")) {
@@ -448,17 +434,28 @@ public class MetadataObtainer {
 				}
 			//Vimeo
 			} else if (urlStr.startsWith(VIMEO_PREFIX)) {
-				String prefix = "<span class=\"clip_info-time\"><time datetime=\"";
+				String prefix = "<meta property=\"og:updated_time\" content=\"";
 				String suffix = "\">";
-				String htmlSubstr = html.substring(html.indexOf(prefix) + prefix.length());
-				
-				prefix = "\" title=\"";
-				
-				int begin = htmlSubstr.indexOf(prefix) + prefix.length();
-				int end = htmlSubstr.indexOf(suffix, begin);
+				String htmlSubstr = "";
+				int begin = html.indexOf(prefix) + prefix.length();
+				int end = html.indexOf(suffix, begin);
 				
 				if (begin != -1 && end != -1) {
-					date = htmlSubstr.substring(begin, end);
+					date = html.substring(begin, end);
+					date = date.substring(0, date.indexOf("T"));
+				} else {
+					prefix = "<span class=\"clip_info-time\"><time datetime=\"";
+					
+					htmlSubstr = html.substring(html.indexOf(prefix) + prefix.length());
+					
+					prefix = "\" title=\"";
+					
+					begin = htmlSubstr.indexOf(prefix) + prefix.length();
+					end = htmlSubstr.indexOf(suffix, begin);
+					
+					if (begin != -1 && end != -1) {
+						date = html.substring(begin, end);
+					}
 				}
 			//Odysee
 			} else if (urlStr.startsWith(ODYSEE_PREFIX)) {
