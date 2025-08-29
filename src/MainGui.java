@@ -111,7 +111,6 @@ public class MainGui extends JFrame implements WindowListener {
 		this.model = model;
 		this.keeper = new VideoKeeper(model, this);
 		this.mainGui = this;
-		this.settings = new SettingsDialog(this, model);
 		this.editor = new EditDialog(this, model);
 		this.searchDialog = new SearchDialog(model, this);
 		this.nextButton = new JButton(NEXT_BUTTON_TXT);
@@ -134,6 +133,7 @@ public class MainGui extends JFrame implements WindowListener {
 		this.channelLabel = new JLabel();
 		this.urlField = new JTextField(PASTE_MESS);
 		this.mainPanel = new JPanel(new BorderLayout());
+		this.settings = new SettingsDialog(this, model); //Moved this here since it was causing null pointers when setting save button disable
 		this.count = 0;
 		this.index = 0;
 		this.locked = false;
@@ -631,7 +631,7 @@ public class MainGui extends JFrame implements WindowListener {
 	}
 	
 	public void saveEnabled(boolean enable) {
-		if(enable) {
+		if (enable) {
 			saveButton.setEnabled(true);
 			saveButton.setBackground(MainGui.PROG_COLOR_BTN_EN);
 		} else {
