@@ -48,6 +48,13 @@ public class Test {
 	private static final String CHNL_YT_PREVIEW 	= "The B1M on YouTube";
 	private static final String TIME_YT_PREVIEW 	= "06:34";
 	
+	private static final String URL_YT_CHANNEL		= "https://www.youtube.com/@DaveMcRaeOfficial/videos";
+	private static final String TYPE_YT_CHANNEL 	= "YouTube Channels";
+	private static final String TTL_YT_CHANNEL 		= "DaveMcRaeOfficial";
+	private static final String DATE_YT_CHANNEL 	= "30K Subscribers ~ 1.5K Videos";
+	private static final String CHNL_YT_CHANNEL 	= "DaveMcRaeOfficial on YouTube";
+	private static final String TIME_YT_CHANNEL 	= "";
+	
 	//Odysee
 	private static final String URL_OD_NORMAL		= "https://odysee.com/@MeekerExtreme:9/ebox-2.0-v2-is-the-only-mini-bike-you:3";
 	private static final String TYPE_OD_NORMAL 		= "Odysee Normal";
@@ -56,13 +63,21 @@ public class Test {
 	private static final String CHNL_OD_NORMAL	 	= "@MeekerExtreme on Odysee";
 	private static final String TIME_OD_NORMAL 		= "07:20";
 	
+	//Vimeo
+	private static final String URL_VMO_NORMAL		= "https://vimeo.com/580025019";
+	private static final String TYPE_VMO_NORMAL 	= "Vimeo Normal";
+	private static final String TTL_VMO_NORMAL 		= "In Memory of Brian.mov";
+	private static final String DATE_VMO_NORMAL 	= "2025-03-23";
+	private static final String CHNL_VMO_NORMAL	 	= "On Vimeo";
+	private static final String TIME_VMO_NORMAL 	= "";
+	
 	//Twitch
-	private static final String URL_TWI_MOBILE		= "https://m.twitch.tv/videos/2453902697";
+	private static final String URL_TWI_MOBILE		= "https://www.twitch.tv/videos/2552343677";
 	private static final String TYPE_TWI_MOBILE 	= "Twitch Mobile (and normal since normal gets converted to mobile)";
-	private static final String TTL_TWI_MOBILE 		= "habemus papem!";
+	private static final String TTL_TWI_MOBILE 		= "every crash out is valid";
 	private static final String DATE_TWI_MOBILE 	= "";
 	private static final String CHNL_TWI_MOBILE	 	= "ptony on Twitch";
-	private static final String TIME_TWI_MOBILE 	= "2:14:25";
+	private static final String TIME_TWI_MOBILE 	= "2:14:18";
 	
 	private boolean failureOccured;
 	
@@ -80,9 +95,13 @@ public class Test {
 		runTest(testLink(URL_YT_LIST_TM, TYPE_YT_LIST_TM, TTL_YT_LIST_TM, DATE_YT_LIST_TM, CHNL_YT_LIST_TM, TIME_YT_LIST_TM), TYPE_YT_LIST_TM);
 		runTest(testLink(URL_YT_TIMESTMP, TYPE_YT_TIMESTMP, TTL_YT_TIMESTMP, DATE_YT_TIMESTMP, CHNL_YT_TIMESTMP, TIME_YT_TIMESTMP), TYPE_YT_TIMESTMP);
 		runTest(testLink(URL_YT_PREVIEW, TYPE_YT_PREVIEW, TTL_YT_PREVIEW, DATE_YT_PREVIEW, CHNL_YT_PREVIEW, TIME_YT_PREVIEW), TYPE_YT_PREVIEW);
+		runTest(testLink(URL_YT_CHANNEL, TYPE_YT_CHANNEL, TTL_YT_CHANNEL, DATE_YT_CHANNEL, CHNL_YT_CHANNEL, TIME_YT_CHANNEL), TYPE_YT_CHANNEL);
 		
 		//Odysee
 		runTest(testLink(URL_OD_NORMAL, TYPE_OD_NORMAL, TTL_OD_NORMAL, DATE_OD_NORMAL, CHNL_OD_NORMAL, TIME_OD_NORMAL), TYPE_OD_NORMAL);
+		
+		//Vimeo
+		runTest(testLink(URL_VMO_NORMAL, TYPE_VMO_NORMAL, TTL_VMO_NORMAL, DATE_VMO_NORMAL, CHNL_VMO_NORMAL, TIME_VMO_NORMAL), TYPE_VMO_NORMAL);
 		
 		//Twitch
 		runTest(testLink(URL_TWI_MOBILE, TYPE_TWI_MOBILE, TTL_TWI_MOBILE, DATE_TWI_MOBILE, CHNL_TWI_MOBILE, TIME_TWI_MOBILE), TYPE_TWI_MOBILE);
