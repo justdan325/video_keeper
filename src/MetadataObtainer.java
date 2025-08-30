@@ -53,10 +53,10 @@ public class MetadataObtainer {
 		MetadataObtainer o = new MetadataObtainer(URL);
 		System.out.println("URL provided: [" + URL + "]");
 		System.out.println("Is supported: [" + isSupported(URL) + "]");
-		System.out.println("[" + o.getTitle() + "]");
-		System.out.println("[" + o.getDate() + "]");
-		System.out.println("[" + o.getChannel() + "]");
-		System.out.println("[" + o.getTime() + "]");
+		System.out.println("Title       : [" + o.getTitle() + "]");
+		System.out.println("Date        : [" + o.getDate() + "]");
+		System.out.println("Channel     : [" + o.getChannel() + "]");
+		System.out.println("Time        : [" + o.getTime() + "]");
 	}
 	
 	public static boolean isSupported(String urlStr) {
