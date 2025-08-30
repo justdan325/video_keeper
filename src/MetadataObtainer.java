@@ -49,7 +49,7 @@ public class MetadataObtainer {
 	
 	public static void main(String[] args) {
 //		System.out.println(fetchHtml("https://odysee.com/win11:6d73df3083e0f634b18f54521763184b47980d8a"));
-		final String URL = "https://www.twitch.tv/videos/2552343677";
+		final String URL = "https://www.youtube.com/shorts/Qx6lTY8UnPw";
 		MetadataObtainer o = new MetadataObtainer(URL);
 		System.out.println("URL provided: [" + URL + "]");
 		System.out.println("Is supported: [" + isSupported(URL) + "]");
@@ -569,6 +569,10 @@ public class MetadataObtainer {
 
 				if (atTime.isPresent()) {
 					time += " (in progress " + convertSecondsToTimeStr(Integer.parseInt(atTime.get())) + ")";
+				}
+				
+				if (urlStr.contains(YOUTUBE_SHORT_TOKEN)) {
+					time += " (Short)";
 				}
 			//Odysee and Twitch (not 100% Reliable for Twitch)
 			} else if (urlStr.startsWith(ODYSEE_PREFIX) || urlStr.startsWith(TWITCH_PREFIX_MOB)) {
