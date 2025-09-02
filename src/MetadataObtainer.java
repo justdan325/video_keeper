@@ -732,7 +732,9 @@ public class MetadataObtainer {
 			content = scanner.next();
 			scanner.close();
 			
-			System.out.println("HTTP Response: " + connection.getResponseCode() + " " + connection.getResponseMessage());
+			if (connection.getResponseCode() != 200) {
+				System.out.println("HTTP Response for " + url + ": " + connection.getResponseCode() + " " + connection.getResponseMessage());
+			}
 		} catch (Exception e) {
 			String message = "";
 			
