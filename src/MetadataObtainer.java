@@ -53,7 +53,7 @@ public class MetadataObtainer {
 	
 	public static void main(String[] args) {
 //		System.out.println(fetchHtml("https://odysee.com/win11:6d73df3083e0f634b18f54521763184b47980d8a"));
-		final String URL = "https://www.dailymotion.com/video/x9ppy20";
+		final String URL = "https://www.bitchute.com/video/JTQL5LMXj50";
 		MetadataObtainer o = new MetadataObtainer(URL);
 		System.out.println("URL provided: [" + URL + "]");
 		System.out.println("Is supported: [" + isSupported(URL) + "]");
@@ -359,7 +359,7 @@ public class MetadataObtainer {
 				channel += " on Dailymotion";
 			//Bitchute
 			} else if (urlStr.startsWith(BITCHUTE_PREFIX) || urlStr.startsWith(BITCHUTE_PREFIX_W)) {
-				channel = "an author on BITCHUTE";
+				channel = "On BITCHUTE";
 			//Rumble
 			} else if (urlStr.startsWith(RUMBLE_PREFIX)) {
 				String prefix = "data-title=\"";

@@ -109,6 +109,14 @@ public class Test {
 	private static final String CHNL_RUM_STRMD		= "Mousehold Farm on Rumble";
 	private static final String TIME_RUM_STRMD 		= "";
 	
+	//Bitchute
+	private static final String URL_BTCHT_NORMAL	= "https://www.bitchute.com/video/JTQL5LMXj50";
+	private static final String TYPE_BTCHT_NORMAL 	= "Bitchute Normal";
+	private static final String TTL_BTCHT_NORMAL 	= "Southwest & Spirit Planes Nearly Collide Midair, American Transportation Must Be Fixed";
+	private static final String DATE_BTCHT_NORMAL 	= "--";
+	private static final String CHNL_BTCHT_NORMAL	= "On BITCHUTE";
+	private static final String TIME_BTCHT_NORMAL 	= "";
+	
 	private boolean failureOccured;
 	
 	public static void main(String[] args) {
@@ -143,6 +151,9 @@ public class Test {
 		runTest(testLink(URL_RUM_NORMAL, TYPE_RUM_NORMAL, TTL_RUM_NORMAL, DATE_RUM_NORMAL, CHNL_RUM_NORMAL, TIME_RUM_NORMAL), TYPE_RUM_NORMAL);
 		runTest(testLink(URL_RUM_STRMING, TYPE_RUM_STRMING, TTL_RUM_STRMING, DATE_RUM_STRMING, CHNL_RUM_STRMING, TIME_RUM_STRMING), TYPE_RUM_STRMING);
 		runTest(testLink(URL_RUM_STRMD, TYPE_RUM_STRMD, TTL_RUM_STRMD, DATE_RUM_STRMD, CHNL_RUM_STRMD, TIME_RUM_STRMD), TYPE_RUM_STRMD);
+		
+		//Bitchute
+		runTest(testLink(URL_BTCHT_NORMAL, TYPE_BTCHT_NORMAL, TTL_BTCHT_NORMAL, DATE_BTCHT_NORMAL, CHNL_BTCHT_NORMAL, TIME_BTCHT_NORMAL), TYPE_BTCHT_NORMAL);
 		
 		if (failureOccured) {
 			System.err.println("\nFailure(s) occured while testing!");
