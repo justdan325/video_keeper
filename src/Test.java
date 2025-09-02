@@ -87,6 +87,28 @@ public class Test {
 	private static final String CHNL_DLYMTN_NORMAL	= "shortfilms on Dailymotion";
 	private static final String TIME_DLYMTN_NORMAL 	= "10:50";
 	
+	//Rumble
+	private static final String URL_RUM_NORMAL		= "https://rumble.com/v6y3w2q-slu-pp-332-my-results-so-far-update.html?playlist_id=MAnJ6cuQdtA";
+	private static final String TYPE_RUM_NORMAL 	= "Rumble Normal";
+	private static final String TTL_RUM_NORMAL 		= "SLU-PP-332: My Results So Far (Update)";
+	private static final String DATE_RUM_NORMAL 	= "August 26, 2025";
+	private static final String CHNL_RUM_NORMAL		= "TigerFitness on Rumble";
+	private static final String TIME_RUM_NORMAL 	= "";
+	
+	private static final String URL_RUM_STRMING		= "https://rumble.com/v6yel6y-mousehold-farm-all-weather-riding-arena.html?e9s=src_v1_sports";
+	private static final String TYPE_RUM_STRMING 	= "Rumble Streaming";
+	private static final String TTL_RUM_STRMING 	= "Mousehold Farm- Riding arena";
+	private static final String DATE_RUM_STRMING 	= "Streaming Now";
+	private static final String CHNL_RUM_STRMING	= "Mousehold Farm on Rumble";
+	private static final String TIME_RUM_STRMING 	= "";
+	
+	private static final String URL_RUM_STRMD		= "https://rumble.com/v6ya0xo-mousehold-farm-all-weather-riding-arena.html?e9s=src_v1_cbl%2Csrc_v1_ucp_l";
+	private static final String TYPE_RUM_STRMD 		= "Rumble Streamed Previously";
+	private static final String TTL_RUM_STRMD 		= "Mousehold Farm Live Stream - Replay - VHS Archives";
+	private static final String DATE_RUM_STRMD 		= "Streamed on 2025-08-30 16:48:03";
+	private static final String CHNL_RUM_STRMD		= "Mousehold Farm on Rumble";
+	private static final String TIME_RUM_STRMD 		= "";
+	
 	private boolean failureOccured;
 	
 	public static void main(String[] args) {
@@ -116,6 +138,11 @@ public class Test {
 		
 		//DailyMotion
 		runTest(testLink(URL_DLYMTN_NORMAL, TYPE_DLYMTN_NORMAL, TTL_DLYMTN_NORMAL, DATE_DLYMTN_NORMAL, CHNL_DLYMTN_NORMAL, TIME_DLYMTN_NORMAL), TYPE_DLYMTN_NORMAL);
+		
+		//Rumble
+		runTest(testLink(URL_RUM_NORMAL, TYPE_RUM_NORMAL, TTL_RUM_NORMAL, DATE_RUM_NORMAL, CHNL_RUM_NORMAL, TIME_RUM_NORMAL), TYPE_RUM_NORMAL);
+		runTest(testLink(URL_RUM_STRMING, TYPE_RUM_STRMING, TTL_RUM_STRMING, DATE_RUM_STRMING, CHNL_RUM_STRMING, TIME_RUM_STRMING), TYPE_RUM_STRMING);
+		runTest(testLink(URL_RUM_STRMD, TYPE_RUM_STRMD, TTL_RUM_STRMD, DATE_RUM_STRMD, CHNL_RUM_STRMD, TIME_RUM_STRMD), TYPE_RUM_STRMD);
 		
 		if (failureOccured) {
 			System.err.println("\nFailure(s) occured while testing!");
