@@ -1,9 +1,13 @@
 import java.util.Scanner;
 import java.net.URLConnection;
+import java.text.SimpleDateFormat;
+import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.Date;
 import java.util.Locale;
 import java.util.Optional;
 import java.time.Instant;
+import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
@@ -49,7 +53,7 @@ public class MetadataObtainer {
 	
 	public static void main(String[] args) {
 //		System.out.println(fetchHtml("https://odysee.com/win11:6d73df3083e0f634b18f54521763184b47980d8a"));
-		final String URL = "https://www.youtube.com/shorts/Qx6lTY8UnPw";
+		final String URL = "https://www.dailymotion.com/video/x9ppy20";
 		MetadataObtainer o = new MetadataObtainer(URL);
 		System.out.println("URL provided: [" + URL + "]");
 		System.out.println("Is supported: [" + isSupported(URL) + "]");
@@ -184,8 +188,8 @@ public class MetadataObtainer {
 			} else if (urlStr.startsWith(DAILYMOTION_PREFIX) || urlStr.startsWith(DAILYMOTION_PREFIX_W)
 					|| urlStr.startsWith(DAILYMOTION_PREFIX_MOB)) {
 				
-				String prefix = "<meta property=\"og:title\" content=\"";
-				String suffix = " - video Dailymotion\"  />";
+				String prefix = "{\"title\":\"";
+				String suffix = "\",";
 				int begin = html.indexOf(prefix) + prefix.length();
 				int end = html.indexOf(suffix, begin);
 				
@@ -343,7 +347,16 @@ public class MetadataObtainer {
 			} else if (urlStr.startsWith(DAILYMOTION_PREFIX) || urlStr.startsWith(DAILYMOTION_PREFIX_W)
 					|| urlStr.startsWith(DAILYMOTION_PREFIX_MOB)) {
 				
-				channel += "an author on Dailymotion";
+				String prefix = "channel\":\"";
+				String suffix = "\"";
+				int begin = html.lastIndexOf(prefix) + prefix.length();
+				int end = html.indexOf(suffix, begin);
+
+				if (begin != -1 && end != -1) {
+					channel = html.substring(begin, end);
+				}
+				
+				channel += " on Dailymotion";
 			//Bitchute
 			} else if (urlStr.startsWith(BITCHUTE_PREFIX) || urlStr.startsWith(BITCHUTE_PREFIX_W)) {
 				channel = "an author on BITCHUTE";
@@ -476,13 +489,14 @@ public class MetadataObtainer {
 			} else if (urlStr.startsWith(DAILYMOTION_PREFIX) || urlStr.startsWith(DAILYMOTION_PREFIX_W)
 					|| urlStr.startsWith(DAILYMOTION_PREFIX_MOB)) {
 				
-				String prefix = "<meta property=\"video:release_date\" content=\"";
-				String suffix = "T";
+				String prefix = "\"created_time\":";
+				String suffix = ",\"";
 				int begin = html.indexOf(prefix) + prefix.length();
 				int end = html.indexOf(suffix, begin);
 				
 				if (begin != -1 && end != -1) {
 					date = html.substring(begin, end);
+					date = parseUnixDateAndTime(date);
 				}
 			//Bitchute
 			} else if (urlStr.startsWith(BITCHUTE_PREFIX) || urlStr.startsWith(BITCHUTE_PREFIX_W)) {
@@ -621,6 +635,25 @@ public class MetadataObtainer {
 						time = "Video is in progress.";
 					}
 				}
+			} else if (urlStr.startsWith(DAILYMOTION_PREFIX) || urlStr.startsWith(DAILYMOTION_PREFIX_W)
+					|| urlStr.startsWith(DAILYMOTION_PREFIX_MOB)) {
+				
+				String prefix = "\"duration\":";
+				String suffix = "}";
+				int begin = html.indexOf(prefix) + prefix.length();
+				int end = html.indexOf(suffix, begin);
+
+				if (begin != -1 && end != -1) {
+					time = html.substring(begin, end);
+				}
+				
+				try {
+					seconds = Integer.parseInt(time);
+				} catch (Exception e) {
+					seconds = -1;
+				}
+				
+				time = convertSecondsToTimeStr(seconds);
 			}
 		}
 		
@@ -671,22 +704,35 @@ public class MetadataObtainer {
 	
 	private static String fetchHtml(String url) {
 		String content = null;
-		URLConnection connection = null;
+		HttpURLConnection connection = null;
 		
 		try {
-			connection =  new URL(url).openConnection();
+			//Daily Motion has a public API for getting title, date, and channel. The DOM of the actual web page only renders these in JavaScript.
+			if (url.startsWith(DAILYMOTION_PREFIX) || url.startsWith(DAILYMOTION_PREFIX_MOB) || url.startsWith(DAILYMOTION_PREFIX_W)) {
+				if (url.contains("?")) {
+					url = url.substring(0, url.indexOf("?"));
+				} else if (url.contains("&")) {
+					url = url.substring(0, url.indexOf("&"));
+				}
+				
+				url = "https://api.dailymotion.com/" + url.substring(url.indexOf("video")) + "?fields=title,created_time,channel,duration";
+			}
+			
+			connection =  (HttpURLConnection) new URL(url).openConnection();
 			
 			//This user agent screws up YouTube for some reason.
 			if (!url.startsWith(YOUTUBE_PREFIX) && !url.startsWith(YOUTUBE_PREFIX_ABBR) && !url.startsWith(YOUTUBE_PREFIX_W)
 					&& !url.contains(YOUTUBE_PLAYLIST_TOKEN) && !url.contains(YOUTUBE_SHORT_TOKEN)) {
-				connection.setRequestProperty("User-Agent",
-						"Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10.4; en-US; rv:1.9.2.2) Gecko/20100316 Firefox/3.6.2");
-			}
+				connection.setRequestProperty("User-Agent", "Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10.4; en-US; rv:1.9.2.2) Gecko/20100316 Firefox/3.6.2");
+//				connection.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36");
+			} 
 			
 			Scanner scanner = new Scanner(connection.getInputStream());
 			scanner.useDelimiter("\\Z");
 			content = scanner.next();
 			scanner.close();
+			
+			System.out.println("HTTP Response: " + connection.getResponseCode() + " " + connection.getResponseMessage());
 		} catch (Exception e) {
 			String message = "";
 			
@@ -918,6 +964,18 @@ public class MetadataObtainer {
 		filtered = filtered.replaceAll("&#039;", "'");
 		
 		return filtered;
+	}
+	
+	private static String parseUnixDateAndTime(String unixTime) {
+        long milliseconds = Long.parseLong(unixTime) * 1000;
+        Instant instant = Instant.ofEpochMilli(milliseconds);
+//        LocalDateTime utcDateTime = LocalDateTime.ofInstant(instant, ZoneId.of("UTC"));
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM-dd-yyyy");
+//        String formattedDate = utcDateTime.format(formatter);
+        LocalDateTime localDateTime = LocalDateTime.ofInstant(instant, ZoneId.of("America/New_York"));
+        String formattedLocalDate = localDateTime.format(formatter);
+        
+        return formattedLocalDate;
 	}
 	
 	//This method does not work reliably.
