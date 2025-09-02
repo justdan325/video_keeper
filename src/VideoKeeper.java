@@ -101,6 +101,8 @@ public class VideoKeeper {
 						if (item.getTime().length() < 1) {
 							item.setTime(obtainer.getTime());
 						}
+						
+						obtainer = null;
 					}
 					
 					System.gc();
@@ -299,6 +301,9 @@ public class VideoKeeper {
 					if (updated) {
 						model.setRequestSaveButtonEn(true);
 					}
+					
+					obtainer = null;
+					System.gc();
 				}
 			}
 		}
@@ -329,6 +334,9 @@ public class VideoKeeper {
 					if(temp.getTime().length() < 1) {
 						temp.setTime(obtainer.getTime());
 					}
+					
+					obtainer = null;
+					System.gc();
 				}
 			}
 		}
@@ -356,11 +364,15 @@ public class VideoKeeper {
 					temp.setDate(obtainer.getDate());
 					temp.setChannel(obtainer.getChannel());
 					temp.setTime(obtainer.getTime());
+					
+					obtainer = null;
 				}
 
 				tempList.append(temp);
 				progBar.progress();
 			}
+			
+			System.gc();
 
 			while (tempList.size() > 0) {
 				vidNodeList.append(tempList.popCurr().get());
