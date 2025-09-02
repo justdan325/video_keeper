@@ -18,7 +18,7 @@ public class Test {
 	private static final String TTL_YT_SHORT 		= "Power Outage - An Actual Short";
 	private static final String DATE_YT_SHORT 		= "Dec 17, 2022";
 	private static final String CHNL_YT_SHORT 		= "Alan Becker on YouTube";
-	private static final String TIME_YT_SHORT 		= "00:47";
+	private static final String TIME_YT_SHORT 		= "00:47 (Short)";
 	
 	private static final String URL_YT_PLYLST		= "https://www.youtube.com/playlist?list=PLT515qV87IFIcL1LvgMVy_IpbWWkiQaXo";
 	private static final String TYPE_YT_PLYLST 		= "YouTube Playlist";
@@ -79,6 +79,14 @@ public class Test {
 	private static final String CHNL_TWI_MOBILE	 	= "ptony on Twitch";
 	private static final String TIME_TWI_MOBILE 	= "2:14:18";
 	
+	//DailyMotion
+	private static final String URL_DLYMTN_NORMAL	= "https://www.dailymotion.com/video/x9ppy20";
+	private static final String TYPE_DLYMTN_NORMAL 	= "Daily Motion Normal";
+	private static final String TTL_DLYMTN_NORMAL 	= "Top 10 Superhero Movie Storylines That Got KILLED (And Where They Were Headed)";
+	private static final String DATE_DLYMTN_NORMAL 	= "08-30-2025";
+	private static final String CHNL_DLYMTN_NORMAL	= "shortfilms on Dailymotion";
+	private static final String TIME_DLYMTN_NORMAL 	= "10:50";
+	
 	private boolean failureOccured;
 	
 	public static void main(String[] args) {
@@ -105,6 +113,9 @@ public class Test {
 		
 		//Twitch
 		runTest(testLink(URL_TWI_MOBILE, TYPE_TWI_MOBILE, TTL_TWI_MOBILE, DATE_TWI_MOBILE, CHNL_TWI_MOBILE, TIME_TWI_MOBILE), TYPE_TWI_MOBILE);
+		
+		//DailyMotion
+		runTest(testLink(URL_DLYMTN_NORMAL, TYPE_DLYMTN_NORMAL, TTL_DLYMTN_NORMAL, DATE_DLYMTN_NORMAL, CHNL_DLYMTN_NORMAL, TIME_DLYMTN_NORMAL), TYPE_DLYMTN_NORMAL);
 		
 		if (failureOccured) {
 			System.err.println("\nFailure(s) occured while testing!");
