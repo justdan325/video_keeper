@@ -1,9 +1,13 @@
 import java.util.Scanner;
 import java.net.URLConnection;
+import java.text.SimpleDateFormat;
+import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.Date;
 import java.util.Locale;
 import java.util.Optional;
 import java.time.Instant;
+import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
@@ -17,6 +21,7 @@ public class MetadataObtainer {
 	private static final String YOUTUBE_SHORT_TOKEN		= "youtube.com/shorts";
 	private static final String YOUTUBE_LIVE_TOKEN		= "https://youtube.com/live/";
 	private static final String YOUTUBE_LIVE_TOKEN_W	= "https://www.youtube.com/live/";
+	private static final String YOUTUBE_CHAN_TOKEN_W	= "https://www.youtube.com/@";
 	private static final String TWITCH_PREFIX_W			= "https://www.twitch.tv/videos/";
 	private static final String TWITCH_PREFIX_MOB		= "https://m.twitch.tv/videos/";
 	private static final String VIMEO_PREFIX			= "https://vimeo.com/";
@@ -27,7 +32,9 @@ public class MetadataObtainer {
 	private static final String BITCHUTE_PREFIX_W		= "https://www.bitchute.com/video/";
 	private static final String BITCHUTE_PREFIX			= "https://bitchute.com/video/";
 	private static final String RUMBLE_PREFIX			= "https://rumble.com/";
-	private static final int	MAX_LEN_TITLE			= 125;
+	private static final String PODBEAN_PREFIX			= "https://podcast.";
+	private static final String PODBEAN_TOKEN			= "podbean.com/e/";
+	private static final int	MAX_LEN_TITLE			= 200;
 	
 	private Optional<String> atTime;
 	private String urlStr;
@@ -48,11 +55,14 @@ public class MetadataObtainer {
 	
 	public static void main(String[] args) {
 //		System.out.println(fetchHtml("https://odysee.com/win11:6d73df3083e0f634b18f54521763184b47980d8a"));
-		MetadataObtainer o = new MetadataObtainer("https://www.youtube.com/watch?v=AWzwHP_dDEU");
-		System.out.println("[" + o.getTitle() + "]");
-		System.out.println("[" + o.getDate() + "]");
-		System.out.println("[" + o.getChannel() + "]");
-		System.out.println("[" + o.getTime() + "]");
+		final String URL = "https://podcast.htmlallthethings.com/e/top-mistakes-that-developers-make-when-building-a-web-app-and-how-to-prevent-them/";
+		MetadataObtainer o = new MetadataObtainer(URL);
+		System.out.println("URL provided: [" + URL + "]");
+		System.out.println("Is supported: [" + isSupported(URL) + "]");
+		System.out.println("Title       : [" + o.getTitle() + "]");
+		System.out.println("Date        : [" + o.getDate() + "]");
+		System.out.println("Channel     : [" + o.getChannel() + "]");
+		System.out.println("Time        : [" + o.getTime() + "]");
 	}
 	
 	public static boolean isSupported(String urlStr) {
@@ -61,12 +71,13 @@ public class MetadataObtainer {
 		if (urlStr.startsWith(YOUTUBE_PREFIX) || urlStr.startsWith(YOUTUBE_PREFIX_W)
 				|| urlStr.contains(YOUTUBE_PLAYLIST_TOKEN) || urlStr.startsWith(YOUTUBE_PREFIX_ABBR)
 				|| urlStr.contains(YOUTUBE_SHORT_TOKEN) || urlStr.contains(YOUTUBE_LIVE_TOKEN)
-				|| urlStr.contains(YOUTUBE_LIVE_TOKEN_W) || urlStr.startsWith(TWITCH_PREFIX_W)
-				|| urlStr.startsWith(TWITCH_PREFIX_MOB) || urlStr.startsWith(VIMEO_PREFIX)
-				|| urlStr.startsWith(ODYSEE_PREFIX) || urlStr.startsWith(DAILYMOTION_PREFIX_W)
-				|| urlStr.startsWith(DAILYMOTION_PREFIX) || urlStr.startsWith(DAILYMOTION_PREFIX_MOB)
-				|| urlStr.startsWith(BITCHUTE_PREFIX) || urlStr.startsWith(BITCHUTE_PREFIX_W)
-				|| urlStr.startsWith(RUMBLE_PREFIX)) {
+				|| urlStr.startsWith(YOUTUBE_CHAN_TOKEN_W) || urlStr.contains(YOUTUBE_LIVE_TOKEN_W)
+				|| urlStr.startsWith(TWITCH_PREFIX_W) || urlStr.startsWith(TWITCH_PREFIX_MOB)
+				|| urlStr.startsWith(VIMEO_PREFIX) || urlStr.startsWith(ODYSEE_PREFIX)
+				|| urlStr.startsWith(DAILYMOTION_PREFIX_W) || urlStr.startsWith(DAILYMOTION_PREFIX)
+				|| urlStr.startsWith(DAILYMOTION_PREFIX_MOB) || urlStr.startsWith(BITCHUTE_PREFIX)
+				|| urlStr.startsWith(BITCHUTE_PREFIX_W) || urlStr.startsWith(RUMBLE_PREFIX)
+				|| urlStr.contains(PODBEAN_TOKEN) || urlStr.startsWith(PODBEAN_PREFIX)) {
 
 			supported = true;
 		}
@@ -94,7 +105,7 @@ public class MetadataObtainer {
 		if (!isUrlError()) {
 			//YouTube Regular Links
 			if (urlStr.startsWith(YOUTUBE_PREFIX) || urlStr.startsWith(YOUTUBE_PREFIX_W) || urlStr.contains(YOUTUBE_SHORT_TOKEN)) {
-				final String WATCH_TAG = "/watch?v=";
+//				final String WATCH_TAG = "/watch?v=";
 				String prefix = "content=\"" + urlStr.trim() + "\"><meta property=\"og:title\" content=\"";
 				String suffix = "\"><meta property=\"og:image\" content=\"";
 				int begin = html.indexOf(prefix) + prefix.length();
@@ -115,6 +126,13 @@ public class MetadataObtainer {
 						title = html.substring(begin, end);
 						title = filterEscapeChars(title);
 					}
+				}
+			} else if (urlStr.startsWith(YOUTUBE_CHAN_TOKEN_W)) {
+				title = urlStr.substring(urlStr.indexOf("@") + 1);
+				
+				//remove trailing URL artifacts if there are any
+				if (title.contains("/")) {
+					title = title.substring(0, title.indexOf("/"));
 				}
 			} else if (urlStr.contains(YOUTUBE_PLAYLIST_TOKEN)) {
 				String prefix = "property=\"og:title\" content=\"";
@@ -173,8 +191,8 @@ public class MetadataObtainer {
 			} else if (urlStr.startsWith(DAILYMOTION_PREFIX) || urlStr.startsWith(DAILYMOTION_PREFIX_W)
 					|| urlStr.startsWith(DAILYMOTION_PREFIX_MOB)) {
 				
-				String prefix = "<meta property=\"og:title\" content=\"";
-				String suffix = " - video Dailymotion\"  />";
+				String prefix = "{\"title\":\"";
+				String suffix = "\",";
 				int begin = html.indexOf(prefix) + prefix.length();
 				int end = html.indexOf(suffix, begin);
 				
@@ -203,6 +221,16 @@ public class MetadataObtainer {
 				if (begin != -1 && end != -1) {
 					title = html.substring(begin, end);
 					title = filterEscapeChars(title);
+				}
+			//Podbean
+			} else if (urlStr.startsWith(PODBEAN_PREFIX) || urlStr.contains(PODBEAN_TOKEN)) {
+				String prefix = "<title>";
+				String suffix = "</title>";
+				int begin = html.indexOf(prefix) + prefix.length();
+				int end = html.indexOf(suffix, begin);
+				
+				if (begin != -1 && end != -1) {
+					title = html.substring(begin, end);
 				}
 			}
 		}
@@ -258,6 +286,8 @@ public class MetadataObtainer {
 				}
 				
 				channel += " on YouTube";
+			} else if (urlStr.startsWith(YOUTUBE_CHAN_TOKEN_W)) {
+				channel = getTitle() + " on YouTube";
 			//Twitch
 			} else if (urlStr.startsWith(TWITCH_PREFIX_MOB)) {
 				String prefix = "name=\"description\"/><meta name=\"title\" content=\"";
@@ -296,21 +326,7 @@ public class MetadataObtainer {
 				channel += " on Twitch";
 			//Vimeo
 			} else if (urlStr.startsWith(VIMEO_PREFIX)) {
-				String prefix = "<span class=\"userlink userlink--md\">";
-				String suffix = "</a>";
-				String htmlSubstr = html.substring(html.indexOf(prefix) + prefix.length());
-				
-				prefix = "\">";
-				
-				int begin = htmlSubstr.indexOf(prefix) + prefix.length();
-				int end = htmlSubstr.indexOf(suffix, begin);
-				
-				if (begin != -1 && end != -1) {
-					channel = htmlSubstr.substring(begin, end);
-					channel = filterEscapeChars(channel);
-				}
-				
-				channel += " on Vimeo";
+				channel += "On Vimeo"; //Channel/user name is rendered via JavaScript
 			//Odysee
 			} else if (urlStr.startsWith(ODYSEE_PREFIX)) {
 				if (urlStr.contains("@")) {
@@ -344,10 +360,19 @@ public class MetadataObtainer {
 			} else if (urlStr.startsWith(DAILYMOTION_PREFIX) || urlStr.startsWith(DAILYMOTION_PREFIX_W)
 					|| urlStr.startsWith(DAILYMOTION_PREFIX_MOB)) {
 				
-				channel += "an author on Dailymotion";
+				String prefix = "channel\":\"";
+				String suffix = "\"";
+				int begin = html.lastIndexOf(prefix) + prefix.length();
+				int end = html.indexOf(suffix, begin);
+
+				if (begin != -1 && end != -1) {
+					channel = html.substring(begin, end);
+				}
+				
+				channel += " on Dailymotion";
 			//Bitchute
 			} else if (urlStr.startsWith(BITCHUTE_PREFIX) || urlStr.startsWith(BITCHUTE_PREFIX_W)) {
-				channel = "an author on BITCHUTE";
+				channel = "On BITCHUTE";
 			//Rumble
 			} else if (urlStr.startsWith(RUMBLE_PREFIX)) {
 				String prefix = "data-title=\"";
@@ -361,6 +386,29 @@ public class MetadataObtainer {
 				}
 				
 				channel += " on Rumble";
+			//Podbean
+			} else if (urlStr.contains(PODBEAN_TOKEN)) {
+				String prefix = "://";
+				String suffix = ".podbean";
+				int begin = urlStr.indexOf(prefix) + prefix.length();
+				int end = urlStr.indexOf(suffix, begin);
+				
+				if (begin != -1 && end != -1) {
+					channel = urlStr.substring(begin, end);
+				}
+				
+				channel += " on PodBean";
+			} else if (urlStr.startsWith(PODBEAN_PREFIX)) {
+				String prefix = "://podcast.";
+				String suffix = ".com";
+				int begin = urlStr.indexOf(prefix) + prefix.length();
+				int end = urlStr.indexOf(suffix, begin);
+				
+				if (begin != -1 && end != -1) {
+					channel = urlStr.substring(begin, end);
+				}
+				
+				channel += " on PodBean";
 			}
 		}
 		
@@ -396,19 +444,67 @@ public class MetadataObtainer {
 				if (begin != -1 && end != -1) {
 					date = html.substring(begin, end);
 				}
+			} else if (urlStr.startsWith(YOUTUBE_CHAN_TOKEN_W)) {
+				String prefix = "\"";
+				String suffix = "subscribers\"}";
+				int end = html.indexOf(suffix);
+				int begin = end;
+				boolean foundBegin = false;
+				
+				for (int i = 0; i < 25; i++) {
+					if (html.charAt(--begin) == prefix.toCharArray()[0]) {
+						foundBegin = true;
+						begin++;
+						break;
+					}
+				}
+				
+				if (foundBegin) {
+					date = html.substring(begin, end);
+					date += "Subscribers";
+					
+					suffix = "videos\",\"styleRuns\"";
+					end = html.indexOf(suffix, begin);
+					begin = end;
+					foundBegin = false;
+					
+					for (int i = 0; i < 25; i++) {
+						if (html.charAt(--begin) == '"') {
+							foundBegin = true;
+							begin++;
+							break;
+						}
+					}
+					
+					if (foundBegin) {
+						date += " ~ " + html.substring(begin, end);
+						date += "Videos";
+					}
+				}
 			//Vimeo
 			} else if (urlStr.startsWith(VIMEO_PREFIX)) {
-				String prefix = "<span class=\"clip_info-time\"><time datetime=\"";
+				String prefix = "<meta property=\"og:updated_time\" content=\"";
 				String suffix = "\">";
-				String htmlSubstr = html.substring(html.indexOf(prefix) + prefix.length());
-				
-				prefix = "\" title=\"";
-				
-				int begin = htmlSubstr.indexOf(prefix) + prefix.length();
-				int end = htmlSubstr.indexOf(suffix, begin);
+				String htmlSubstr = "";
+				int begin = html.indexOf(prefix) + prefix.length();
+				int end = html.indexOf(suffix, begin);
 				
 				if (begin != -1 && end != -1) {
-					date = htmlSubstr.substring(begin, end);
+					date = html.substring(begin, end);
+					date = date.substring(0, date.indexOf("T"));
+				} else {
+					prefix = "<span class=\"clip_info-time\"><time datetime=\"";
+					
+					htmlSubstr = html.substring(html.indexOf(prefix) + prefix.length());
+					
+					prefix = "\" title=\"";
+					
+					begin = htmlSubstr.indexOf(prefix) + prefix.length();
+					end = htmlSubstr.indexOf(suffix, begin);
+					
+					if (begin != -1 && end != -1) {
+						date = html.substring(begin, end);
+					}
 				}
 			//Odysee
 			} else if (urlStr.startsWith(ODYSEE_PREFIX)) {
@@ -429,13 +525,14 @@ public class MetadataObtainer {
 			} else if (urlStr.startsWith(DAILYMOTION_PREFIX) || urlStr.startsWith(DAILYMOTION_PREFIX_W)
 					|| urlStr.startsWith(DAILYMOTION_PREFIX_MOB)) {
 				
-				String prefix = "<meta property=\"video:release_date\" content=\"";
-				String suffix = "T";
+				String prefix = "\"created_time\":";
+				String suffix = ",\"";
 				int begin = html.indexOf(prefix) + prefix.length();
 				int end = html.indexOf(suffix, begin);
 				
 				if (begin != -1 && end != -1) {
 					date = html.substring(begin, end);
+					date = parseUnixDateAndTime(date);
 				}
 			//Bitchute
 			} else if (urlStr.startsWith(BITCHUTE_PREFIX) || urlStr.startsWith(BITCHUTE_PREFIX_W)) {
@@ -474,6 +571,16 @@ public class MetadataObtainer {
 						date = html.substring(begin, end);
 						date = date.replaceAll("\n", "");
 					}
+				}
+			//Podbean
+			} else if (urlStr.startsWith(PODBEAN_PREFIX) || urlStr.contains(PODBEAN_TOKEN)) {
+				String prefix = "class=\"episode-date\">";
+				String suffix = "</span>";
+				int begin = html.indexOf(prefix) + prefix.length();
+				int end = html.indexOf(suffix, begin);
+				
+				if (begin != -1 && end != -1) {
+					date = html.substring(begin, end);
 				}
 			}
 		}
@@ -523,6 +630,10 @@ public class MetadataObtainer {
 				if (atTime.isPresent()) {
 					time += " (in progress " + convertSecondsToTimeStr(Integer.parseInt(atTime.get())) + ")";
 				}
+				
+				if (urlStr.contains(YOUTUBE_SHORT_TOKEN)) {
+					time += " (Short)";
+				}
 			//Odysee and Twitch (not 100% Reliable for Twitch)
 			} else if (urlStr.startsWith(ODYSEE_PREFIX) || urlStr.startsWith(TWITCH_PREFIX_MOB)) {
 				String prefix = "<meta property=\"og:video:duration\" content=\"";
@@ -568,6 +679,48 @@ public class MetadataObtainer {
 						time = " In progress at " + convertSecondsToTimeStr(Integer.parseInt(time));
 					} catch(Exception e) {
 						time = "Video is in progress.";
+					}
+				}
+			//DailyMotion
+			} else if (urlStr.startsWith(DAILYMOTION_PREFIX) || urlStr.startsWith(DAILYMOTION_PREFIX_W)
+					|| urlStr.startsWith(DAILYMOTION_PREFIX_MOB)) {
+				
+				String prefix = "\"duration\":";
+				String suffix = "}";
+				int begin = html.indexOf(prefix) + prefix.length();
+				int end = html.indexOf(suffix, begin);
+
+				if (begin != -1 && end != -1) {
+					try {
+						time = html.substring(begin, end);
+						seconds = Integer.parseInt(time);
+					} catch (Exception e) {
+						seconds = -1;
+					}
+
+					if (seconds > -1) {
+						time = convertSecondsToTimeStr(seconds);
+					}
+				}
+			//Podbean
+			} else if (urlStr.startsWith(PODBEAN_PREFIX) || urlStr.contains(PODBEAN_TOKEN)) {
+				String prefix = "duration\\\":";
+				String suffix = ",";
+				int begin = html.indexOf(prefix) + prefix.length();
+				int end = html.indexOf(suffix, begin);
+				
+				if (begin != -1 && end != -1) {
+					time = html.substring(begin, end);
+					
+					try {
+						time = html.substring(begin, end);
+						seconds = Integer.parseInt(time);
+					} catch (Exception e) {
+						seconds = -1;
+					}
+
+					if (seconds > -1) {
+						time = convertSecondsToTimeStr(seconds);
 					}
 				}
 			}
@@ -620,22 +773,37 @@ public class MetadataObtainer {
 	
 	private static String fetchHtml(String url) {
 		String content = null;
-		URLConnection connection = null;
+		HttpURLConnection connection = null;
 		
 		try {
-			connection =  new URL(url).openConnection();
+			//Daily Motion has a public API for getting title, date, and channel. The DOM of the actual web page only renders these in JavaScript.
+			if (url.startsWith(DAILYMOTION_PREFIX) || url.startsWith(DAILYMOTION_PREFIX_MOB) || url.startsWith(DAILYMOTION_PREFIX_W)) {
+				if (url.contains("?")) {
+					url = url.substring(0, url.indexOf("?"));
+				} else if (url.contains("&")) {
+					url = url.substring(0, url.indexOf("&"));
+				}
+				
+				url = "https://api.dailymotion.com/" + url.substring(url.indexOf("video")) + "?fields=title,created_time,channel,duration";
+			}
+			
+			connection =  (HttpURLConnection) new URL(url).openConnection();
 			
 			//This user agent screws up YouTube for some reason.
 			if (!url.startsWith(YOUTUBE_PREFIX) && !url.startsWith(YOUTUBE_PREFIX_ABBR) && !url.startsWith(YOUTUBE_PREFIX_W)
 					&& !url.contains(YOUTUBE_PLAYLIST_TOKEN) && !url.contains(YOUTUBE_SHORT_TOKEN)) {
-				connection.setRequestProperty("User-Agent",
-						"Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10.4; en-US; rv:1.9.2.2) Gecko/20100316 Firefox/3.6.2");
-			}
+				connection.setRequestProperty("User-Agent", "Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10.4; en-US; rv:1.9.2.2) Gecko/20100316 Firefox/3.6.2");
+//				connection.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36");
+			} 
 			
 			Scanner scanner = new Scanner(connection.getInputStream());
 			scanner.useDelimiter("\\Z");
 			content = scanner.next();
 			scanner.close();
+			
+			if (connection.getResponseCode() != 200) {
+				System.out.println("HTTP Response for " + url + ": " + connection.getResponseCode() + " " + connection.getResponseMessage());
+			}
 		} catch (Exception e) {
 			String message = "";
 			
@@ -867,6 +1035,18 @@ public class MetadataObtainer {
 		filtered = filtered.replaceAll("&#039;", "'");
 		
 		return filtered;
+	}
+	
+	private static String parseUnixDateAndTime(String unixTime) {
+        long milliseconds = Long.parseLong(unixTime) * 1000;
+        Instant instant = Instant.ofEpochMilli(milliseconds);
+//        LocalDateTime utcDateTime = LocalDateTime.ofInstant(instant, ZoneId.of("UTC"));
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM-dd-yyyy");
+//        String formattedDate = utcDateTime.format(formatter);
+        LocalDateTime localDateTime = LocalDateTime.ofInstant(instant, ZoneId.of("America/New_York"));
+        String formattedLocalDate = localDateTime.format(formatter);
+        
+        return formattedLocalDate;
 	}
 	
 	//This method does not work reliably.
