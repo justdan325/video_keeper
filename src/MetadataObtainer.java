@@ -1,9 +1,6 @@
 import java.util.Scanner;
-import java.net.URLConnection;
-import java.text.SimpleDateFormat;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.Date;
 import java.util.Locale;
 import java.util.Optional;
 import java.time.Instant;
