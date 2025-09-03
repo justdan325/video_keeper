@@ -32,8 +32,9 @@ public class MetadataObtainer {
 	private static final String BITCHUTE_PREFIX_W		= "https://www.bitchute.com/video/";
 	private static final String BITCHUTE_PREFIX			= "https://bitchute.com/video/";
 	private static final String RUMBLE_PREFIX			= "https://rumble.com/";
+	private static final String PODBEAN_PREFIX			= "https://podcast.";
 	private static final String PODBEAN_TOKEN			= "podbean.com/e/";
-	private static final int	MAX_LEN_TITLE			= 125;
+	private static final int	MAX_LEN_TITLE			= 200;
 	
 	private Optional<String> atTime;
 	private String urlStr;
@@ -54,7 +55,7 @@ public class MetadataObtainer {
 	
 	public static void main(String[] args) {
 //		System.out.println(fetchHtml("https://odysee.com/win11:6d73df3083e0f634b18f54521763184b47980d8a"));
-		final String URL = "https://geruhmyuh.podbean.com/e/god-s-sovereignty/";
+		final String URL = "https://podcast.htmlallthethings.com/e/top-mistakes-that-developers-make-when-building-a-web-app-and-how-to-prevent-them/";
 		MetadataObtainer o = new MetadataObtainer(URL);
 		System.out.println("URL provided: [" + URL + "]");
 		System.out.println("Is supported: [" + isSupported(URL) + "]");
@@ -76,7 +77,7 @@ public class MetadataObtainer {
 				|| urlStr.startsWith(DAILYMOTION_PREFIX_W) || urlStr.startsWith(DAILYMOTION_PREFIX)
 				|| urlStr.startsWith(DAILYMOTION_PREFIX_MOB) || urlStr.startsWith(BITCHUTE_PREFIX)
 				|| urlStr.startsWith(BITCHUTE_PREFIX_W) || urlStr.startsWith(RUMBLE_PREFIX)
-				|| urlStr.contains(PODBEAN_TOKEN)) {
+				|| urlStr.contains(PODBEAN_TOKEN) || urlStr.startsWith(PODBEAN_PREFIX)) {
 
 			supported = true;
 		}
@@ -222,7 +223,7 @@ public class MetadataObtainer {
 					title = filterEscapeChars(title);
 				}
 			//Podbean
-			} else if (urlStr.contains(PODBEAN_TOKEN)) {
+			} else if (urlStr.startsWith(PODBEAN_PREFIX) || urlStr.contains(PODBEAN_TOKEN)) {
 				String prefix = "<title>";
 				String suffix = "</title>";
 				int begin = html.indexOf(prefix) + prefix.length();
@@ -397,6 +398,17 @@ public class MetadataObtainer {
 				}
 				
 				channel += " on PodBean";
+			} else if (urlStr.startsWith(PODBEAN_PREFIX)) {
+				String prefix = "://podcast.";
+				String suffix = ".com";
+				int begin = urlStr.indexOf(prefix) + prefix.length();
+				int end = urlStr.indexOf(suffix, begin);
+				
+				if (begin != -1 && end != -1) {
+					channel = urlStr.substring(begin, end);
+				}
+				
+				channel += " on PodBean";
 			}
 		}
 		
@@ -561,7 +573,7 @@ public class MetadataObtainer {
 					}
 				}
 			//Podbean
-			} else if (urlStr.contains(PODBEAN_TOKEN)) {
+			} else if (urlStr.startsWith(PODBEAN_PREFIX) || urlStr.contains(PODBEAN_TOKEN)) {
 				String prefix = "class=\"episode-date\">";
 				String suffix = "</span>";
 				int begin = html.indexOf(prefix) + prefix.length();
@@ -669,6 +681,7 @@ public class MetadataObtainer {
 						time = "Video is in progress.";
 					}
 				}
+			//DailyMotion
 			} else if (urlStr.startsWith(DAILYMOTION_PREFIX) || urlStr.startsWith(DAILYMOTION_PREFIX_W)
 					|| urlStr.startsWith(DAILYMOTION_PREFIX_MOB)) {
 				
@@ -690,7 +703,7 @@ public class MetadataObtainer {
 					}
 				}
 			//Podbean
-			} else if (urlStr.contains(PODBEAN_TOKEN)) {
+			} else if (urlStr.startsWith(PODBEAN_PREFIX) || urlStr.contains(PODBEAN_TOKEN)) {
 				String prefix = "duration\\\":";
 				String suffix = ",";
 				int begin = html.indexOf(prefix) + prefix.length();

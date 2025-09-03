@@ -138,6 +138,13 @@ public class Test {
 	private static final String CHNL_PDBN_NORMAL	= "geruhmyuh on PodBean";
 	private static final String TIME_PDBN_NORMAL 	= "32:25";
 	
+	private static final String URL_PDBN_NORMAL2	= "https://podcast.htmlallthethings.com/e/top-mistakes-that-developers-make-when-building-a-web-app-and-how-to-prevent-them/";
+	private static final String TYPE_PDBN_NORMAL2 	= "PodBean Normal with \"podcast\" URL";
+	private static final String TTL_PDBN_NORMAL2 	= "Top Mistakes That Developers Make When Building a Web App (And How to Prevent Them) | HTML All The Things - Web Development, Web Design, Small Business";
+	private static final String DATE_PDBN_NORMAL2 	= "Tuesday Aug 26, 2025";
+	private static final String CHNL_PDBN_NORMAL2	= "htmlallthethings on PodBean";
+	private static final String TIME_PDBN_NORMAL2 	= "1:05:07";
+	
 	private int prevGroupNo;
 	private boolean failureOccured;
 	
@@ -179,6 +186,7 @@ public class Test {
 		
 		//Podbean
 		runTest(testLink(URL_PDBN_NORMAL, TYPE_PDBN_NORMAL, TTL_PDBN_NORMAL, DATE_PDBN_NORMAL, CHNL_PDBN_NORMAL, TIME_PDBN_NORMAL), TYPE_PDBN_NORMAL, PDBN_GROUP_NO);
+		runTest(testLink(URL_PDBN_NORMAL2, TYPE_PDBN_NORMAL2, TTL_PDBN_NORMAL2, DATE_PDBN_NORMAL2, CHNL_PDBN_NORMAL2, TIME_PDBN_NORMAL2), TYPE_PDBN_NORMAL2, PDBN_GROUP_NO);
 				
 		if (failureOccured) {
 			System.err.println("\nFailure(s) occured while testing!");
