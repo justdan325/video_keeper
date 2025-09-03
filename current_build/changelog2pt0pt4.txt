@@ -1,0 +1,6 @@
+VIDEO KEEPER CHANGE LOG -- VERSION 2.0.4
+
+-Updated video metadata obtaining logic to compensate for DOM changes on various sites.
+-Tweak to program dimensions to compensate for text rendering on some OSes.
+-Added support for PodBean.
+-Improved YouTube support (channels, playlists, and shorts).
