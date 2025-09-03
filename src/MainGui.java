@@ -30,7 +30,7 @@ import java.awt.Dimension;
 @SuppressWarnings("serial")
 public class MainGui extends JFrame implements WindowListener {
 	public  static final String PROG_NAME 			= "Video Keeper";
-	public  static final String PROG_VER			= "2.0.1";
+	public  static final String PROG_VER			= "2.0.3";
 	public  static final String PROG_FONT			= "Arial";
 	public	static final Color 	PROG_COLOR_BKRND	= new Color(3156004);
 	public	static final Color	PROG_COLOR_BTN_EN	= new Color(8388608);
@@ -55,10 +55,10 @@ public class MainGui extends JFrame implements WindowListener {
 	private static final String TOOLTIP_HEAD		= "Return to head of the watch list.";
 	private static final String TOOLTIP_SETTINGS	= "Settings";
 	private static final String CHANNEL_PREFIX 		= "By: ";
-	private static final int 	WIN_X 				= 600;
-	private static final int 	WIN_Y 				= 350;
-	private static final int 	URL_FIELD_X			= 450;
-	private static final int 	URL_FIELD_Y			= 40;
+	private static final int 	WIN_X 				= 610;
+	private static final int 	WIN_Y 				= 370;
+	private static final int 	URL_FIELD_X			= 440;
+	private static final int 	URL_FIELD_Y			= 50;
 	private static final int 	UP_NEXT_FONT_SIZE 	= 20;
 	private static final int 	VID_DATA_FONT_SIZE 	= 14;
 	

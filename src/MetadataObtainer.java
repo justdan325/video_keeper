@@ -1,9 +1,13 @@
 import java.util.Scanner;
 import java.net.URLConnection;
+import java.text.SimpleDateFormat;
+import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.Date;
 import java.util.Locale;
 import java.util.Optional;
 import java.time.Instant;
+import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
@@ -13,6 +17,11 @@ public class MetadataObtainer {
 	private static final String YOUTUBE_PREFIX 			= "https://youtube.com/watch?v=";
 	private static final String YOUTUBE_PREFIX_W 		= "https://www.youtube.com/watch?v=";
 	private static final String YOUTUBE_PREFIX_ABBR 	= "https://youtu.be/";
+	private static final String YOUTUBE_PLAYLIST_TOKEN	= "youtube.com/playlist?list=";
+	private static final String YOUTUBE_SHORT_TOKEN		= "youtube.com/shorts";
+	private static final String YOUTUBE_LIVE_TOKEN		= "https://youtube.com/live/";
+	private static final String YOUTUBE_LIVE_TOKEN_W	= "https://www.youtube.com/live/";
+	private static final String YOUTUBE_CHAN_TOKEN_W	= "https://www.youtube.com/@";
 	private static final String TWITCH_PREFIX_W			= "https://www.twitch.tv/videos/";
 	private static final String TWITCH_PREFIX_MOB		= "https://m.twitch.tv/videos/";
 	private static final String VIMEO_PREFIX			= "https://vimeo.com/";
@@ -23,6 +32,9 @@ public class MetadataObtainer {
 	private static final String BITCHUTE_PREFIX_W		= "https://www.bitchute.com/video/";
 	private static final String BITCHUTE_PREFIX			= "https://bitchute.com/video/";
 	private static final String RUMBLE_PREFIX			= "https://rumble.com/";
+	private static final String PODBEAN_PREFIX			= "https://podcast.";
+	private static final String PODBEAN_TOKEN			= "podbean.com/e/";
+	private static final int	MAX_LEN_TITLE			= 200;
 	
 	private Optional<String> atTime;
 	private String urlStr;
@@ -41,26 +53,32 @@ public class MetadataObtainer {
 		}
 	}
 	
-	public static void main(String[] args){
+	public static void main(String[] args) {
 //		System.out.println(fetchHtml("https://odysee.com/win11:6d73df3083e0f634b18f54521763184b47980d8a"));
-		MetadataObtainer o = new MetadataObtainer("");
-		System.out.println(o.getTitle());
-		System.out.println(o.getDate());
-		System.out.println(o.getChannel());
-		System.out.println(o.getTime());
+		final String URL = "https://podcast.htmlallthethings.com/e/top-mistakes-that-developers-make-when-building-a-web-app-and-how-to-prevent-them/";
+		MetadataObtainer o = new MetadataObtainer(URL);
+		System.out.println("URL provided: [" + URL + "]");
+		System.out.println("Is supported: [" + isSupported(URL) + "]");
+		System.out.println("Title       : [" + o.getTitle() + "]");
+		System.out.println("Date        : [" + o.getDate() + "]");
+		System.out.println("Channel     : [" + o.getChannel() + "]");
+		System.out.println("Time        : [" + o.getTime() + "]");
 	}
 	
 	public static boolean isSupported(String urlStr) {
 		boolean supported = false;
 
-		if(urlStr.startsWith(YOUTUBE_PREFIX) || urlStr.startsWith(YOUTUBE_PREFIX_W) 
-		   || urlStr.startsWith(YOUTUBE_PREFIX_ABBR) || urlStr.startsWith(TWITCH_PREFIX_W) 
-		   || urlStr.startsWith(TWITCH_PREFIX_MOB) || urlStr.startsWith(VIMEO_PREFIX)
-		   || urlStr.startsWith(ODYSEE_PREFIX) ||  urlStr.startsWith(DAILYMOTION_PREFIX_W)
-		   || urlStr.startsWith(DAILYMOTION_PREFIX) || urlStr.startsWith(DAILYMOTION_PREFIX_MOB)
-		   || urlStr.startsWith(BITCHUTE_PREFIX) || urlStr.startsWith(BITCHUTE_PREFIX_W)
-		   || urlStr.startsWith(RUMBLE_PREFIX)) {
-			
+		if (urlStr.startsWith(YOUTUBE_PREFIX) || urlStr.startsWith(YOUTUBE_PREFIX_W)
+				|| urlStr.contains(YOUTUBE_PLAYLIST_TOKEN) || urlStr.startsWith(YOUTUBE_PREFIX_ABBR)
+				|| urlStr.contains(YOUTUBE_SHORT_TOKEN) || urlStr.contains(YOUTUBE_LIVE_TOKEN)
+				|| urlStr.startsWith(YOUTUBE_CHAN_TOKEN_W) || urlStr.contains(YOUTUBE_LIVE_TOKEN_W)
+				|| urlStr.startsWith(TWITCH_PREFIX_W) || urlStr.startsWith(TWITCH_PREFIX_MOB)
+				|| urlStr.startsWith(VIMEO_PREFIX) || urlStr.startsWith(ODYSEE_PREFIX)
+				|| urlStr.startsWith(DAILYMOTION_PREFIX_W) || urlStr.startsWith(DAILYMOTION_PREFIX)
+				|| urlStr.startsWith(DAILYMOTION_PREFIX_MOB) || urlStr.startsWith(BITCHUTE_PREFIX)
+				|| urlStr.startsWith(BITCHUTE_PREFIX_W) || urlStr.startsWith(RUMBLE_PREFIX)
+				|| urlStr.contains(PODBEAN_TOKEN) || urlStr.startsWith(PODBEAN_PREFIX)) {
+
 			supported = true;
 		}
 		
@@ -74,7 +92,7 @@ public class MetadataObtainer {
 	public boolean isUrlError() {
 		boolean error = false;
 		
-		if(html.startsWith(FETCH_ERROR_PREFIX)) {
+		if (html.startsWith(FETCH_ERROR_PREFIX)) {
 			error = true;
 		}
 		
@@ -84,49 +102,71 @@ public class MetadataObtainer {
 	public String getTitle() {
 		String title = urlStr;
 		
-		if(!isUrlError()) {
+		if (!isUrlError()) {
 			//YouTube Regular Links
-			if(urlStr.startsWith(YOUTUBE_PREFIX) || urlStr.startsWith(YOUTUBE_PREFIX_W)) {
+			if (urlStr.startsWith(YOUTUBE_PREFIX) || urlStr.startsWith(YOUTUBE_PREFIX_W) || urlStr.contains(YOUTUBE_SHORT_TOKEN)) {
+//				final String WATCH_TAG = "/watch?v=";
 				String prefix = "content=\"" + urlStr.trim() + "\"><meta property=\"og:title\" content=\"";
 				String suffix = "\"><meta property=\"og:image\" content=\"";
 				int begin = html.indexOf(prefix) + prefix.length();
 				int end = html.indexOf(suffix, begin);
+
+				if (begin != -1 && end != -1) {
+					title = html.substring(begin, end);
+					title = filterEscapeChars(title);
+				} 
 				
+				if (title.length() > MAX_LEN_TITLE) { 
+					prefix = "</title><meta name=\"title\" content=\"";
+					suffix = "\"><meta name=\"description\"";
+					begin = html.indexOf(prefix) + prefix.length();
+					end = html.indexOf(suffix, begin);
+					
+					if (begin != -1 && end != -1) {
+						title = html.substring(begin, end);
+						title = filterEscapeChars(title);
+					}
+				}
+			} else if (urlStr.startsWith(YOUTUBE_CHAN_TOKEN_W)) {
+				title = urlStr.substring(urlStr.indexOf("@") + 1);
+				
+				//remove trailing URL artifacts if there are any
+				if (title.contains("/")) {
+					title = title.substring(0, title.indexOf("/"));
+				}
+			} else if (urlStr.contains(YOUTUBE_PLAYLIST_TOKEN)) {
+				String prefix = "property=\"og:title\" content=\"";
+				String suffix = "\"><meta property=\"og:description\"";
+				int begin = html.indexOf(prefix) + prefix.length();
+				int end = html.indexOf(suffix, begin);
+
 				if (begin != -1 && end != -1) {
 					title = html.substring(begin, end);
 					title = filterEscapeChars(title);
 				}
-			//YouTube Shortened Links -- Now dealt with in URL sanitization
-//			} else if(urlStr.startsWith(YOUTUBE_PREFIX_ABBR)) {
-//				String prefix = "feature=youtu.be\"><title>";
-//				String suffix = " - YouTube</title>";
-//				int begin = html.indexOf(prefix) + prefix.length();
-//				int end = html.indexOf(suffix, begin);
-//				
-//				if (begin != -1 && end != -1) {
-//					title = html.substring(begin, end);
-//					title = filterEscapeChars(title);
-//				}
 			//Twitch
 			} else if(urlStr.startsWith(TWITCH_PREFIX_MOB)) {
-				String prefix = "<title>";
-				String suffix = "</title>";
+				String prefix = "\"/><meta property=\"og:title\" content=\"";
+				String suffix = " on Twitch\"/><meta ";
 				int begin = html.indexOf(prefix) + prefix.length();
 				int end = html.indexOf(suffix, begin);
 				
 				if (begin != -1 && end != -1) {
 					title = html.substring(begin, end);
-					title = filterEscapeChars(title);
-				}
-				
-				//title is first part
-				String[] strArr = title.split(" - ");
-				
-				if(strArr.length >= 1) {
-					title = strArr[0];
+					//using lastIndexOf doesn't work because reasons...
+					end -= 2;
+
+					if (begin != -1 && end != -1) {
+						while (html.substring(end, end + 3).equals(" - ") == false) {
+							end--;
+						}
+
+						title = html.substring(begin, end);
+						title = filterEscapeChars(title);
+					}
 				}
 			//Vimeo
-			} else if(urlStr.startsWith(VIMEO_PREFIX)) {
+			} else if (urlStr.startsWith(VIMEO_PREFIX)) {
 				String prefix = "<meta property=\"og:title\" content=\"";
 				String suffix = "\">";
 				int begin = html.indexOf(prefix) + prefix.length();
@@ -137,7 +177,7 @@ public class MetadataObtainer {
 					title = filterEscapeChars(title);
 				}
 			//Odysee
-			} else if(urlStr.startsWith(ODYSEE_PREFIX)) {
+			} else if (urlStr.startsWith(ODYSEE_PREFIX)) {
 				String prefix = "<meta charset=\"utf8\"/><title>";
 				String suffix = "</title>";
 				int begin = html.indexOf(prefix) + prefix.length();
@@ -148,11 +188,11 @@ public class MetadataObtainer {
 					title = filterEscapeChars(title);
 				}
 			//Dailymotion
-			} else if(urlStr.startsWith(DAILYMOTION_PREFIX) || urlStr.startsWith(DAILYMOTION_PREFIX_W)
+			} else if (urlStr.startsWith(DAILYMOTION_PREFIX) || urlStr.startsWith(DAILYMOTION_PREFIX_W)
 					|| urlStr.startsWith(DAILYMOTION_PREFIX_MOB)) {
 				
-				String prefix = "<meta property=\"og:title\" content=\"";
-				String suffix = " - video Dailymotion\"  />";
+				String prefix = "{\"title\":\"";
+				String suffix = "\",";
 				int begin = html.indexOf(prefix) + prefix.length();
 				int end = html.indexOf(suffix, begin);
 				
@@ -169,10 +209,10 @@ public class MetadataObtainer {
 				
 				if (begin != -1 && end != -1) {
 					title = html.substring(begin, end);
-					title = filterEscapeChars(title);
+					title = filterEscapeChars(title).trim();
 				}
 			//Rumble
-			} else if(urlStr.startsWith(RUMBLE_PREFIX)) {
+			} else if (urlStr.startsWith(RUMBLE_PREFIX)) {
 				String prefix = "title=\"";
 				String suffix = "\" type";
 				int begin = html.indexOf(prefix) + prefix.length();
@@ -182,10 +222,20 @@ public class MetadataObtainer {
 					title = html.substring(begin, end);
 					title = filterEscapeChars(title);
 				}
+			//Podbean
+			} else if (urlStr.startsWith(PODBEAN_PREFIX) || urlStr.contains(PODBEAN_TOKEN)) {
+				String prefix = "<title>";
+				String suffix = "</title>";
+				int begin = html.indexOf(prefix) + prefix.length();
+				int end = html.indexOf(suffix, begin);
+				
+				if (begin != -1 && end != -1) {
+					title = html.substring(begin, end);
+				}
 			}
 		}
 		
-		if(title.length() > 125) {
+		if (title.length() > MAX_LEN_TITLE) {
 			title = urlStr;
 		}
 		
@@ -195,75 +245,90 @@ public class MetadataObtainer {
 	public String getChannel() {
 		String channel = "";
 		
-		if(!isUrlError()) {
+		if (!isUrlError()) {
 			//YouTube
-			if(urlStr.startsWith(YOUTUBE_PREFIX) || urlStr.startsWith(YOUTUBE_PREFIX_W) || urlStr.startsWith(YOUTUBE_PREFIX_ABBR)) {
+			if (urlStr.startsWith(YOUTUBE_PREFIX) || urlStr.startsWith(YOUTUBE_PREFIX_W) || urlStr.startsWith(YOUTUBE_PREFIX_ABBR) || urlStr.contains(YOUTUBE_SHORT_TOKEN)) {
 				String prefix = "{\"label\":\"Subscribe to ";
 				String suffix = ".\"}},";
 				int begin = html.indexOf(prefix) + prefix.length();
 				int end = html.indexOf(suffix, begin);
-				
-				if(begin == -1 || end == -1) {
+
+				if (begin == -1 || end == -1) {
 					prefix = "<link itemprop=\"url\" href=\"http://www.youtube.com/channel";
 					suffix = "\">";
 					begin = html.indexOf(prefix) + prefix.length();
-					
+
 					prefix = "\"><link itemprop=\"name\" content=\"";
 					begin = html.indexOf(prefix) + prefix.length();
 					end = html.indexOf(suffix, begin);
 				}
-				
-				if(begin == -1 || end == -1) {
+
+				if (begin == -1 || end == -1) {
 					prefix = "\"title\":{\"simpleText\":\"Mix - ";
 					suffix = "\"}";
 					begin = html.indexOf(prefix) + prefix.length();
 					end = html.indexOf(suffix, begin);
 				}
-				
+
 				channel = html.substring(begin, end);
 				channel = filterEscapeChars(channel);
-				
+
 				channel += " on YouTube";
-			//Twitch
-			} else if(urlStr.startsWith(TWITCH_PREFIX_MOB)) {
-				String prefix = "<title>";
-				String suffix = "</title>";
+			} else if (urlStr.contains(YOUTUBE_PLAYLIST_TOKEN)) {
+				String prefix = "\"shortBylineText\":{\"runs\":[{\"text\":\"";
+				String suffix = "\",";
 				int begin = html.indexOf(prefix) + prefix.length();
 				int end = html.indexOf(suffix, begin);
-				
+
 				if (begin != -1 && end != -1) {
 					channel = html.substring(begin, end);
 					channel = filterEscapeChars(channel);
 				}
 				
-				//channel is second part
-				String[] strArr = channel.split(" - ");
-				
-				if(strArr.length >= 2) {
-					channel = strArr[1];
-				}
-				
-				//This is already contained in the title on Twitch
-//				channel += " on Twitch";
-			//Vimeo
-			} else if(urlStr.startsWith(VIMEO_PREFIX)) {
-				String prefix = "<span class=\"userlink userlink--md\">";
-				String suffix = "</a>";
-				String htmlSubstr = html.substring(html.indexOf(prefix) + prefix.length());
-				
-				prefix = "\">";
-				
-				int begin = htmlSubstr.indexOf(prefix) + prefix.length();
-				int end = htmlSubstr.indexOf(suffix, begin);
+				channel += " on YouTube";
+			} else if (urlStr.startsWith(YOUTUBE_CHAN_TOKEN_W)) {
+				channel = getTitle() + " on YouTube";
+			//Twitch
+			} else if (urlStr.startsWith(TWITCH_PREFIX_MOB)) {
+				String prefix = "name=\"description\"/><meta name=\"title\" content=\"";
+				String suffix = " on Twitch\"/><meta ";
+				int begin = html.indexOf(prefix) + prefix.length();
+				int end = html.indexOf(suffix, begin);
 				
 				if (begin != -1 && end != -1) {
-					channel = htmlSubstr.substring(begin, end);
-					channel = filterEscapeChars(channel);
+					channel = html.substring(begin, end);
+					//using lastIndexOf doesn't work because reasons...
+					begin = end - 2;
+
+					if (begin != -1 && end != -1) {
+						while (html.substring(begin, begin + 3).equals(" - ") == false) {
+							begin--;
+						}
+
+						begin += 3;
+						channel = html.substring(begin, end);
+						channel = filterEscapeChars(channel);
+					}
 				}
 				
-				channel += " on Vimeo";
+				if (channel.trim().equals("")) {
+					prefix = "<meta property=\"og:type\" content=\"video.other\"/><meta content=\"";
+					suffix = " went live on Twitch.";
+					begin = html.indexOf(prefix) + prefix.length();
+					end = html.indexOf(suffix, begin);
+					
+					if (begin != -1 && end != -1) {
+						channel = html.substring(begin, end);
+						channel = filterEscapeChars(channel);
+					}
+				}
+				
+				channel += " on Twitch";
+			//Vimeo
+			} else if (urlStr.startsWith(VIMEO_PREFIX)) {
+				channel += "On Vimeo"; //Channel/user name is rendered via JavaScript
 			//Odysee
-			} else if(urlStr.startsWith(ODYSEE_PREFIX)) {
+			} else if (urlStr.startsWith(ODYSEE_PREFIX)) {
 				if (urlStr.contains("@")) {
 					String prefix = "@";
 					String suffix = ":";
@@ -285,42 +350,31 @@ public class MetadataObtainer {
 						channel = filterEscapeChars(channel);
 					}
 					
-					if(!channel.contains("@") || channel.length() > 150) {
+					if (!channel.contains("@") || channel.length() > 150) {
 						channel = "Anonymous";
 					}
 				}
 
 				channel += " on Odysee";
 			//Dailymotion
-			} else if(urlStr.startsWith(DAILYMOTION_PREFIX) || urlStr.startsWith(DAILYMOTION_PREFIX_W)
+			} else if (urlStr.startsWith(DAILYMOTION_PREFIX) || urlStr.startsWith(DAILYMOTION_PREFIX_W)
 					|| urlStr.startsWith(DAILYMOTION_PREFIX_MOB)) {
 				
-				String prefix = "<meta property=\"video:director\" content=\"https://www.dailymotion.com/";
-				String suffix = "\"  />";
-				int begin = html.indexOf(prefix) + prefix.length();
+				String prefix = "channel\":\"";
+				String suffix = "\"";
+				int begin = html.lastIndexOf(prefix) + prefix.length();
 				int end = html.indexOf(suffix, begin);
-				
+
 				if (begin != -1 && end != -1) {
 					channel = html.substring(begin, end);
-					channel = filterEscapeChars(channel);
 				}
 				
 				channel += " on Dailymotion";
 			//Bitchute
-			} else if(urlStr.startsWith(BITCHUTE_PREFIX) || urlStr.startsWith(BITCHUTE_PREFIX_W)) {
-				String prefix = "<a href=\"/channel/";
-				String suffix = "/";
-				int begin = html.indexOf(prefix) + prefix.length();
-				int end = html.indexOf(suffix, begin);
-				
-				if (begin != -1 && end != -1) {
-					channel = html.substring(begin, end);
-					channel = filterEscapeChars(channel);
-				}
-				
-				channel += " on BITCHUTE";
+			} else if (urlStr.startsWith(BITCHUTE_PREFIX) || urlStr.startsWith(BITCHUTE_PREFIX_W)) {
+				channel = "On BITCHUTE";
 			//Rumble
-			} else if(urlStr.startsWith(RUMBLE_PREFIX)) {
+			} else if (urlStr.startsWith(RUMBLE_PREFIX)) {
 				String prefix = "data-title=\"";
 				String suffix = "\"";
 				int begin = html.indexOf(prefix) + prefix.length();
@@ -332,10 +386,33 @@ public class MetadataObtainer {
 				}
 				
 				channel += " on Rumble";
+			//Podbean
+			} else if (urlStr.contains(PODBEAN_TOKEN)) {
+				String prefix = "://";
+				String suffix = ".podbean";
+				int begin = urlStr.indexOf(prefix) + prefix.length();
+				int end = urlStr.indexOf(suffix, begin);
+				
+				if (begin != -1 && end != -1) {
+					channel = urlStr.substring(begin, end);
+				}
+				
+				channel += " on PodBean";
+			} else if (urlStr.startsWith(PODBEAN_PREFIX)) {
+				String prefix = "://podcast.";
+				String suffix = ".com";
+				int begin = urlStr.indexOf(prefix) + prefix.length();
+				int end = urlStr.indexOf(suffix, begin);
+				
+				if (begin != -1 && end != -1) {
+					channel = urlStr.substring(begin, end);
+				}
+				
+				channel += " on PodBean";
 			}
 		}
 		
-		if(channel.length() > 75) {
+		if (channel.length() > 75) {
 			channel = "";
 		}
 		
@@ -345,9 +422,9 @@ public class MetadataObtainer {
 	public String getDate() {
 		String date = "";
 		
-		if(!isUrlError()) {
+		if (!isUrlError()) {
 			//YouTube
-			if(urlStr.startsWith(YOUTUBE_PREFIX) || urlStr.startsWith(YOUTUBE_PREFIX_W) || urlStr.startsWith(YOUTUBE_PREFIX_ABBR)) {
+			if (urlStr.startsWith(YOUTUBE_PREFIX) || urlStr.startsWith(YOUTUBE_PREFIX_W) || urlStr.startsWith(YOUTUBE_PREFIX_ABBR)) {
 				String prefix = "\"dateText\":{\"simpleText\":\"";
 				String suffix = "\"}";
 				int begin = html.indexOf(prefix) + prefix.length();
@@ -356,22 +433,81 @@ public class MetadataObtainer {
 				if (begin != -1 && end != -1) {
 					date = html.substring(begin, end);
 				}
-			//Vimeo
-			} else if(urlStr.startsWith(VIMEO_PREFIX)) {
-				String prefix = "<span class=\"clip_info-time\"><time datetime=\"";
-				String suffix = "\">";
-				String htmlSubstr = html.substring(html.indexOf(prefix) + prefix.length());
-				
-				prefix = "\" title=\"";
-				
-				int begin = htmlSubstr.indexOf(prefix) + prefix.length();
-				int end = htmlSubstr.indexOf(suffix, begin);
+			} else if (urlStr.contains(YOUTUBE_PLAYLIST_TOKEN)) {
+				date = "[playlist]";
+			} else if (urlStr.contains(YOUTUBE_SHORT_TOKEN)) {
+				String prefix = "\"publishDate\":{\"simpleText\":\"";
+				String suffix = "\"},\"";
+				int begin = html.indexOf(prefix) + prefix.length();
+				int end = html.indexOf(suffix, begin);
 				
 				if (begin != -1 && end != -1) {
-					date = htmlSubstr.substring(begin, end);
+					date = html.substring(begin, end);
+				}
+			} else if (urlStr.startsWith(YOUTUBE_CHAN_TOKEN_W)) {
+				String prefix = "\"";
+				String suffix = "subscribers\"}";
+				int end = html.indexOf(suffix);
+				int begin = end;
+				boolean foundBegin = false;
+				
+				for (int i = 0; i < 25; i++) {
+					if (html.charAt(--begin) == prefix.toCharArray()[0]) {
+						foundBegin = true;
+						begin++;
+						break;
+					}
+				}
+				
+				if (foundBegin) {
+					date = html.substring(begin, end);
+					date += "Subscribers";
+					
+					suffix = "videos\",\"styleRuns\"";
+					end = html.indexOf(suffix, begin);
+					begin = end;
+					foundBegin = false;
+					
+					for (int i = 0; i < 25; i++) {
+						if (html.charAt(--begin) == '"') {
+							foundBegin = true;
+							begin++;
+							break;
+						}
+					}
+					
+					if (foundBegin) {
+						date += " ~ " + html.substring(begin, end);
+						date += "Videos";
+					}
+				}
+			//Vimeo
+			} else if (urlStr.startsWith(VIMEO_PREFIX)) {
+				String prefix = "<meta property=\"og:updated_time\" content=\"";
+				String suffix = "\">";
+				String htmlSubstr = "";
+				int begin = html.indexOf(prefix) + prefix.length();
+				int end = html.indexOf(suffix, begin);
+				
+				if (begin != -1 && end != -1) {
+					date = html.substring(begin, end);
+					date = date.substring(0, date.indexOf("T"));
+				} else {
+					prefix = "<span class=\"clip_info-time\"><time datetime=\"";
+					
+					htmlSubstr = html.substring(html.indexOf(prefix) + prefix.length());
+					
+					prefix = "\" title=\"";
+					
+					begin = htmlSubstr.indexOf(prefix) + prefix.length();
+					end = htmlSubstr.indexOf(suffix, begin);
+					
+					if (begin != -1 && end != -1) {
+						date = html.substring(begin, end);
+					}
 				}
 			//Odysee
-			} else if(urlStr.startsWith(ODYSEE_PREFIX)) {
+			} else if (urlStr.startsWith(ODYSEE_PREFIX)) {
 				String prefix = "\"uploadDate\": \"";
 				String suffix = "\",";
 				int begin = html.indexOf(prefix) + prefix.length();
@@ -386,47 +522,47 @@ public class MetadataObtainer {
 				date = date.replaceAll("Eastern Daylight Time", "EDT");
 				date = date.replaceAll("Eastern Standard Time", "EST");
 			//Dailymotion
-			} else if(urlStr.startsWith(DAILYMOTION_PREFIX) || urlStr.startsWith(DAILYMOTION_PREFIX_W)
+			} else if (urlStr.startsWith(DAILYMOTION_PREFIX) || urlStr.startsWith(DAILYMOTION_PREFIX_W)
 					|| urlStr.startsWith(DAILYMOTION_PREFIX_MOB)) {
 				
-				String prefix = "<meta property=\"video:release_date\" content=\"";
-				String suffix = "T";
+				String prefix = "\"created_time\":";
+				String suffix = ",\"";
 				int begin = html.indexOf(prefix) + prefix.length();
 				int end = html.indexOf(suffix, begin);
 				
 				if (begin != -1 && end != -1) {
 					date = html.substring(begin, end);
+					date = parseUnixDateAndTime(date);
 				}
 			//Bitchute
-			} else if(urlStr.startsWith(BITCHUTE_PREFIX) || urlStr.startsWith(BITCHUTE_PREFIX_W)) {
-				String prefix = "<div class=\"video-publish-date\">";
-				String suffix = "</div>";
-				int begin = html.indexOf(prefix) + prefix.length();
-				int end = html.indexOf(suffix, begin);
-				
-				if (begin != -1 && end != -1) {
-					date = html.substring(begin, end);
-					date = date.replaceAll("\n", "");
-				}
-				//Rumble
-			} else if(urlStr.startsWith(RUMBLE_PREFIX)) {
-				final String STREAM_INDICATOR = "<div class=\"streamed-on\">";
+			} else if (urlStr.startsWith(BITCHUTE_PREFIX) || urlStr.startsWith(BITCHUTE_PREFIX_W)) {
+				date = "--";
+			//Rumble
+			} else if (urlStr.startsWith(RUMBLE_PREFIX)) {
+				final String STREAMED_INDICATOR = "</clipPath></svg>			Streamed on:			<time datetime=\"";
+				final String STREAMING_INDICATOR = "/clipPath></svg>				Streaming now\n"
+						+ "									</div>";
 				
 				//Stream on Rumble have the date located in a different tag
-				if (html.contains(STREAM_INDICATOR)) {
-					String prefix = ">";
-					String suffix = "</time>";
-					int begin = html.indexOf(STREAM_INDICATOR) + STREAM_INDICATOR.length();
-					String htmlTrimmed = html.substring(begin);
-
-					begin = htmlTrimmed.indexOf(prefix) + 1;
-					int end = htmlTrimmed.indexOf(suffix, begin);
+				if (html.contains(STREAMED_INDICATOR)) {
+					String prefix = STREAMED_INDICATOR;
+					String suffix = "\"";
+					int begin = html.indexOf(prefix) + prefix.length();
+					int end = html.indexOf(suffix, begin);
 
 					if (begin != -1 && end != -1) {
-						date = "Streamed on " + htmlTrimmed.substring(begin, end).trim();
+						date = html.substring(begin, end);
+						date = date.replaceAll("\n", "");
+						
+						//format: 2024-09-21T02:55:15+00:00
+						date = date.substring(0, 10) + " " + date.substring(11, 19);
+						
+						date = "Streamed on " + date;
 					}
+				} else if (html.contains(STREAMING_INDICATOR)) {
+					date = "Streaming Now";
 				} else {
-					String prefix = "<div class=\"media-published\" title=\"";
+					String prefix = "</clipPath></svg>							<div title=\"";
 					String suffix = "\">";
 					int begin = html.indexOf(prefix) + prefix.length();
 					int end = html.indexOf(suffix, begin);
@@ -436,28 +572,20 @@ public class MetadataObtainer {
 						date = date.replaceAll("\n", "");
 					}
 				}
-			}
-			/*//Twitch
-			} else if(urlStr.startsWith(TWITCH_PREFIX_MOB)) {
-				String find = " days ago";
-				int index = html.indexOf(find);
+			//Podbean
+			} else if (urlStr.startsWith(PODBEAN_PREFIX) || urlStr.contains(PODBEAN_TOKEN)) {
+				String prefix = "class=\"episode-date\">";
+				String suffix = "</span>";
+				int begin = html.indexOf(prefix) + prefix.length();
+				int end = html.indexOf(suffix, begin);
 				
-				if(index != -1) {
-					String dateStr = html.substring(index-10, index);
-					String prefix = "-->";
-
-					int begin = dateStr.indexOf(prefix) + prefix.length();
-
-					//number of days ago
-					dateStr = dateStr.substring(begin);
-
-					date = dateStr + " days ago";
-					date = determineDateOnTwitch(date);
+				if (begin != -1 && end != -1) {
+					date = html.substring(begin, end);
 				}
-			}*/
+			}
 		}
 		
-		if(date.length() > 100) {
+		if (date.length() > 100) {
 			date = "";
 		}
 		
@@ -468,9 +596,9 @@ public class MetadataObtainer {
 		String time = "";
 		int seconds = 0;
 		
-		if(!isUrlError()) {
+		if (!isUrlError()) {
 			//YouTube
-			if(urlStr.startsWith(YOUTUBE_PREFIX) || urlStr.startsWith(YOUTUBE_PREFIX_W) || urlStr.startsWith(YOUTUBE_PREFIX_ABBR)) {
+			if (urlStr.startsWith(YOUTUBE_PREFIX) || urlStr.startsWith(YOUTUBE_PREFIX_W) || urlStr.startsWith(YOUTUBE_PREFIX_ABBR) || urlStr.contains(YOUTUBE_SHORT_TOKEN)) {
 				//get URL for the embedded YouTube video
 				String prefix = "<meta property=\"og:video:url\" content=\"";
 				String suffix = "\">";
@@ -502,8 +630,12 @@ public class MetadataObtainer {
 				if (atTime.isPresent()) {
 					time += " (in progress " + convertSecondsToTimeStr(Integer.parseInt(atTime.get())) + ")";
 				}
+				
+				if (urlStr.contains(YOUTUBE_SHORT_TOKEN)) {
+					time += " (Short)";
+				}
 			//Odysee and Twitch (not 100% Reliable for Twitch)
-			} else if(urlStr.startsWith(ODYSEE_PREFIX) || urlStr.startsWith(TWITCH_PREFIX_MOB)) {
+			} else if (urlStr.startsWith(ODYSEE_PREFIX) || urlStr.startsWith(TWITCH_PREFIX_MOB)) {
 				String prefix = "<meta property=\"og:video:duration\" content=\"";
 				String suffix = "\"/";
 				int begin = html.indexOf(prefix) + prefix.length();
@@ -540,13 +672,55 @@ public class MetadataObtainer {
 			} else if (urlStr.startsWith(VIMEO_PREFIX)) {
 				final String TIME_Q_PARAM = "#t=";
 				
-				if(urlStr.contains(TIME_Q_PARAM)) {
+				if (urlStr.contains(TIME_Q_PARAM)) {
 					time = urlStr.substring(urlStr.indexOf(TIME_Q_PARAM) + TIME_Q_PARAM.length(), urlStr.lastIndexOf("s"));
 					
 					try {
 						time = " In progress at " + convertSecondsToTimeStr(Integer.parseInt(time));
 					} catch(Exception e) {
 						time = "Video is in progress.";
+					}
+				}
+			//DailyMotion
+			} else if (urlStr.startsWith(DAILYMOTION_PREFIX) || urlStr.startsWith(DAILYMOTION_PREFIX_W)
+					|| urlStr.startsWith(DAILYMOTION_PREFIX_MOB)) {
+				
+				String prefix = "\"duration\":";
+				String suffix = "}";
+				int begin = html.indexOf(prefix) + prefix.length();
+				int end = html.indexOf(suffix, begin);
+
+				if (begin != -1 && end != -1) {
+					try {
+						time = html.substring(begin, end);
+						seconds = Integer.parseInt(time);
+					} catch (Exception e) {
+						seconds = -1;
+					}
+
+					if (seconds > -1) {
+						time = convertSecondsToTimeStr(seconds);
+					}
+				}
+			//Podbean
+			} else if (urlStr.startsWith(PODBEAN_PREFIX) || urlStr.contains(PODBEAN_TOKEN)) {
+				String prefix = "duration\\\":";
+				String suffix = ",";
+				int begin = html.indexOf(prefix) + prefix.length();
+				int end = html.indexOf(suffix, begin);
+				
+				if (begin != -1 && end != -1) {
+					time = html.substring(begin, end);
+					
+					try {
+						time = html.substring(begin, end);
+						seconds = Integer.parseInt(time);
+					} catch (Exception e) {
+						seconds = -1;
+					}
+
+					if (seconds > -1) {
+						time = convertSecondsToTimeStr(seconds);
 					}
 				}
 			}
@@ -586,7 +760,11 @@ public class MetadataObtainer {
 
 				time += seconds;
 			} else {
-				time = "0:" + seconds;
+				if (seconds >= 10) {
+					time = "00:" + seconds;
+				} else {
+					time = "00:0" + seconds;
+				}
 			}
 		}
 		
@@ -595,14 +773,37 @@ public class MetadataObtainer {
 	
 	private static String fetchHtml(String url) {
 		String content = null;
-		URLConnection connection = null;
+		HttpURLConnection connection = null;
 		
 		try {
-			connection =  new URL(url).openConnection();
+			//Daily Motion has a public API for getting title, date, and channel. The DOM of the actual web page only renders these in JavaScript.
+			if (url.startsWith(DAILYMOTION_PREFIX) || url.startsWith(DAILYMOTION_PREFIX_MOB) || url.startsWith(DAILYMOTION_PREFIX_W)) {
+				if (url.contains("?")) {
+					url = url.substring(0, url.indexOf("?"));
+				} else if (url.contains("&")) {
+					url = url.substring(0, url.indexOf("&"));
+				}
+				
+				url = "https://api.dailymotion.com/" + url.substring(url.indexOf("video")) + "?fields=title,created_time,channel,duration";
+			}
+			
+			connection =  (HttpURLConnection) new URL(url).openConnection();
+			
+			//This user agent screws up YouTube for some reason.
+			if (!url.startsWith(YOUTUBE_PREFIX) && !url.startsWith(YOUTUBE_PREFIX_ABBR) && !url.startsWith(YOUTUBE_PREFIX_W)
+					&& !url.contains(YOUTUBE_PLAYLIST_TOKEN) && !url.contains(YOUTUBE_SHORT_TOKEN)) {
+				connection.setRequestProperty("User-Agent", "Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10.4; en-US; rv:1.9.2.2) Gecko/20100316 Firefox/3.6.2");
+//				connection.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36");
+			} 
+			
 			Scanner scanner = new Scanner(connection.getInputStream());
 			scanner.useDelimiter("\\Z");
 			content = scanner.next();
 			scanner.close();
+			
+			if (connection.getResponseCode() != 200) {
+				System.out.println("HTTP Response for " + url + ": " + connection.getResponseCode() + " " + connection.getResponseMessage());
+			}
 		} catch (Exception e) {
 			String message = "";
 			
@@ -612,7 +813,7 @@ public class MetadataObtainer {
 				
 		    content = FETCH_ERROR_PREFIX + e.toString() + message;
 		}
-
+		
 		return content;
 	}
 	
@@ -620,50 +821,183 @@ public class MetadataObtainer {
 		String sanitized = urlStr;
 		
 		//https fix
-		if(sanitized.startsWith("http") && !sanitized.startsWith("https")) {
+		if (sanitized.startsWith("http") && !sanitized.startsWith("https")) {
 			sanitized = sanitized.replaceFirst("http", "https");
-		} else if(!sanitized.startsWith("http")) {
+		} else if (!sanitized.startsWith("http")) {
 			sanitized = "https://" + urlStr;
 		}
 
 		//YouTube
-		if(sanitized.startsWith(YOUTUBE_PREFIX) || sanitized.startsWith(YOUTUBE_PREFIX_W) 
-		   || sanitized.startsWith(YOUTUBE_PREFIX_ABBR)) {
-			
-			sanitized = sanitizeYoutube(sanitized);
+		if (sanitized.startsWith(YOUTUBE_PREFIX) || sanitized.startsWith(YOUTUBE_PREFIX_W) || sanitized.startsWith(YOUTUBE_PREFIX_ABBR) 
+				|| sanitized.contains(YOUTUBE_PLAYLIST_TOKEN) || sanitized.contains(YOUTUBE_LIVE_TOKEN) || sanitized.contains(YOUTUBE_LIVE_TOKEN_W)) {
+
+			sanitized = sanitizeYoutube(sanitized, false);
 		//Twitch
-		} else if(sanitized.startsWith(TWITCH_PREFIX_W) || sanitized.startsWith(TWITCH_PREFIX_MOB) || sanitized.startsWith(ODYSEE_PREFIX)) {
+		} else if (sanitized.startsWith(TWITCH_PREFIX_W) || sanitized.startsWith(TWITCH_PREFIX_MOB) || sanitized.startsWith(ODYSEE_PREFIX)) {
 			sanitized = sanitizeTwitchAndOdysee(sanitized);
 		}
 		
 		return sanitized;
 	}
 	
-	private String sanitizeYoutube(String urlStr) {
+	/*
+	 * Remove unwanted metadata from URL to store in DB file. Currently will only support YouTube as of 9/21/24.
+	 */
+	public Optional<String> sanitizeForStorage(String url) {
+		Optional<String> sanitized = Optional.empty();
+		
+		//YouTube
+		if (url.startsWith(YOUTUBE_PREFIX) || url.startsWith(YOUTUBE_PREFIX_W) || url.startsWith(YOUTUBE_PREFIX_ABBR) || url.contains(YOUTUBE_PLAYLIST_TOKEN)) {
+			sanitized = Optional.of(sanitizeYoutube(url, true));
+		}
+		
+		return sanitized;
+	}
+	
+	/*
+	 * TODO: This method does not account for the possibility of "?" or "&" being in the value itself
+	 */
+	private Optional<String> findEndOfArgKeyValuePair(String url, String param) {
+		Optional<String> restOfUrl = Optional.empty();
+		String temp = "";
+		int paramLoc = -1;
+		int nextIndexQuery = -1;
+		int nextIndexParam = -1;
+		int endOfKeyValuePair = -1;
+
+		paramLoc = url.indexOf(param) + 1;
+
+		if (paramLoc > 0) {
+			temp = url.substring(paramLoc);
+			nextIndexQuery = temp.indexOf("?");
+			nextIndexParam = temp.indexOf("&");
+
+			if (nextIndexQuery > 0 || nextIndexParam > 0) {
+				if (nextIndexParam > 0 && ((nextIndexQuery > 0 && nextIndexParam < nextIndexQuery) || nextIndexQuery <= 0)) {
+					endOfKeyValuePair = nextIndexParam;
+				} else {
+					endOfKeyValuePair = nextIndexQuery;
+				}
+			}
+			
+			if (endOfKeyValuePair > -1) {
+				restOfUrl = Optional.of(temp.substring(endOfKeyValuePair));
+			}
+		}
+
+		return restOfUrl;
+	}
+	
+	/*
+	 * boolean keepCritialData : useful for wanting to keep time param, but get rid of preview & list data, for example
+	 */
+	private String sanitizeYoutube(String urlStr, boolean keepCritialData) {
+		final String TIME_PARAM_1 = "&t=";
+		final String TIME_PARAM_2 = "?t=";
+		final String LIST_PARAM_1 = "&list=";
+		final String LIST_PARAM_2 = "?list=";
+		final String INDX_PARAM_1 = "&index=";
+		final String INDX_PARAM_2 = "&index=";
+		final String DIS_POLY_PARAM = "&disable_polymer=1";
+		final String PIC_PREVIEW_PARAM = "&pp=";
 		String sanitized = urlStr;
 		
 		//convert to non-abbreviated link
-		if(urlStr.startsWith(YOUTUBE_PREFIX_ABBR)) {
+		if (sanitized.startsWith(YOUTUBE_PREFIX_ABBR)) {
 			sanitized = YOUTUBE_PREFIX_W + sanitized.substring(YOUTUBE_PREFIX_ABBR.length());
 		}
 		
-		//remove playlist data
-		if(urlStr.contains("&list=")) {
-			sanitized = sanitized.substring(0, sanitized.indexOf("&list="));
+		if (sanitized.startsWith(YOUTUBE_LIVE_TOKEN)) {
+			sanitized = YOUTUBE_PREFIX_W + sanitized.substring(YOUTUBE_LIVE_TOKEN.length());
+		} else if (sanitized.startsWith(YOUTUBE_LIVE_TOKEN_W)) {
+			sanitized = YOUTUBE_PREFIX_W + sanitized.substring(YOUTUBE_LIVE_TOKEN_W.length());
+		}
+		
+		//remove playlist data if individual video was navigated to from a playlist but is not a playlist link itself
+		if (sanitized.contains(YOUTUBE_PLAYLIST_TOKEN) == false) {
+			Optional<String> restOfUrl;
+			
+			if (sanitized.contains(LIST_PARAM_1)) {
+				restOfUrl = findEndOfArgKeyValuePair(sanitized, LIST_PARAM_1);
+				
+				if (restOfUrl.isPresent()) {
+					sanitized = sanitized.substring(0, sanitized.indexOf(LIST_PARAM_1)) + restOfUrl.get();
+				} else {
+					sanitized = sanitized.substring(0, sanitized.indexOf(LIST_PARAM_1));
+				}
+			} else if (sanitized.contains(LIST_PARAM_2)) {
+				restOfUrl = findEndOfArgKeyValuePair(sanitized, LIST_PARAM_2);
+
+				if (restOfUrl.isPresent()) {
+					sanitized = sanitized.substring(0, sanitized.indexOf(LIST_PARAM_2)) + restOfUrl.get();
+				} else {
+					sanitized = sanitized.substring(0, sanitized.indexOf(LIST_PARAM_2));
+				}
+			}
+			
+			if (sanitized.contains(INDX_PARAM_1)) {
+				restOfUrl = findEndOfArgKeyValuePair(sanitized, INDX_PARAM_1);
+				
+				if (restOfUrl.isPresent()) {
+					sanitized = sanitized.substring(0, sanitized.indexOf(INDX_PARAM_1)) + restOfUrl.get();
+				} else {
+					sanitized = sanitized.substring(0, sanitized.indexOf(INDX_PARAM_1));
+				}
+			} else if (sanitized.contains(INDX_PARAM_2)) {
+				restOfUrl = findEndOfArgKeyValuePair(sanitized, INDX_PARAM_2);
+
+				if (restOfUrl.isPresent()) {
+					sanitized = sanitized.substring(0, sanitized.indexOf(INDX_PARAM_2)) + restOfUrl.get();
+				} else {
+					sanitized = sanitized.substring(0, sanitized.indexOf(INDX_PARAM_2));
+				}
+			}
 		}
 		
 		//remove polymer disable
-		if(urlStr.contains("&disable_polymer=1")) {
-			sanitized = sanitized.replaceAll("&disable_polymer=1", "");
+		if (sanitized.contains(DIS_POLY_PARAM)) {
+			sanitized = sanitized.replaceAll(DIS_POLY_PARAM, "");
 		}
 		
-		//remove time tags
-		if(urlStr.contains("&t=")) {
-			this.atTime = Optional.of(sanitized.substring(sanitized.indexOf("&t=") + 3));
-			sanitized = sanitized.substring(0, sanitized.indexOf("&t="));
-		} else if(urlStr.contains("?t=")) {
-			this.atTime = Optional.of(sanitized.substring(sanitized.indexOf("?t=") + 3));
-			sanitized = sanitized.substring(0, sanitized.indexOf("?t="));
+		//remove picture preview param
+		if (sanitized.contains(PIC_PREVIEW_PARAM)) {
+			int picPreParamInd = sanitized.indexOf(PIC_PREVIEW_PARAM);
+			String trailingStr = sanitized.substring(picPreParamInd);
+			
+			//keep other query parameters in case they're start time or something else useful.
+			if (trailingStr.contains("?") || trailingStr.substring(1).contains("&")) {
+				//determine the innermost parameter beginning
+				int questionInd = trailingStr.indexOf("?", 1);
+				int ampersandInd = trailingStr.indexOf("&", 1);
+				
+				//if str is not present, set largest to give appearance of being outermost.
+				questionInd = questionInd == -1 ? trailingStr.length() : questionInd;
+				ampersandInd = ampersandInd == -1 ? trailingStr.length() : ampersandInd;
+				
+				if (questionInd < ampersandInd) {
+					sanitized = sanitized.substring(0, picPreParamInd) + trailingStr.substring(questionInd);
+				} else if (ampersandInd < questionInd) {
+					sanitized = sanitized.substring(0, picPreParamInd) + trailingStr.substring(ampersandInd);
+				} else {
+					//TODO: Should never be able to make it into this block. Remove in the future once stress testing is complete. -DJM 1/9/24 
+					System.err.println("ERROR: Logic for determining whether to split string at \"?\" or \"&\" is not sound.");
+				}
+			} else {
+				sanitized = sanitized.substring(0, picPreParamInd);
+			}
+		}
+		
+		//Oddly YouTube provides links with the progress time stamp, yet when going to them in the browser, it chops the timestamp off
+		//and redirects to the regular URL when using the question mark. This began happening recently, but using the ampersand seems to
+		//work fine, so we're subbing it in here on our end. -9/30/24
+		sanitized = sanitized.replace(TIME_PARAM_2, TIME_PARAM_1);
+		
+		if (keepCritialData == false) {
+			//remove time tags
+			if (sanitized.contains(TIME_PARAM_1)) {
+				this.atTime = Optional.of(sanitized.substring(sanitized.indexOf(TIME_PARAM_1) + TIME_PARAM_1.length()));
+				sanitized = sanitized.substring(0, sanitized.indexOf(TIME_PARAM_1));
+			} 
 		}
 		
 		return sanitized;
@@ -673,16 +1007,16 @@ public class MetadataObtainer {
 		final String TIME_Q_PARAM = "?t=";
 		String sanitized = urlStr;
 		
-		//normal twitch video id i.e. https://www.twitch.tv/videos/997396590
+		//normal twitch video id e.g. https://www.twitch.tv/videos/997396590
 		//must convert to mobile to get data
-		if(urlStr.startsWith(TWITCH_PREFIX_W)) {
+		if (urlStr.startsWith(TWITCH_PREFIX_W)) {
 			sanitized = urlStr.replaceFirst(TWITCH_PREFIX_W, TWITCH_PREFIX_MOB);
-			
-			if(sanitized.contains(TIME_Q_PARAM)) {
+
+			if (sanitized.contains(TIME_Q_PARAM)) {
 				atTime = Optional.of(sanitized.substring(sanitized.indexOf(TIME_Q_PARAM) + TIME_Q_PARAM.length(), sanitized.lastIndexOf("s") + 1));
 			}
-		} else if(urlStr.contains(ODYSEE_PREFIX)) {
-			if(urlStr.contains(TIME_Q_PARAM)) {
+		} else if (urlStr.contains(ODYSEE_PREFIX)) {
+			if (urlStr.contains(TIME_Q_PARAM)) {
 				atTime = Optional.of(sanitized.substring(sanitized.indexOf(TIME_Q_PARAM) + TIME_Q_PARAM.length()));
 			}
 		}
@@ -701,6 +1035,18 @@ public class MetadataObtainer {
 		filtered = filtered.replaceAll("&#039;", "'");
 		
 		return filtered;
+	}
+	
+	private static String parseUnixDateAndTime(String unixTime) {
+        long milliseconds = Long.parseLong(unixTime) * 1000;
+        Instant instant = Instant.ofEpochMilli(milliseconds);
+//        LocalDateTime utcDateTime = LocalDateTime.ofInstant(instant, ZoneId.of("UTC"));
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM-dd-yyyy");
+//        String formattedDate = utcDateTime.format(formatter);
+        LocalDateTime localDateTime = LocalDateTime.ofInstant(instant, ZoneId.of("America/New_York"));
+        String formattedLocalDate = localDateTime.format(formatter);
+        
+        return formattedLocalDate;
 	}
 	
 	//This method does not work reliably.
