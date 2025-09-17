@@ -1,0 +1,5 @@
+VIDEO KEEPER CHANGE LOG -- VERSION 3.0b2
+
+BUG FIX: Only reading/writing to the props file at a max of every 6.5 seconds instead of every 30 ms to save wear on SSDs.
+
+-Made the current index of the video watch list persistent in order to pick up where you left off between closing and opening program.

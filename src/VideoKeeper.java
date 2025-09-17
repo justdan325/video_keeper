@@ -33,6 +33,9 @@ public class VideoKeeper {
 		model.setVideoList(Optional.of(vidNodeList));
 		
 		populateList();
+		
+		vidNodeList.setIndex(model.getCurrIndex());
+		
 		monitor();
 	}
 	
@@ -513,6 +516,8 @@ public class VideoKeeper {
 						populateList();
 						model.setVideoList(Optional.of(vidNodeList));
 					}
+					
+					model.setCurrIndex(vidNodeList.getIndex());
 					
 					try {
 						Thread.sleep(30);

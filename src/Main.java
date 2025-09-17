@@ -15,6 +15,7 @@ public class Main {
 	private static final String PROP_KEY_HNDL_LNKS		= "handleLinks";
 	private static final String PROP_KEY_PREV_HNDL_LNKS	= "prevHandleLinks";
 	private static final String PROP_KEY_SRCH_OPTS		= "searchOptions";
+	private static final String PROP_KEY_CURR_INDX		= "currentIndex";
 	private static final String PROP_FILE				= "videokeeper.properties";
 	
 	private PropsFileUtil props;
@@ -74,6 +75,7 @@ public class Main {
 		String handleLinks = DEFAULT_HNDL_LNKS;
 		String previousHandleLinks = "";
 		String searchOptions = "";
+		String currIndex = "";
 		File databaseFile;
 		
 		//get database
@@ -130,11 +132,26 @@ public class Main {
 			searchOptions = props.get(PROP_KEY_SRCH_OPTS);
 		}
 		
+		//get current index
+		if (!props.containsProp(PROP_KEY_CURR_INDX)) {
+			props.set(PROP_KEY_CURR_INDX, currIndex);
+		} else {
+			currIndex = props.get(PROP_KEY_CURR_INDX);
+		}
+		
 		databaseFile = new File(database);
 		model.setDatabaseFile(databaseFile.getAbsolutePath());
 		model.setHandleLinks(handleLinks);
 		model.setPreviousHandleLinks(previousHandleLinks);
 		model.setSearchOptions(searchOptions);
+		
+		try {
+			if (currIndex != null && currIndex.isEmpty() == false) {
+				model.setCurrIndex(Integer.parseInt(currIndex));
+			}
+		} catch (NumberFormatException e) {
+			model.setCurrIndex(0);
+		}
 
 		monitorProperties();
 
@@ -142,33 +159,26 @@ public class Main {
 	}
 	
 	private void monitorProperties() {
-		Thread thread = new Thread(new Runnable() {
+		Thread monitorThread = new Thread(new Runnable() {
 			@Override
 			public void run() {
 				for (;;) {
-					//Check to see if model data differs from props. If so, save the props.
-					if (strToBool(props.get(PROP_KEY_AUTO_SAVE)) != model.isAutoSaveOnExit()) {
-						props.set(PROP_KEY_AUTO_SAVE, boolToStr(model.isAutoSaveOnExit()));
+					checkAndSaveProperties();
+					try {
+						Thread.sleep(6500); //Only conduct read/write ops every 6.5 seconds to save SSD wear.
+					} catch (InterruptedException e) {
+						e.printStackTrace();
 					}
-					
-					if (strToBool(props.get(PROP_KEY_CHECK_DUPL)) != model.isCheckForDupl()) {
-						props.set(PROP_KEY_CHECK_DUPL, boolToStr(model.isCheckForDupl()));
-					}
-
-					if (!props.get(PROP_KEY_DATABASE).trim().equals(model.getDatabaseFile().trim())) {
-						props.set(PROP_KEY_DATABASE, model.getDatabaseFile().trim());
-					}
-
-					if (!props.get(PROP_KEY_HNDL_LNKS).trim().equals(model.getHandleLinks().trim())) {
-						props.set(PROP_KEY_HNDL_LNKS, model.getHandleLinks().trim());
-					}
-
-					if (!props.get(PROP_KEY_PREV_HNDL_LNKS).trim().equals(model.getPreviousHandleLinks().trim())) {
-						props.set(PROP_KEY_PREV_HNDL_LNKS, model.getPreviousHandleLinks().trim());
-					}
-					
-					if (!props.get(PROP_KEY_SRCH_OPTS).trim().equals(model.getSearchOptions().trim())) {
-						props.set(PROP_KEY_SRCH_OPTS, model.getSearchOptions().trim());
+				}
+			}
+		});
+		
+		Thread monitorClosingThread = new Thread(new Runnable() {
+			@Override
+			public void run() {
+				for (;;) {
+					if (model.isProgramClosing()) {
+						checkAndSaveProperties();
 					}
 					
 					try {
@@ -180,7 +190,45 @@ public class Main {
 			}
 		});
 		
-		thread.start();
+		monitorClosingThread.start();
+		monitorThread.start();
+	}
+	
+	/*
+	 * Check to see if model data differs from props. If so, save the props.
+	 */
+	protected void checkAndSaveProperties() {
+		if (strToBool(props.get(PROP_KEY_AUTO_SAVE)) != model.isAutoSaveOnExit()) {
+			props.set(PROP_KEY_AUTO_SAVE, boolToStr(model.isAutoSaveOnExit()));
+		}
+		
+		if (strToBool(props.get(PROP_KEY_CHECK_DUPL)) != model.isCheckForDupl()) {
+			props.set(PROP_KEY_CHECK_DUPL, boolToStr(model.isCheckForDupl()));
+		}
+
+		if (!props.get(PROP_KEY_DATABASE).trim().equals(model.getDatabaseFile().trim())) {
+			props.set(PROP_KEY_DATABASE, model.getDatabaseFile().trim());
+		}
+
+		if (!props.get(PROP_KEY_HNDL_LNKS).trim().equals(model.getHandleLinks().trim())) {
+			props.set(PROP_KEY_HNDL_LNKS, model.getHandleLinks().trim());
+		}
+
+		if (!props.get(PROP_KEY_PREV_HNDL_LNKS).trim().equals(model.getPreviousHandleLinks().trim())) {
+			props.set(PROP_KEY_PREV_HNDL_LNKS, model.getPreviousHandleLinks().trim());
+		}
+		
+		if (!props.get(PROP_KEY_SRCH_OPTS).trim().equals(model.getSearchOptions().trim())) {
+			props.set(PROP_KEY_SRCH_OPTS, model.getSearchOptions().trim());
+		}
+		
+		try {
+			if (Integer.parseInt(props.get(PROP_KEY_CURR_INDX).trim()) != model.getCurrIndex()) {
+				props.set(PROP_KEY_CURR_INDX, (model.getCurrIndex() + ""));
+			}
+		} catch (NumberFormatException e) {
+			props.set(PROP_KEY_CURR_INDX, (model.getCurrIndex() + ""));
+		}
 	}
 	
 	private File getOrCreatePropsFile() {

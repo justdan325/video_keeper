@@ -8,6 +8,7 @@ public class DataModel {
 	private String handleLinks;
 	private String previousHandleLinks;
 	private String searchOptions;
+	private int currIndex;
 	private boolean autoSaveOnExit;
 	private boolean checkForDupl;
 	private boolean requestSaveButtonEn;
@@ -16,6 +17,7 @@ public class DataModel {
 	private boolean searchThruDates;
 	private boolean searchThruChannels;
 	private boolean playAndDelete;
+	private boolean programClosing;
 	
 	public DataModel() {
 		this.videoList = Optional.empty();
@@ -23,6 +25,7 @@ public class DataModel {
 		this.databaseFile = Main.DEFAULT_DATABASE;
 		this.handleLinks = Main.DEFAULT_HNDL_LNKS;
 		this.searchOptions = "";
+		this.currIndex = 0;
 		this.autoSaveOnExit = true;
 		this.checkForDupl = true;
 		this.requestSaveButtonEn = false;
@@ -31,6 +34,7 @@ public class DataModel {
 		this.searchThruDates = true;
 		this.searchThruChannels = true;
 		this.playAndDelete = true;
+		this.programClosing = false;
 	}
 	
 	public synchronized Optional<VideoList> getVideoList() {
@@ -79,6 +83,14 @@ public class DataModel {
 
 	public void setSearchOptions(String searchOptions) {
 		this.searchOptions = searchOptions;
+	}
+
+	public int getCurrIndex() {
+		return currIndex;
+	}
+
+	public void setCurrIndex(int currIndex) {
+		this.currIndex = currIndex;
 	}
 
 	public synchronized boolean isAutoSaveOnExit() {
@@ -143,5 +155,13 @@ public class DataModel {
 
 	public void setPlayAndDelete(boolean playAndDelete) {
 		this.playAndDelete = playAndDelete;
+	}
+
+	public boolean isProgramClosing() {
+		return programClosing;
+	}
+
+	public void setProgramClosing(boolean programClosing) {
+		this.programClosing = programClosing;
 	}
 }

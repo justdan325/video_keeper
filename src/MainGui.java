@@ -27,7 +27,7 @@ import java.awt.Dimension;
 @SuppressWarnings("serial")
 public class MainGui extends JFrame implements WindowListener {
 	public  static final String PROG_NAME 			= "Video Keeper";
-	public  static final String PROG_VER			= "3.0b1";
+	public  static final String PROG_VER			= "3.0b2";
 	public  static final String PROG_FONT			= "Arial";
 	public	static final Color 	PROG_COLOR_BKRND	= Main.OS_MAC ? Color.LIGHT_GRAY : new Color(3156004);
 	public	static final Color	PROG_COLOR_BTN_EN	= Main.OS_MAC ? Color.WHITE : new Color(8388608);
@@ -584,6 +584,7 @@ public class MainGui extends JFrame implements WindowListener {
 		
 		setLocked(true);
 		saved = keeper.save();
+		model.setProgramClosing(true);
 		setLocked(false);
 		
 		return saved;
@@ -648,8 +649,19 @@ public class MainGui extends JFrame implements WindowListener {
 	
 	@Override
 	public void windowClosing(WindowEvent e) {
+		model.setProgramClosing(true);
+		
 		if (model.isAutoSaveOnExit()) {
 			save();
+			
+			this.setVisible(false);
+			
+			try {
+				Thread.sleep(1500); //give other threads sufficient time to prepare for closing
+			} catch (InterruptedException e1) {
+				e1.printStackTrace();
+			}
+			
 			System.exit(0);
 		} else {
 			String mess = "Would you like to save the watch list?";
@@ -657,6 +669,15 @@ public class MainGui extends JFrame implements WindowListener {
 			
 			if(option == JOptionPane.YES_OPTION) {
 				save();
+				
+				this.setVisible(false);
+				
+				try {
+					Thread.sleep(1500); //give other threads sufficient time to prepare for closing
+				} catch (InterruptedException e1) {
+					e1.printStackTrace();
+				}
+				
 				System.exit(0);
 			} else if(option == JOptionPane.NO_OPTION) {
 				System.exit(0);
