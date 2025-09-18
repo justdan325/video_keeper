@@ -204,7 +204,6 @@ public class Main {
 	 * Check to see if model data differs from props. If so, save the props.
 	 */
 	protected void checkAndSaveProperties() {
-		System.out.println("Call...");
 		if (strToBool(props.get(PROP_KEY_AUTO_SAVE)) != model.isAutoSaveOnExit()) {
 			props.set(PROP_KEY_AUTO_SAVE, boolToStr(model.isAutoSaveOnExit()));
 		}
