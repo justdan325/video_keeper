@@ -681,6 +681,8 @@ public class MainGui extends JFrame implements WindowListener {
 				System.exit(0);
 			} else if(option == JOptionPane.NO_OPTION) {
 				System.exit(0);
+			} else if (option == JOptionPane.CANCEL_OPTION) {
+				model.setProgramClosing(false);
 			}
 		}
 		

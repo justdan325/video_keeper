@@ -164,6 +164,7 @@ public class Main {
 			public void run() {
 				for (;;) {
 					checkAndSaveProperties();
+					
 					try {
 						Thread.sleep(6500); //Only conduct read/write ops every 6.5 seconds to save SSD wear.
 					} catch (InterruptedException e) {
@@ -177,11 +178,16 @@ public class Main {
 			@Override
 			public void run() {
 				for (;;) {
-					if (model.isProgramClosing()) {
-						checkAndSaveProperties();
-					}
-					
 					try {
+						if (model.isProgramClosing()) {
+							checkAndSaveProperties();
+
+							//Only check once while closing dialog might be on screen. Don't kill thread in case user selects "cancel."
+							while (model.isProgramClosing()) {
+								Thread.sleep(30);
+							}
+						}
+
 						Thread.sleep(30);
 					} catch (InterruptedException e) {
 						e.printStackTrace();
@@ -198,6 +204,7 @@ public class Main {
 	 * Check to see if model data differs from props. If so, save the props.
 	 */
 	protected void checkAndSaveProperties() {
+		System.out.println("Call...");
 		if (strToBool(props.get(PROP_KEY_AUTO_SAVE)) != model.isAutoSaveOnExit()) {
 			props.set(PROP_KEY_AUTO_SAVE, boolToStr(model.isAutoSaveOnExit()));
 		}
