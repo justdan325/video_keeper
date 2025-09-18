@@ -91,7 +91,7 @@ public class Main {
 		} else {
 			autoSave = props.get(PROP_KEY_AUTO_SAVE);
 
-			if (autoSave.trim().equals("1")) {
+			if (strToBool(autoSave.trim())) {
 				model.setAutoSaveOnExit(true);
 			} else {
 				model.setAutoSaveOnExit(false);
@@ -104,7 +104,7 @@ public class Main {
 		} else {
 			checkDuplicates = props.get(PROP_KEY_CHECK_DUPL);
 
-			if (checkDuplicates.trim().equals("1")) {
+			if (strToBool(checkDuplicates.trim())) {
 				model.setCheckForDupl(true);
 			} else {
 				model.setCheckForDupl(false);
