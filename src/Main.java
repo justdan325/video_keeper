@@ -20,6 +20,13 @@ public class Main {
 	
 	private PropsFileUtil props;
 	private DataModel model;
+	private String database;
+	private String searchOptions;
+	private String handleLinks;
+	private String prevHandleLinks;
+	private int currentIndex;
+	private boolean autoSave;
+	private boolean checkDuplicates;
 	
 	public static void main(String[] args) {
 		new Main();
@@ -69,29 +76,28 @@ public class Main {
 	}
 
 	private void init() {
-		String database = DEFAULT_DATABASE;
-		String autoSave = "1";
-		String checkDuplicates = "1";
-		String handleLinks = DEFAULT_HNDL_LNKS;
-		String previousHandleLinks = "";
-		String searchOptions = "";
-		String currIndex = "";
-		File databaseFile;
+		this.database = DEFAULT_DATABASE;
+		this.autoSave = true;
+		this.checkDuplicates = true;
+		this.handleLinks = DEFAULT_HNDL_LNKS;
+		this.prevHandleLinks = "";
+		this.searchOptions = "";
+		this.currentIndex = 0;
 		
 		//get database
 		if (!props.containsProp(PROP_KEY_DATABASE)) {
 			props.set(PROP_KEY_DATABASE, database);
 		} else {
-			database = props.get(PROP_KEY_DATABASE);
+			this.database = props.get(PROP_KEY_DATABASE);
 		}
 		
 		//get auto save
 		if (!props.containsProp(PROP_KEY_AUTO_SAVE)) {
-			props.set(PROP_KEY_AUTO_SAVE, autoSave);
+			props.set(PROP_KEY_AUTO_SAVE, boolToStr(autoSave));
 		} else {
-			autoSave = props.get(PROP_KEY_AUTO_SAVE);
+			this.autoSave = strToBool(props.get(PROP_KEY_AUTO_SAVE));
 
-			if (strToBool(autoSave.trim())) {
+			if (autoSave) {
 				model.setAutoSaveOnExit(true);
 			} else {
 				model.setAutoSaveOnExit(false);
@@ -100,11 +106,11 @@ public class Main {
 		
 		//get check duplicates
 		if (!props.containsProp(PROP_KEY_CHECK_DUPL)) {
-			props.set(PROP_KEY_CHECK_DUPL, checkDuplicates);
+			props.set(PROP_KEY_CHECK_DUPL, boolToStr(checkDuplicates));
 		} else {
-			checkDuplicates = props.get(PROP_KEY_CHECK_DUPL);
+			this.checkDuplicates = strToBool(props.get(PROP_KEY_CHECK_DUPL));
 
-			if (strToBool(checkDuplicates.trim())) {
+			if (checkDuplicates) {
 				model.setCheckForDupl(true);
 			} else {
 				model.setCheckForDupl(false);
@@ -115,43 +121,39 @@ public class Main {
 		if (!props.containsProp(PROP_KEY_HNDL_LNKS)) {
 			props.set(PROP_KEY_HNDL_LNKS, handleLinks);
 		} else {
-			handleLinks = props.get(PROP_KEY_HNDL_LNKS);
+			this.handleLinks = props.get(PROP_KEY_HNDL_LNKS);
 		}
 		
 		//get prev handle links 
 		if (!props.containsProp(PROP_KEY_PREV_HNDL_LNKS)) {
-			props.set(PROP_KEY_PREV_HNDL_LNKS, previousHandleLinks);
+			props.set(PROP_KEY_PREV_HNDL_LNKS, prevHandleLinks);
 		} else {
-			previousHandleLinks = props.get(PROP_KEY_PREV_HNDL_LNKS);
+			this.prevHandleLinks = props.get(PROP_KEY_PREV_HNDL_LNKS);
 		}
 		
 		//get search options
 		if (!props.containsProp(PROP_KEY_SRCH_OPTS)) {
 			props.set(PROP_KEY_SRCH_OPTS, searchOptions);
 		} else {
-			searchOptions = props.get(PROP_KEY_SRCH_OPTS);
+			this.searchOptions = props.get(PROP_KEY_SRCH_OPTS);
 		}
 		
 		//get current index
 		if (!props.containsProp(PROP_KEY_CURR_INDX)) {
-			props.set(PROP_KEY_CURR_INDX, currIndex);
+			props.set(PROP_KEY_CURR_INDX, currentIndex + "");
 		} else {
-			currIndex = props.get(PROP_KEY_CURR_INDX);
-		}
-		
-		databaseFile = new File(database);
-		model.setDatabaseFile(databaseFile.getAbsolutePath());
-		model.setHandleLinks(handleLinks);
-		model.setPreviousHandleLinks(previousHandleLinks);
-		model.setSearchOptions(searchOptions);
-		
-		try {
-			if (currIndex != null && currIndex.isEmpty() == false) {
-				model.setCurrIndex(Integer.parseInt(currIndex));
+			try {
+				currentIndex = Integer.parseInt(props.get(PROP_KEY_CURR_INDX));
+			} catch (NumberFormatException e) {
+				currentIndex = 0;
 			}
-		} catch (NumberFormatException e) {
-			model.setCurrIndex(0);
 		}
+		
+		model.setDatabaseFile(database);
+		model.setHandleLinks(handleLinks);
+		model.setPreviousHandleLinks(prevHandleLinks);
+		model.setSearchOptions(searchOptions);
+		model.setCurrIndex(currentIndex);
 
 		monitorProperties();
 
@@ -204,35 +206,38 @@ public class Main {
 	 * Check to see if model data differs from props. If so, save the props.
 	 */
 	protected void checkAndSaveProperties() {
-		if (strToBool(props.get(PROP_KEY_AUTO_SAVE)) != model.isAutoSaveOnExit()) {
+		if (autoSave != model.isAutoSaveOnExit()) {
+			this.autoSave = model.isAutoSaveOnExit();
 			props.set(PROP_KEY_AUTO_SAVE, boolToStr(model.isAutoSaveOnExit()));
 		}
 		
-		if (strToBool(props.get(PROP_KEY_CHECK_DUPL)) != model.isCheckForDupl()) {
+		if (checkDuplicates != model.isCheckForDupl()) {
+			this.checkDuplicates = model.isCheckForDupl();
 			props.set(PROP_KEY_CHECK_DUPL, boolToStr(model.isCheckForDupl()));
 		}
 
-		if (!props.get(PROP_KEY_DATABASE).trim().equals(model.getDatabaseFile().trim())) {
+		if (!database.trim().equals(model.getDatabaseFile().trim())) {
+			this.database = model.getDatabaseFile().trim();
 			props.set(PROP_KEY_DATABASE, model.getDatabaseFile().trim());
 		}
 
-		if (!props.get(PROP_KEY_HNDL_LNKS).trim().equals(model.getHandleLinks().trim())) {
+		if (!handleLinks.trim().equals(model.getHandleLinks().trim())) {
+			this.handleLinks = model.getHandleLinks().trim();
 			props.set(PROP_KEY_HNDL_LNKS, model.getHandleLinks().trim());
 		}
 
-		if (!props.get(PROP_KEY_PREV_HNDL_LNKS).trim().equals(model.getPreviousHandleLinks().trim())) {
+		if (!prevHandleLinks.trim().equals(model.getPreviousHandleLinks().trim())) {
+			this.prevHandleLinks = model.getPreviousHandleLinks().trim();
 			props.set(PROP_KEY_PREV_HNDL_LNKS, model.getPreviousHandleLinks().trim());
 		}
 		
-		if (!props.get(PROP_KEY_SRCH_OPTS).trim().equals(model.getSearchOptions().trim())) {
+		if (!searchOptions.trim().equals(model.getSearchOptions().trim())) {
+			this.searchOptions = model.getSearchOptions().trim();
 			props.set(PROP_KEY_SRCH_OPTS, model.getSearchOptions().trim());
 		}
 		
-		try {
-			if (Integer.parseInt(props.get(PROP_KEY_CURR_INDX).trim()) != model.getCurrIndex()) {
-				props.set(PROP_KEY_CURR_INDX, (model.getCurrIndex() + ""));
-			}
-		} catch (NumberFormatException e) {
+		if (currentIndex != model.getCurrIndex()) {
+			this.currentIndex = model.getCurrIndex();
 			props.set(PROP_KEY_CURR_INDX, (model.getCurrIndex() + ""));
 		}
 	}
