@@ -54,7 +54,7 @@ public class MetadataObtainer {
 	
 	public static void main(String[] args) {
 //		System.out.println(fetchHtml("https://odysee.com/win11:6d73df3083e0f634b18f54521763184b47980d8a"));
-		final String URL = "https://watch.heehaw.space/w/8awhQPbdKdnqp5cqaoFipS";
+		final String URL = "https://www.youtube.com/watch?v=UTosKh0M42o";
 		MetadataObtainer o = new MetadataObtainer(URL);
 		System.out.println("URL provided: [" + URL + "]");
 		System.out.println("Is supported: [" + isSupported(URL, true) + "]");
@@ -644,13 +644,30 @@ public class MetadataObtainer {
 			//YouTube
 			if (urlStr.startsWith(YOUTUBE_PREFIX) || urlStr.startsWith(YOUTUBE_PREFIX_W) || urlStr.startsWith(YOUTUBE_PREFIX_ABBR) || urlStr.contains(YOUTUBE_SHORT_TOKEN)) {
 				//get URL for the embedded YouTube video
-				String prefix = "<meta property=\"og:video:url\" content=\"";
-				String suffix = "\">";
+				String prefix = "\"lengthSeconds\":\"";
+				String suffix = "\",";
 				String embedded = null;
 				int begin = html.indexOf(prefix) + prefix.length();
 				int end = html.indexOf(suffix, begin);
 				
-				if (begin != -1 && end != -1) {
+				
+				//attempt to derive from main page
+				if (begin != -1 && end != -1 && (end - begin) <= 8) {
+					try {
+						//add one second to be consistent with thumbnail time, which the backup method uses
+						//YouTube's player always reads a second shorter than the thumbnail time stamp
+						seconds = Integer.parseInt(html.substring(begin, end)) + 1; 
+					} catch (Exception e) {
+						seconds = -1;
+					}
+
+					time = convertSecondsToTimeStr(seconds);
+				//if not accessible on main page, use this as a backup
+				} else {
+					prefix = "<meta property=\"og:video:url\" content=\"";
+					suffix = "\">";
+					begin = html.indexOf(prefix) + prefix.length();
+					end = html.indexOf(suffix, begin);
 					embedded = html.substring(begin, end);
 					
 					//get the embedded video html, which has a category for video seconds
@@ -794,7 +811,7 @@ public class MetadataObtainer {
 		return time;
 	}
 	
-	private String convertSecondsToTimeStr(int seconds) {
+	public static String convertSecondsToTimeStr(int seconds) {
 		String time = "";
 		int minutes = 0;
 		int hours = 0;
