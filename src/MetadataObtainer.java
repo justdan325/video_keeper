@@ -31,6 +31,8 @@ public class MetadataObtainer {
 	private static final String RUMBLE_PREFIX			= "https://rumble.com/";
 	private static final String PODBEAN_PREFIX			= "https://podcast.";
 	private static final String PODBEAN_TOKEN			= "podbean.com/e/";
+	private static final String PEERTUBE_PREFIX			= "https://peertube";
+	private static final String PEERTUBE_TOKEN			= "<meta property=\"og:platform\" content=\"PeerTube\">";
 	private static final int	MAX_LEN_TITLE			= 200;
 	
 	private Optional<String> atTime;
@@ -41,7 +43,7 @@ public class MetadataObtainer {
 	public MetadataObtainer(String urlStr) {
 		this.atTime = Optional.empty();
 		this.urlStr = sanitize(urlStr);
-		this.isSupported = isSupported(urlStr);
+		this.isSupported = isSupported(urlStr, true);
 	
 		if (isSupported) {
 			this.html = fetchHtml(this.urlStr);
@@ -52,17 +54,18 @@ public class MetadataObtainer {
 	
 	public static void main(String[] args) {
 //		System.out.println(fetchHtml("https://odysee.com/win11:6d73df3083e0f634b18f54521763184b47980d8a"));
-		final String URL = "https://podcast.htmlallthethings.com/e/top-mistakes-that-developers-make-when-building-a-web-app-and-how-to-prevent-them/";
+		final String URL = "https://watch.heehaw.space/w/8awhQPbdKdnqp5cqaoFipS";
 		MetadataObtainer o = new MetadataObtainer(URL);
 		System.out.println("URL provided: [" + URL + "]");
-		System.out.println("Is supported: [" + isSupported(URL) + "]");
+		System.out.println("Is supported: [" + isSupported(URL, true) + "]");
 		System.out.println("Title       : [" + o.getTitle() + "]");
 		System.out.println("Date        : [" + o.getDate() + "]");
 		System.out.println("Channel     : [" + o.getChannel() + "]");
 		System.out.println("Time        : [" + o.getTime() + "]");
 	}
 	
-	public static boolean isSupported(String urlStr) {
+	public static boolean isSupported(String urlStr, boolean inspectWebpage) {
+		String html = FETCH_ERROR_PREFIX;
 		boolean supported = false;
 
 		if (urlStr.startsWith(YOUTUBE_PREFIX) || urlStr.startsWith(YOUTUBE_PREFIX_W)
@@ -74,9 +77,17 @@ public class MetadataObtainer {
 				|| urlStr.startsWith(DAILYMOTION_PREFIX_W) || urlStr.startsWith(DAILYMOTION_PREFIX)
 				|| urlStr.startsWith(DAILYMOTION_PREFIX_MOB) || urlStr.startsWith(BITCHUTE_PREFIX)
 				|| urlStr.startsWith(BITCHUTE_PREFIX_W) || urlStr.startsWith(RUMBLE_PREFIX)
-				|| urlStr.contains(PODBEAN_TOKEN) || urlStr.startsWith(PODBEAN_PREFIX)) {
+				|| urlStr.contains(PODBEAN_TOKEN) || urlStr.startsWith(PODBEAN_PREFIX)
+				|| urlStr.startsWith(PEERTUBE_PREFIX)) {
 
 			supported = true;
+		} else if (inspectWebpage) {
+			html = fetchHtml(urlStr);
+			
+			//Peertube instances
+			if (html.contains(PEERTUBE_TOKEN)) {
+				supported = true;
+			}
 		}
 		
 		return supported;
@@ -228,6 +239,17 @@ public class MetadataObtainer {
 				
 				if (begin != -1 && end != -1) {
 					title = html.substring(begin, end);
+				}
+			//Peertube
+			} else if (urlStr.contains(PEERTUBE_PREFIX) || html.contains(PEERTUBE_TOKEN) ) {
+				String prefix = "<title>";
+				String suffix = "</title>";
+				int begin = html.indexOf(prefix) + prefix.length();
+				int end = html.indexOf(suffix, begin);
+				
+				if (begin != -1 && end != -1) {
+					title = html.substring(begin, end);
+					title = filterEscapeChars(title);
 				}
 			}
 		}
@@ -406,7 +428,22 @@ public class MetadataObtainer {
 				}
 				
 				channel += " on PodBean";
+			//Peertube
+			} else if (urlStr.contains(PEERTUBE_PREFIX) || html.contains(PEERTUBE_TOKEN) ) {
+				String prefix = "<meta property=\"og:site_name\" content=\"";
+				String suffix = "\" />";
+				int begin = html.indexOf(prefix) + prefix.length();
+				int end = html.indexOf(suffix, begin);
+				
+				if (begin != -1 && end != -1) {
+					channel = html.substring(begin, end);
+					channel = filterEscapeChars(channel);
+				}
+				
+				channel += " Peertube Instance";
 			}
+			
+			
 		}
 		
 		if (channel.length() > 75) {
@@ -579,6 +616,16 @@ public class MetadataObtainer {
 				if (begin != -1 && end != -1) {
 					date = html.substring(begin, end);
 				}
+			//Peertube
+			} else if (urlStr.contains(PEERTUBE_PREFIX) || html.contains(PEERTUBE_TOKEN) ) {
+				String prefix = "\"uploadDate\":\"";
+				String suffix = "T";
+				int begin = html.indexOf(prefix) + prefix.length();
+				int end = html.indexOf(suffix, begin);
+				
+				if (begin != -1 && end != -1) {
+					date = html.substring(begin, end);
+				}
 			}
 		}
 		
@@ -703,6 +750,27 @@ public class MetadataObtainer {
 			} else if (urlStr.startsWith(PODBEAN_PREFIX) || urlStr.contains(PODBEAN_TOKEN)) {
 				String prefix = "duration\\\":";
 				String suffix = ",";
+				int begin = html.indexOf(prefix) + prefix.length();
+				int end = html.indexOf(suffix, begin);
+				
+				if (begin != -1 && end != -1) {
+					time = html.substring(begin, end);
+					
+					try {
+						time = html.substring(begin, end);
+						seconds = Integer.parseInt(time);
+					} catch (Exception e) {
+						seconds = -1;
+					}
+
+					if (seconds > -1) {
+						time = convertSecondsToTimeStr(seconds);
+					}
+				}
+			//Peertube
+			} else if (urlStr.contains(PEERTUBE_PREFIX) || html.contains(PEERTUBE_TOKEN) ) {
+				String prefix = "\"duration\":\"PT";
+				String suffix = "S\",";
 				int begin = html.indexOf(prefix) + prefix.length();
 				int end = html.indexOf(suffix, begin);
 				
