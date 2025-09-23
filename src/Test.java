@@ -34,14 +34,14 @@ public class Test {
 	private static final String TTL_YT_LIST_TM 		= "This Liquid Cooled Mini PC Is WILD";
 	private static final String DATE_YT_LIST_TM 	= "Sep 11, 2024";
 	private static final String CHNL_YT_LIST_TM 	= "Dawid Does Tech Stuff on YouTube";
-	private static final String TIME_YT_LIST_TM 	= "13:52 (in progress 00:34)";
+	private static final String TIME_YT_LIST_TM 	= "13:53 (in progress 00:34)";
 	
 	private static final String URL_YT_TIMESTMP		= "https://www.youtube.com/watch?v=rRn31oxQARY&t=32";
 	private static final String TYPE_YT_TIMESTMP 	= "YouTube with Timestamp";
 	private static final String TTL_YT_TIMESTMP 	= "This Liquid Cooled Mini PC Is WILD";
 	private static final String DATE_YT_TIMESTMP 	= "Sep 11, 2024";
 	private static final String CHNL_YT_TIMESTMP 	= "Dawid Does Tech Stuff on YouTube";
-	private static final String TIME_YT_TIMESTMP 	= "13:52 (in progress 00:32)";
+	private static final String TIME_YT_TIMESTMP 	= "13:53 (in progress 00:32)";
 	
 	private static final String URL_YT_PREVIEW		= "https://www.youtube.com/watch?v=iRV-XdwRkO4&pp=ygUVZW1waXJlIHN0YXRlIGJ1aWxkaW5n";
 	private static final String TYPE_YT_PREVIEW 	= "YouTube with Pic Preview";
