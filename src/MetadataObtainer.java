@@ -54,7 +54,7 @@ public class MetadataObtainer {
 	
 	public static void main(String[] args) {
 //		System.out.println(fetchHtml("https://odysee.com/win11:6d73df3083e0f634b18f54521763184b47980d8a"));
-		final String URL = "https://www.youtube.com/watch?v=UTosKh0M42o";
+		final String URL = "https://rumble.com/v6z6vvw-allatra-tv-live-247.html?e9s=src_v1_live";
 		MetadataObtainer o = new MetadataObtainer(URL);
 		System.out.println("URL provided: [" + URL + "]");
 		System.out.println("Is supported: [" + isSupported(URL, true) + "]");
@@ -574,8 +574,7 @@ public class MetadataObtainer {
 			//Rumble
 			} else if (urlStr.startsWith(RUMBLE_PREFIX)) {
 				final String STREAMED_INDICATOR = "</clipPath></svg>			Streamed on:			<time datetime=\"";
-				final String STREAMING_INDICATOR = "/clipPath></svg>				Streaming now\n"
-						+ "									</div>";
+				final String STREAMING_INDICATOR = "Streaming now";
 				
 				//Stream on Rumble have the date located in a different tag
 				if (html.contains(STREAMED_INDICATOR)) {

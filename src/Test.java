@@ -13,7 +13,7 @@ public class Test {
 	private static final String TTL_YT_NORMAL 		= "I Bought A $500 Gaming PC From Temu...";
 	private static final String DATE_YT_NORMAL 		= "Jul 20, 2024";
 	private static final String CHNL_YT_NORMAL 		= "Dawid Does Tech Stuff on YouTube";
-	private static final String TIME_YT_NORMAL 		= "10:53";
+	private static final String TIME_YT_NORMAL 		= "10:54";
 	
 	private static final String URL_YT_SHORT		= "https://www.youtube.com/shorts/Qx6lTY8UnPw";
 	private static final String TYPE_YT_SHORT 		= "YouTube Short";
@@ -105,11 +105,11 @@ public class Test {
 	private static final String CHNL_RUM_NORMAL		= "TigerFitness on Rumble";
 	private static final String TIME_RUM_NORMAL 	= "";
 	
-	private static final String URL_RUM_STRMING		= "https://rumble.com/v6yel6y-mousehold-farm-all-weather-riding-arena.html?e9s=src_v1_sports";
+	private static final String URL_RUM_STRMING		= "https://rumble.com/v6z6vvw-allatra-tv-live-247.html?e9s=src_v1_live";
 	private static final String TYPE_RUM_STRMING 	= "Rumble Streaming";
-	private static final String TTL_RUM_STRMING 	= "Mousehold Farm- Riding arena";
+	private static final String TTL_RUM_STRMING 	= "ALLATRA TV LIVE 24/7";
 	private static final String DATE_RUM_STRMING 	= "Streaming Now";
-	private static final String CHNL_RUM_STRMING	= "Mousehold Farm on Rumble";
+	private static final String CHNL_RUM_STRMING	= "AllatRa TV on Rumble";
 	private static final String TIME_RUM_STRMING 	= "";
 	
 	private static final String URL_RUM_STRMD		= "https://rumble.com/v6ya0xo-mousehold-farm-all-weather-riding-arena.html?e9s=src_v1_cbl%2Csrc_v1_ucp_l";
