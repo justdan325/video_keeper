@@ -18,7 +18,8 @@ public class MetadataObtainer {
 	private static final String YOUTUBE_SHORT_TOKEN		= "youtube.com/shorts";
 	private static final String YOUTUBE_LIVE_TOKEN		= "https://youtube.com/live/";
 	private static final String YOUTUBE_LIVE_TOKEN_W	= "https://www.youtube.com/live/";
-	private static final String YOUTUBE_CHAN_TOKEN_W	= "https://www.youtube.com/@";
+	private static final String YOUTUBE_CHAN_TOKEN_W_1	= "https://www.youtube.com/@";
+	private static final String YOUTUBE_CHAN_TOKEN_W_2	= "https://www.youtube.com/c/";
 	private static final String TWITCH_PREFIX_W			= "https://www.twitch.tv/videos/";
 	private static final String TWITCH_PREFIX_MOB		= "https://m.twitch.tv/videos/";
 	private static final String VIMEO_PREFIX			= "https://vimeo.com/";
@@ -54,7 +55,7 @@ public class MetadataObtainer {
 	
 	public static void main(String[] args) {
 //		System.out.println(fetchHtml("https://odysee.com/win11:6d73df3083e0f634b18f54521763184b47980d8a"));
-		final String URL = "https://www.youtube.com/watch?v=O5u-aoHfbbI";
+		final String URL = "https://www.youtube.com/@greatscottlab";
 		MetadataObtainer o = new MetadataObtainer(URL);
 		System.out.println("URL provided: [" + URL + "]");
 		System.out.println("Is supported: [" + isSupported(URL, true) + "]");
@@ -76,14 +77,14 @@ public class MetadataObtainer {
 		if (urlStr.startsWith(YOUTUBE_PREFIX) || urlStr.startsWith(YOUTUBE_PREFIX_W)
 				|| urlStr.contains(YOUTUBE_PLAYLIST_TOKEN) || urlStr.startsWith(YOUTUBE_PREFIX_ABBR)
 				|| urlStr.contains(YOUTUBE_SHORT_TOKEN) || urlStr.contains(YOUTUBE_LIVE_TOKEN)
-				|| urlStr.startsWith(YOUTUBE_CHAN_TOKEN_W) || urlStr.contains(YOUTUBE_LIVE_TOKEN_W)
-				|| urlStr.startsWith(TWITCH_PREFIX_W) || urlStr.startsWith(TWITCH_PREFIX_MOB)
-				|| urlStr.startsWith(VIMEO_PREFIX) || urlStr.startsWith(ODYSEE_PREFIX)
-				|| urlStr.startsWith(DAILYMOTION_PREFIX_W) || urlStr.startsWith(DAILYMOTION_PREFIX)
-				|| urlStr.startsWith(DAILYMOTION_PREFIX_MOB) || urlStr.startsWith(BITCHUTE_PREFIX)
-				|| urlStr.startsWith(BITCHUTE_PREFIX_W) || urlStr.startsWith(RUMBLE_PREFIX)
-				|| urlStr.contains(PODBEAN_TOKEN) || urlStr.startsWith(PODBEAN_PREFIX)
-				|| urlStr.startsWith(PEERTUBE_PREFIX)) {
+				|| urlStr.startsWith(YOUTUBE_CHAN_TOKEN_W_1) || urlStr.startsWith(YOUTUBE_CHAN_TOKEN_W_2)
+				|| urlStr.contains(YOUTUBE_LIVE_TOKEN_W) || urlStr.startsWith(TWITCH_PREFIX_W)
+				|| urlStr.startsWith(TWITCH_PREFIX_MOB) || urlStr.startsWith(VIMEO_PREFIX)
+				|| urlStr.startsWith(ODYSEE_PREFIX) || urlStr.startsWith(DAILYMOTION_PREFIX_W)
+				|| urlStr.startsWith(DAILYMOTION_PREFIX) || urlStr.startsWith(DAILYMOTION_PREFIX_MOB)
+				|| urlStr.startsWith(BITCHUTE_PREFIX) || urlStr.startsWith(BITCHUTE_PREFIX_W)
+				|| urlStr.startsWith(RUMBLE_PREFIX) || urlStr.contains(PODBEAN_TOKEN)
+				|| urlStr.startsWith(PODBEAN_PREFIX) || urlStr.startsWith(PEERTUBE_PREFIX)) {
 
 			supported = true;
 		} else if (inspectWebpage) {
@@ -140,12 +141,22 @@ public class MetadataObtainer {
 						title = filterEscapeChars(title);
 					}
 				}
-			} else if (urlStr.startsWith(YOUTUBE_CHAN_TOKEN_W)) {
+			} else if (urlStr.startsWith(YOUTUBE_CHAN_TOKEN_W_1)) {
 				title = urlStr.substring(urlStr.indexOf("@") + 1);
 				
 				//remove trailing URL artifacts if there are any
 				if (title.contains("/")) {
 					title = title.substring(0, title.indexOf("/"));
+				}
+			} else if (urlStr.startsWith(YOUTUBE_CHAN_TOKEN_W_2)) { 
+				String prefix = "<title>";
+				String suffix = " - YouTube</title>";
+				int begin = html.indexOf(prefix) + prefix.length();
+				int end = html.indexOf(suffix, begin);
+
+				if (begin != -1 && end != -1) {
+					title = html.substring(begin, end);
+					title = filterEscapeChars(title);
 				}
 			} else if (urlStr.contains(YOUTUBE_PLAYLIST_TOKEN)) {
 				String prefix = "property=\"og:title\" content=\"";
@@ -310,7 +321,7 @@ public class MetadataObtainer {
 				}
 				
 				channel += " on YouTube";
-			} else if (urlStr.startsWith(YOUTUBE_CHAN_TOKEN_W)) {
+			} else if (urlStr.startsWith(YOUTUBE_CHAN_TOKEN_W_1) || urlStr.startsWith(YOUTUBE_CHAN_TOKEN_W_2)) {
 				channel = getTitle() + " on YouTube";
 			//Twitch
 			} else if (urlStr.startsWith(TWITCH_PREFIX_MOB)) {
@@ -483,7 +494,7 @@ public class MetadataObtainer {
 				if (begin != -1 && end != -1) {
 					date = html.substring(begin, end);
 				}
-			} else if (urlStr.startsWith(YOUTUBE_CHAN_TOKEN_W)) {
+			} else if (urlStr.startsWith(YOUTUBE_CHAN_TOKEN_W_1) || urlStr.startsWith(YOUTUBE_CHAN_TOKEN_W_2)) {
 				String prefix = "\"";
 				String suffix = "subscribers\"}";
 				int end = html.indexOf(suffix);
@@ -918,8 +929,10 @@ public class MetadataObtainer {
 		}
 
 		//YouTube
-		if (sanitized.startsWith(YOUTUBE_PREFIX) || sanitized.startsWith(YOUTUBE_PREFIX_W) || sanitized.startsWith(YOUTUBE_PREFIX_ABBR) 
-				|| sanitized.contains(YOUTUBE_PLAYLIST_TOKEN) || sanitized.contains(YOUTUBE_LIVE_TOKEN) || sanitized.contains(YOUTUBE_LIVE_TOKEN_W)) {
+		if (sanitized.startsWith(YOUTUBE_PREFIX) || sanitized.startsWith(YOUTUBE_PREFIX_W)
+				|| sanitized.startsWith(YOUTUBE_PREFIX_ABBR) || sanitized.contains(YOUTUBE_PLAYLIST_TOKEN)
+				|| sanitized.contains(YOUTUBE_LIVE_TOKEN) || sanitized.contains(YOUTUBE_LIVE_TOKEN_W)
+				|| sanitized.contains(YOUTUBE_CHAN_TOKEN_W_1) || sanitized.contains(YOUTUBE_CHAN_TOKEN_W_2)) {
 
 			sanitized = sanitizeYoutube(sanitized, false);
 		//Twitch
@@ -990,6 +1003,8 @@ public class MetadataObtainer {
 		final String INDX_PARAM_2 = "&index=";
 		final String DIS_POLY_PARAM = "&disable_polymer=1";
 		final String PIC_PREVIEW_PARAM = "&pp=";
+		final String VID_ENDPNT = "/videos";
+		String temp = "";
 		String sanitized = urlStr;
 		
 		//convert to non-abbreviated link
@@ -1042,6 +1057,29 @@ public class MetadataObtainer {
 					sanitized = sanitized.substring(0, sanitized.indexOf(INDX_PARAM_2));
 				}
 			}
+		}
+		
+		//When fetching YouTube channels, the "/videos" end point is needed to get accurate subscription count
+		if ((sanitized.startsWith(YOUTUBE_CHAN_TOKEN_W_1) || sanitized.startsWith(YOUTUBE_CHAN_TOKEN_W_2)) && sanitized.contains(VID_ENDPNT) == false) {
+			if (sanitized.startsWith(YOUTUBE_CHAN_TOKEN_W_1)) {
+				temp = sanitized.trim().substring(YOUTUBE_CHAN_TOKEN_W_1.length());
+				sanitized = YOUTUBE_CHAN_TOKEN_W_1;
+			} else {
+				temp = sanitized.trim().substring(YOUTUBE_CHAN_TOKEN_W_2.length());
+				sanitized = YOUTUBE_CHAN_TOKEN_W_2;
+			}
+			
+			//extract user name
+			for (int i = 0; i < temp.length(); i++) {
+				if (temp.charAt(i) != '/' && temp.charAt(i) != '?' && temp.charAt(i) != '&') {
+					sanitized += temp.charAt(i);
+				} else {
+					break;
+				}
+			}
+			
+			//add video endpoint
+			sanitized += VID_ENDPNT;
 		}
 		
 		//remove polymer disable

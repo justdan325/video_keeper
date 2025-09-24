@@ -51,11 +51,18 @@ public class Test {
 	private static final String TIME_YT_PREVIEW 	= "06:34";
 	
 	private static final String URL_YT_CHANNEL		= "https://www.youtube.com/@DaveMcRaeOfficial/videos";
-	private static final String TYPE_YT_CHANNEL 	= "YouTube Channels";
+	private static final String TYPE_YT_CHANNEL 	= "YouTube Channels using \"@\"";
 	private static final String TTL_YT_CHANNEL 		= "DaveMcRaeOfficial";
 	private static final String DATE_YT_CHANNEL 	= "30K Subscribers ~ 1.5K Videos";
 	private static final String CHNL_YT_CHANNEL 	= "DaveMcRaeOfficial on YouTube";
 	private static final String TIME_YT_CHANNEL 	= "";
+	
+	private static final String URL_YT_CHANNEL_2	= "https://www.youtube.com/c/GreatDepressionCooking";
+	private static final String TYPE_YT_CHANNEL_2 	= "YouTube Channels using \"/c/\"";
+	private static final String TTL_YT_CHANNEL_2 	= "Great Depression Cooking with Clara";
+	private static final String DATE_YT_CHANNEL_2 	= "1.06M Subscribers ~ 51 Videos";
+	private static final String CHNL_YT_CHANNEL_2 	= "Great Depression Cooking with Clara on YouTube";
+	private static final String TIME_YT_CHANNEL_2 	= "";
 	
 	//Odysee
 	private static final int	OD_GROUP_NO			= 2;
@@ -163,6 +170,7 @@ public class Test {
 		runTest(testLink(URL_YT_TIMESTMP, TYPE_YT_TIMESTMP, TTL_YT_TIMESTMP, DATE_YT_TIMESTMP, CHNL_YT_TIMESTMP, TIME_YT_TIMESTMP), TYPE_YT_TIMESTMP, YT_GROUP_NO);
 		runTest(testLink(URL_YT_PREVIEW, TYPE_YT_PREVIEW, TTL_YT_PREVIEW, DATE_YT_PREVIEW, CHNL_YT_PREVIEW, TIME_YT_PREVIEW), TYPE_YT_PREVIEW, YT_GROUP_NO);
 		runTest(testLink(URL_YT_CHANNEL, TYPE_YT_CHANNEL, TTL_YT_CHANNEL, DATE_YT_CHANNEL, CHNL_YT_CHANNEL, TIME_YT_CHANNEL), TYPE_YT_CHANNEL, YT_GROUP_NO);
+		runTest(testLink(URL_YT_CHANNEL_2, TYPE_YT_CHANNEL_2, TTL_YT_CHANNEL_2, DATE_YT_CHANNEL_2, CHNL_YT_CHANNEL_2, TIME_YT_CHANNEL_2), TYPE_YT_CHANNEL_2, YT_GROUP_NO);
 		
 		//Odysee
 		runTest(testLink(URL_OD_NORMAL, TYPE_OD_NORMAL, TTL_OD_NORMAL, DATE_OD_NORMAL, CHNL_OD_NORMAL, TIME_OD_NORMAL), TYPE_OD_NORMAL, OD_GROUP_NO);
