@@ -54,7 +54,7 @@ public class MetadataObtainer {
 	
 	public static void main(String[] args) {
 //		System.out.println(fetchHtml("https://odysee.com/win11:6d73df3083e0f634b18f54521763184b47980d8a"));
-		final String URL = "https://rumble.com/v6z6vvw-allatra-tv-live-247.html?e9s=src_v1_live";
+		final String URL = "youtu.be/pvpbzcwJW0o";
 		MetadataObtainer o = new MetadataObtainer(URL);
 		System.out.println("URL provided: [" + URL + "]");
 		System.out.println("Is supported: [" + isSupported(URL, true) + "]");
@@ -67,6 +67,11 @@ public class MetadataObtainer {
 	public static boolean isSupported(String urlStr, boolean inspectWebpage) {
 		String html = FETCH_ERROR_PREFIX;
 		boolean supported = false;
+		
+		//make sure that we have a proper URL
+		if (urlStr.startsWith("https://") || urlStr.startsWith("http://") == false) {
+			urlStr = "https://" + urlStr;
+		}
 
 		if (urlStr.startsWith(YOUTUBE_PREFIX) || urlStr.startsWith(YOUTUBE_PREFIX_W)
 				|| urlStr.contains(YOUTUBE_PLAYLIST_TOKEN) || urlStr.startsWith(YOUTUBE_PREFIX_ABBR)
