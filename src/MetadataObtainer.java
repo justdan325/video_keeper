@@ -54,7 +54,7 @@ public class MetadataObtainer {
 	
 	public static void main(String[] args) {
 //		System.out.println(fetchHtml("https://odysee.com/win11:6d73df3083e0f634b18f54521763184b47980d8a"));
-		final String URL = "https://www.youtube.com/watch?v=UTosKh0M42o";
+		final String URL = "https://www.youtube.com/watch?v=O5u-aoHfbbI";
 		MetadataObtainer o = new MetadataObtainer(URL);
 		System.out.println("URL provided: [" + URL + "]");
 		System.out.println("Is supported: [" + isSupported(URL, true) + "]");
@@ -658,9 +658,13 @@ public class MetadataObtainer {
 				//attempt to derive from main page
 				if (begin != -1 && end != -1 && (end - begin) <= 8) {
 					try {
-						//add one second to be consistent with thumbnail time, which the backup method uses
-						//YouTube's player always reads a second shorter than the thumbnail time stamp
-						seconds = Integer.parseInt(html.substring(begin, end)) + 1; 
+						seconds = Integer.parseInt(html.substring(begin, end)); 
+						
+						//if stream time is present (> 0) add one second to be consistent with thumbnail time, which the backup 
+						//method uses YouTube's player always reads a second shorter than the thumbnail time stamp
+						if (seconds > 0) {
+							seconds++;
+						}
 					} catch (Exception e) {
 						seconds = -1;
 					}
