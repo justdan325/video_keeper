@@ -49,6 +49,8 @@ public class MetadataObtainer {
 	
 		if (isSupported) {
 			this.html = fetchHtml(this.urlStr);
+			
+			reattemptUponFailure();
 		} else {
 			this.html = FETCH_ERROR_PREFIX;
 		}
@@ -56,7 +58,7 @@ public class MetadataObtainer {
 	
 	public static void main(String[] args) {
 //		System.out.println(fetchHtml("https://odysee.com/win11:6d73df3083e0f634b18f54521763184b47980d8a"));
-		final String URL = "https://www.youtube.com/channel/UC0pQ953D3p1fP3Cg5m0zFfw/";
+		final String URL = "https://www.twitch.tv/videos/2575353535";
 		MetadataObtainer o = new MetadataObtainer(URL);
 		System.out.println("URL provided: [" + URL + "]");
 		System.out.println("Is supported: [" + isSupported(URL, true) + "]");
@@ -926,6 +928,27 @@ public class MetadataObtainer {
 		}
 		
 		return content;
+	}
+	
+	private void reattemptUponFailure() {
+		//Twitch will often fail to get html with the desired elements in it. Reattempt up to four times.
+		if (urlStr.startsWith(TWITCH_PREFIX_W) || urlStr.startsWith(TWITCH_PREFIX_MOB)) {
+			//see if channel is missing...don't bother with title or time as they don't work on all VODs
+			if (getChannel().equals(" on Twitch")) {
+				for (int i = 0; i < 4; i++) {
+					this.html = fetchHtml(urlStr);
+					
+					if (getChannel().equals(" on Twitch")) {
+						try {
+							Thread.sleep(750);
+						} catch (InterruptedException e) {
+						}
+					} else {
+						break;
+					}
+				}
+			}
+		}
 	}
 	
 	private String sanitize(String urlStr) {
