@@ -36,7 +36,7 @@ public class MainGui extends JFrame implements WindowListener {
 	public	static final Color	PROG_COLOR_TXT_DRK	= Color.BLACK;
 	
 	private static final String PASTE_MESS 			= "<Paste Video Link Here>";
-	private static final String NEXT_BUTTON_TXT 	= "Play Next";
+	private static final String NEXT_BUTTON_TXT 	= "Play";
 	private static final String PREV_BUTTON_TXT 	= "Play Prev.";
 //	private static final String FWRD_BUTTON_TXT 	= ">";
 	private static final String FWRD_BUTTON_TXT 	= "➡️";
