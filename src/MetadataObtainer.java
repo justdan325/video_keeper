@@ -58,7 +58,7 @@ public class MetadataObtainer {
 	
 	public static void main(String[] args) {
 //		System.out.println(fetchHtml("https://odysee.com/win11:6d73df3083e0f634b18f54521763184b47980d8a"));
-		final String URL = "https://rumble.com/v6ziyjy-they-met-on-x-with-goodtweetman-and-catholic-engineer-crash-canon-podcast-e.html?e9s=src_v1_cbl%2Csrc_v1_ucp_a";
+		final String URL = "https://www.youtube.com/watch?v=gRxi1eCV4xI&t=1s";
 		MetadataObtainer o = new MetadataObtainer(URL);
 		System.out.println("URL provided: [" + URL + "]");
 		System.out.println("Is supported: [" + isSupported(URL, true) + "]");
@@ -1169,7 +1169,15 @@ public class MetadataObtainer {
 		if (keepCritialData == false) {
 			//remove time tags
 			if (sanitized.contains(TIME_PARAM_1)) {
-				this.atTime = Optional.of(sanitized.substring(sanitized.indexOf(TIME_PARAM_1) + TIME_PARAM_1.length()));
+				temp = sanitized.substring(sanitized.indexOf(TIME_PARAM_1) + TIME_PARAM_1.length());
+				
+				//YouTube used to append "s" after the time stamp to indicate seconds. They seem not to do this much
+				//any longer, but compensating for it here just in case. -DJM 10/2/25
+				if (temp.endsWith("s")) {
+					temp = temp.replaceAll("s", "");;
+				}
+				
+				this.atTime = Optional.of(temp);
 				sanitized = sanitized.substring(0, sanitized.indexOf(TIME_PARAM_1));
 			} 
 		}
