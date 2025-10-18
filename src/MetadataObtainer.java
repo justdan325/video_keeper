@@ -58,7 +58,7 @@ public class MetadataObtainer {
 	
 	public static void main(String[] args) {
 //		System.out.println(fetchHtml("https://odysee.com/win11:6d73df3083e0f634b18f54521763184b47980d8a"));
-		final String URL = "https://www.youtube.com/watch?v=MrUFIgtxt20&t=2226s";
+		final String URL = "https://rumble.com/v70fz36-bourbon-n-beer-20251017.html?e9s=src_v1_clp";
 		MetadataObtainer o = new MetadataObtainer(URL);
 		System.out.println("URL provided: [" + URL + "]");
 		System.out.println("Is supported: [" + isSupported(URL, true) + "]");

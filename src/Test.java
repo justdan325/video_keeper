@@ -119,11 +119,11 @@ public class Test {
 	private static final String CHNL_RUM_NORMAL		= "TigerFitness on Rumble";
 	private static final String TIME_RUM_NORMAL 	= "";
 	
-	private static final String URL_RUM_STRMING		= "https://rumble.com/v6z6vvw-allatra-tv-live-247.html?e9s=src_v1_live";
+	private static final String URL_RUM_STRMING		= "https://rumble.com/v70fz36-bourbon-n-beer-20251017.html";
 	private static final String TYPE_RUM_STRMING 	= "Rumble Streaming";
-	private static final String TTL_RUM_STRMING 	= "ALLATRA TV LIVE 24/7";
+	private static final String TTL_RUM_STRMING 	= "Bourbon 'n' Beer 20251017";
 	private static final String DATE_RUM_STRMING 	= "Streaming Now";
-	private static final String CHNL_RUM_STRMING	= "AllatRa TV on Rumble";
+	private static final String CHNL_RUM_STRMING	= "Living Yankee Free on Rumble";
 	private static final String TIME_RUM_STRMING 	= "";
 	
 	private static final String URL_RUM_STRMD		= "https://rumble.com/v6ya0xo-mousehold-farm-all-weather-riding-arena.html?e9s=src_v1_cbl%2Csrc_v1_ucp_l";
