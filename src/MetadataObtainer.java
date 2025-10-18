@@ -58,7 +58,7 @@ public class MetadataObtainer {
 	
 	public static void main(String[] args) {
 //		System.out.println(fetchHtml("https://odysee.com/win11:6d73df3083e0f634b18f54521763184b47980d8a"));
-		final String URL = "https://www.twitch.tv/videos/2583383258";
+		final String URL = "https://www.youtube.com/watch?v=MrUFIgtxt20&t=2226s";
 		MetadataObtainer o = new MetadataObtainer(URL);
 		System.out.println("URL provided: [" + URL + "]");
 		System.out.println("Is supported: [" + isSupported(URL, true) + "]");
@@ -1167,9 +1167,15 @@ public class MetadataObtainer {
 		sanitized = sanitized.replace(TIME_PARAM_2, TIME_PARAM_1);
 		
 		if (keepCritialData == false) {
-			//remove time tags
+			//remove time tags and the trailing "s" (if present)
 			if (sanitized.contains(TIME_PARAM_1)) {
-				this.atTime = Optional.of(sanitized.substring(sanitized.indexOf(TIME_PARAM_1) + TIME_PARAM_1.length()));
+				temp = sanitized.substring(sanitized.indexOf(TIME_PARAM_1) + TIME_PARAM_1.length());
+				
+				if (temp.toLowerCase().endsWith("s")) {
+					temp = temp.substring(0, temp.toLowerCase().lastIndexOf("s"));
+				}
+				
+				this.atTime = Optional.of(temp);
 				sanitized = sanitized.substring(0, sanitized.indexOf(TIME_PARAM_1));
 			} 
 		}
