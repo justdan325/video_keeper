@@ -60,7 +60,7 @@ public class Test {
 	private static final String URL_YT_CHANNEL_2	= "https://www.youtube.com/c/GreatDepressionCooking";
 	private static final String TYPE_YT_CHANNEL_2 	= "YouTube Channels using \"/c/\"";
 	private static final String TTL_YT_CHANNEL_2 	= "Great Depression Cooking with Clara";
-	private static final String DATE_YT_CHANNEL_2 	= "1.06M Subscribers ~ 51 Videos";
+	private static final String DATE_YT_CHANNEL_2 	= "1.07M Subscribers ~ 51 Videos";
 	private static final String CHNL_YT_CHANNEL_2 	= "Great Depression Cooking with Clara on YouTube";
 	private static final String TIME_YT_CHANNEL_2 	= "";
 	
