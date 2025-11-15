@@ -132,7 +132,7 @@ public class VideoList {
 	public synchronized boolean setIndex(int index) {
 		boolean set = false;
 
-		if (index <= list.size() - 1) {
+		if (index >= 0 && index <= list.size() - 1) {
 			this.index = index;
 			set = true;
 		}

@@ -47,6 +47,13 @@ public class VideoKeeper {
 		return vidNodeList.getIndex();
 	}
 	
+	/*
+	 * This method will take the human readable, convert it to the primitive index, and set it.
+	 */
+	public boolean setCurrentIndex(int index) {
+		return vidNodeList.setIndex(--index);
+	}
+	
 	public VideoDataNode getPrev() {
 		return prev;
 	}

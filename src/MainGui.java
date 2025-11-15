@@ -55,6 +55,7 @@ public class MainGui extends JFrame implements WindowListener {
 	private static final String DEL_BUTTON_TXT 		= "🗑️";
 //	private static final String SEARCH_BUTTON_TXT 	= "Search";
 	private static final String SEARCH_BUTTON_TXT 	= "🔎";
+	private static final String GOTO_BUTTON_TXT		= "i";
 	private static final String EDIT_BUTTON_TXT 	= "📝";
 	private static final String UP_NEXT_TXT			= " -- Up Next -- ";
 	private static final String EMPTY_QUEUE_TXT		= "~ No Video Links in Watch List ~";
@@ -65,6 +66,7 @@ public class MainGui extends JFrame implements WindowListener {
 	private static final String TOOLTIP_REFRESH		= "Refresh video metadata for the next video.";
 	private static final String TOOLTIP_DELETE		= "Delete current video from the list.";
 	private static final String TOOLTIP_SEARCH		= "Search through the list of videos.";
+	private static final String TOOLTIP_GOTO_IND	= "Go to index in watch list.";
 	private static final String TOOLTIP_EDIT		= "Edit current video metadata.";
 	private static final String TOOLTIP_SAVE		= "Save changes to the watch list.";
 	private static final String CHANNEL_PREFIX 		= "By: ";
@@ -94,6 +96,7 @@ public class MainGui extends JFrame implements WindowListener {
 	private JButton deleteButton;
 	private JButton editButton;
 	private JButton searchButton;
+	private JButton gotoIndexButton;
 	private JLabel upNextLabel;
 	private JLabel counterLabel;
 	private JLabel titleLabel;
@@ -126,6 +129,7 @@ public class MainGui extends JFrame implements WindowListener {
 		this.deleteButton = new JButton(DEL_BUTTON_TXT);
 		this.editButton = new JButton(EDIT_BUTTON_TXT);
 		this.searchButton = new JButton(SEARCH_BUTTON_TXT);
+		this.gotoIndexButton = new JButton(GOTO_BUTTON_TXT);
 		this.upNextLabel = new JLabel();
 		this.counterLabel = new JLabel("0");
 		this.titleLabel = new JLabel();
@@ -182,6 +186,7 @@ public class MainGui extends JFrame implements WindowListener {
 		deleteButton.setToolTipText(TOOLTIP_DELETE);
 		editButton.setToolTipText(TOOLTIP_EDIT);
 		searchButton.setToolTipText(TOOLTIP_SEARCH);
+		gotoIndexButton.setToolTipText(TOOLTIP_GOTO_IND);
 		saveButton.setToolTipText(TOOLTIP_SAVE);
 		settButton.setToolTipText(TOOLTIP_SETTINGS);
 		settButton.setBackground(PROG_COLOR_BTN_EN);
@@ -193,6 +198,7 @@ public class MainGui extends JFrame implements WindowListener {
 		topPanel.add(refreshButton);
 		topPanel.add(deleteButton);
 		topPanel.add(editButton);
+		topPanel.add(gotoIndexButton);
 		topPanel.add(searchButton);
 		
 		north.add(topPanel);
@@ -418,6 +424,24 @@ public class MainGui extends JFrame implements WindowListener {
 				searchDialog.setVisible(true);
 			}
 		});
+		
+		gotoIndexButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				String choiceStr = JOptionPane.showInputDialog(rootPane, "Enter an index to go to:", "1");
+				int choice;
+				
+				try {
+					choice = Integer.parseInt(choiceStr);
+				} catch (NumberFormatException f) {
+					choice = -2;
+				}
+				
+				if (keeper.setCurrentIndex(choice) == false) {
+					JOptionPane.showMessageDialog(rootPane, "Must enter a valid index!", "Invalid Index! " + PROG_NAME, JOptionPane.ERROR_MESSAGE);
+				}
+			}
+		});
 	}
 	
 	private void add() {
@@ -496,6 +520,8 @@ public class MainGui extends JFrame implements WindowListener {
 						editButton.setBackground(PROG_COLOR_BTN_EN);
 						searchButton.setEnabled(true);
 						searchButton.setBackground(PROG_COLOR_BTN_EN);
+						gotoIndexButton.setEnabled(true);
+						gotoIndexButton.setBackground(PROG_COLOR_BTN_EN);
 						
 						if (refreshing == false) {
 							refreshButton.setEnabled(true);
@@ -521,6 +547,8 @@ public class MainGui extends JFrame implements WindowListener {
 						editButton.setBackground(PROG_COLOR_BTN_DIS);
 						searchButton.setEnabled(false);
 						searchButton.setBackground(PROG_COLOR_BTN_DIS);
+						gotoIndexButton.setEnabled(false);
+						gotoIndexButton.setBackground(PROG_COLOR_BTN_DIS);
 						
 						if (refreshing == false) {
 							refreshButton.setEnabled(false);
