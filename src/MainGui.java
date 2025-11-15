@@ -431,14 +431,17 @@ public class MainGui extends JFrame implements WindowListener {
 				String choiceStr = JOptionPane.showInputDialog(rootPane, "Enter an index to go to:", "1");
 				int choice;
 				
-				try {
-					choice = Integer.parseInt(choiceStr);
-				} catch (NumberFormatException f) {
-					choice = -2;
-				}
-				
-				if (keeper.setCurrentIndex(choice) == false) {
-					JOptionPane.showMessageDialog(rootPane, "Must enter a valid index!", "Invalid Index! " + PROG_NAME, JOptionPane.ERROR_MESSAGE);
+				if (choiceStr != null) {
+					try {
+						choice = Integer.parseInt(choiceStr);
+					} catch (NumberFormatException f) {
+						choice = -2;
+					}
+
+					if (keeper.setCurrentIndex(choice) == false) {
+						JOptionPane.showMessageDialog(rootPane, "Must enter a valid index!",
+								"Invalid Index! " + PROG_NAME, JOptionPane.ERROR_MESSAGE);
+					}
 				}
 			}
 		});
