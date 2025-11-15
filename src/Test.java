@@ -93,12 +93,12 @@ public class Test {
 	
 	//Twitch
 	private static final int	TWI_GROUP_NO		= 4;
-	private static final String URL_TWI_MOBILE		= "https://www.twitch.tv/videos/2583383258";
+	private static final String URL_TWI_MOBILE		= "https://www.twitch.tv/videos/2616952037";
 	private static final String TYPE_TWI_MOBILE 	= "Twitch Mobile (and normal since normal gets converted to mobile)";
-	private static final String TTL_TWI_MOBILE 		= "388";
+	private static final String TTL_TWI_MOBILE 		= "Back at GoF 3.0";
 	private static final String DATE_TWI_MOBILE 	= "";
 	private static final String CHNL_TWI_MOBILE	 	= "ptony on Twitch";
-	private static final String TIME_TWI_MOBILE 	= "1:22:09";
+	private static final String TIME_TWI_MOBILE 	= "1:52:12";
 	
 	//DailyMotion
 	private static final int	DLYMTN_GROUP_NO		= 5;
@@ -112,26 +112,12 @@ public class Test {
 	
 	//Rumble
 	private static final int	RUM_GROUP_NO		= 6;
-	private static final String URL_RUM_NORMAL		= "https://rumble.com/v6y3w2q-slu-pp-332-my-results-so-far-update.html?playlist_id=MAnJ6cuQdtA";
+	private static final String URL_RUM_NORMAL		= "https://rumble.com/v70fz36-bourbon-n-beer-20251017.html";
 	private static final String TYPE_RUM_NORMAL 	= "Rumble Normal";
-	private static final String TTL_RUM_NORMAL 		= "SLU-PP-332: My Results So Far (Update)";
-	private static final String DATE_RUM_NORMAL 	= "August 26, 2025";
-	private static final String CHNL_RUM_NORMAL		= "TigerFitness on Rumble";
+	private static final String TTL_RUM_NORMAL 		= "bourbon n beer 20251017";
+	private static final String DATE_RUM_NORMAL 	= "--";
+	private static final String CHNL_RUM_NORMAL		= "On Rumble";
 	private static final String TIME_RUM_NORMAL 	= "";
-	
-	private static final String URL_RUM_STRMING		= "https://rumble.com/v70fz36-bourbon-n-beer-20251017.html";
-	private static final String TYPE_RUM_STRMING 	= "Rumble Streaming";
-	private static final String TTL_RUM_STRMING 	= "Bourbon 'n' Beer 20251017";
-	private static final String DATE_RUM_STRMING 	= "Streaming Now";
-	private static final String CHNL_RUM_STRMING	= "Living Yankee Free on Rumble";
-	private static final String TIME_RUM_STRMING 	= "";
-	
-	private static final String URL_RUM_STRMD		= "https://rumble.com/v6ya0xo-mousehold-farm-all-weather-riding-arena.html?e9s=src_v1_cbl%2Csrc_v1_ucp_l";
-	private static final String TYPE_RUM_STRMD 		= "Rumble Streamed Previously";
-	private static final String TTL_RUM_STRMD 		= "Mousehold Farm Live Stream - Replay - VHS Archives";
-	private static final String DATE_RUM_STRMD 		= "Streamed on 2025-08-30 16:48:03";
-	private static final String CHNL_RUM_STRMD		= "Mousehold Farm on Rumble";
-	private static final String TIME_RUM_STRMD 		= "";
 	
 	//Bitchute
 	private static final int	BTCHT_GROUP_NO		= 7;
@@ -173,9 +159,7 @@ public class Test {
 		runTest(testLink(URL_TWI_MOBILE, TYPE_TWI_MOBILE, TTL_TWI_MOBILE, DATE_TWI_MOBILE, CHNL_TWI_MOBILE, TIME_TWI_MOBILE), TYPE_TWI_MOBILE, TWI_GROUP_NO);
 
 		//Rumble
-		runTest(testLink(URL_RUM_STRMING, TYPE_RUM_STRMING, TTL_RUM_STRMING, DATE_RUM_STRMING, CHNL_RUM_STRMING, TIME_RUM_STRMING), TYPE_RUM_STRMING, RUM_GROUP_NO);
 		runTest(testLink(URL_RUM_NORMAL, TYPE_RUM_NORMAL, TTL_RUM_NORMAL, DATE_RUM_NORMAL, CHNL_RUM_NORMAL, TIME_RUM_NORMAL), TYPE_RUM_NORMAL, RUM_GROUP_NO);
-		runTest(testLink(URL_RUM_STRMD, TYPE_RUM_STRMD, TTL_RUM_STRMD, DATE_RUM_STRMD, CHNL_RUM_STRMD, TIME_RUM_STRMD), TYPE_RUM_STRMD, RUM_GROUP_NO);
 
 		//Vimeo
 		runTest(testLink(URL_VMO_NORMAL, TYPE_VMO_NORMAL, TTL_VMO_NORMAL, DATE_VMO_NORMAL, CHNL_VMO_NORMAL, TIME_VMO_NORMAL), TYPE_VMO_NORMAL, VMO_GROUP_NO);

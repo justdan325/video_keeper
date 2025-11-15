@@ -59,6 +59,7 @@ public class MetadataObtainer {
 	public static void main(String[] args) {
 //		System.out.println(fetchHtml("https://odysee.com/win11:6d73df3083e0f634b18f54521763184b47980d8a"));
 		final String URL = "https://www.twitch.tv/videos/2616952037";
+		
 		MetadataObtainer o = new MetadataObtainer(URL);
 		System.out.println("URL provided: [" + URL + "]");
 		System.out.println("Is supported: [" + isSupported(URL, true) + "]");
@@ -190,6 +191,21 @@ public class MetadataObtainer {
 						}
 
 						title = html.substring(begin, end);
+						title = filterEscapeChars(title);
+					}
+				}
+				
+				//Sometimes the DOM is different even on the same channel...
+				if (title.length() > MAX_LEN_TITLE) {
+					begin = html.indexOf("<meta property=\"og:url\" content=\"");
+					prefix = "<meta content=\"";
+					suffix = "on Twitch\" property=";
+					begin = html.indexOf(prefix, begin) + prefix.length();
+					end = html.indexOf(suffix, begin);
+					
+					if (begin != -1 && end != -1) {
+						title = html.substring(begin, end);
+						title = title.substring(0, title.lastIndexOf("-")).trim(); //chop of channel name
 						title = filterEscapeChars(title);
 					}
 				}
