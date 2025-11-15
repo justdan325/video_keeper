@@ -58,7 +58,7 @@ public class MetadataObtainer {
 	
 	public static void main(String[] args) {
 //		System.out.println(fetchHtml("https://odysee.com/win11:6d73df3083e0f634b18f54521763184b47980d8a"));
-		final String URL = "https://rumble.com/v70fz36-bourbon-n-beer-20251017.html?e9s=src_v1_clp";
+		final String URL = "https://www.twitch.tv/videos/2616952037";
 		MetadataObtainer o = new MetadataObtainer(URL);
 		System.out.println("URL provided: [" + URL + "]");
 		System.out.println("Is supported: [" + isSupported(URL, true) + "]");
@@ -241,15 +241,18 @@ public class MetadataObtainer {
 				}
 			//Rumble
 			} else if (urlStr.startsWith(RUMBLE_PREFIX)) {
-				String prefix = "title=\"";
-				String suffix = "\" type";
-				int begin = html.indexOf(prefix) + prefix.length();
-				int end = html.indexOf(suffix, begin);
+//				String prefix = "title=\"";
+//				String suffix = "\" type";
+//				int begin = html.indexOf(prefix) + prefix.length();
+//				int end = html.indexOf(suffix, begin);
+//				
+//				if (begin != -1 && end != -1) {
+//					title = html.substring(begin, end);
+//					title = filterEscapeChars(title);
+//				}
 				
-				if (begin != -1 && end != -1) {
-					title = html.substring(begin, end);
-					title = filterEscapeChars(title);
-				}
+				title = filterEscapeChars(html);
+				title = title.replaceAll("-", " ");
 			//Podbean
 			} else if (urlStr.startsWith(PODBEAN_PREFIX) || urlStr.contains(PODBEAN_TOKEN)) {
 				String prefix = "<title>";
@@ -416,17 +419,19 @@ public class MetadataObtainer {
 				channel = "On BITCHUTE";
 			//Rumble
 			} else if (urlStr.startsWith(RUMBLE_PREFIX)) {
-				String prefix = "data-title=\"";
-				String suffix = "\"";
-				int begin = html.indexOf(prefix) + prefix.length();
-				int end = html.indexOf(suffix, begin);
+//				String prefix = "data-title=\"";
+//				String suffix = "\"";
+//				int begin = html.indexOf(prefix) + prefix.length();
+//				int end = html.indexOf(suffix, begin);
+//				
+//				if (begin != -1 && end != -1) {
+//					channel = html.substring(begin, end);
+//					channel = filterEscapeChars(channel);
+//				}
+//				
+//				channel += " on Rumble";
 				
-				if (begin != -1 && end != -1) {
-					channel = html.substring(begin, end);
-					channel = filterEscapeChars(channel);
-				}
-				
-				channel += " on Rumble";
+				channel = "On Rumble";
 			//Podbean
 			} else if (urlStr.contains(PODBEAN_TOKEN)) {
 				String prefix = "://";
@@ -601,51 +606,53 @@ public class MetadataObtainer {
 				date = "--";
 			//Rumble
 			} else if (urlStr.startsWith(RUMBLE_PREFIX)) {
-				final String STREAMED_INDICATOR = "</clipPath></svg>			Streamed on:			<time datetime=\"";
-				final String STREAMING_INDICATOR = "Streaming now";
+//				final String STREAMED_INDICATOR = "</clipPath></svg>			Streamed on:			<time datetime=\"";
+//				final String STREAMING_INDICATOR = "Streaming now";
+//				
+//				//Stream on Rumble have the date located in a different tag
+//				if (html.contains(STREAMED_INDICATOR)) {
+//					String prefix = STREAMED_INDICATOR;
+//					String suffix = "\"";
+//					int begin = html.indexOf(prefix) + prefix.length();
+//					int end = html.indexOf(suffix, begin);
+//
+//					if (begin != -1 && end != -1) {
+//						date = html.substring(begin, end);
+//						date = date.replaceAll("\n", "");
+//						
+//						//format: 2024-09-21T02:55:15+00:00
+//						date = date.substring(0, 10) + " " + date.substring(11, 19);
+//						date = "Streamed on " + date;
+//					}
+//				} else if (html.contains(STREAMING_INDICATOR)) {
+//					date = "Streaming Now";
+//				} else if (html.contains("Livestream begins")) { 
+//					String prefix = "\"uploadDate\":\"";
+//					String suffix = "\",";
+//					int begin = html.indexOf(prefix) + prefix.length();
+//					int end = html.indexOf(suffix, begin);
+//					
+//					if (begin != -1 && end != -1) {
+//						date = html.substring(begin, end);
+//						date = date.replaceAll("\n", "");
+//						
+//						//format: 2024-09-21T02:55:15+00:00
+//						date = date.substring(0, 10);
+//						date = "Stream begins: " + date;
+//					}
+//				} else {
+//					String prefix = "</clipPath></svg>							<div title=\"";
+//					String suffix = "\">";
+//					int begin = html.indexOf(prefix) + prefix.length();
+//					int end = html.indexOf(suffix, begin);
+//
+//					if (begin != -1 && end != -1) {
+//						date = html.substring(begin, end);
+//						date = date.replaceAll("\n", "");
+//					}
+//				}
 				
-				//Stream on Rumble have the date located in a different tag
-				if (html.contains(STREAMED_INDICATOR)) {
-					String prefix = STREAMED_INDICATOR;
-					String suffix = "\"";
-					int begin = html.indexOf(prefix) + prefix.length();
-					int end = html.indexOf(suffix, begin);
-
-					if (begin != -1 && end != -1) {
-						date = html.substring(begin, end);
-						date = date.replaceAll("\n", "");
-						
-						//format: 2024-09-21T02:55:15+00:00
-						date = date.substring(0, 10) + " " + date.substring(11, 19);
-						date = "Streamed on " + date;
-					}
-				} else if (html.contains(STREAMING_INDICATOR)) {
-					date = "Streaming Now";
-				} else if (html.contains("Livestream begins")) { 
-					String prefix = "\"uploadDate\":\"";
-					String suffix = "\",";
-					int begin = html.indexOf(prefix) + prefix.length();
-					int end = html.indexOf(suffix, begin);
-					
-					if (begin != -1 && end != -1) {
-						date = html.substring(begin, end);
-						date = date.replaceAll("\n", "");
-						
-						//format: 2024-09-21T02:55:15+00:00
-						date = date.substring(0, 10);
-						date = "Stream begins: " + date;
-					}
-				} else {
-					String prefix = "</clipPath></svg>							<div title=\"";
-					String suffix = "\">";
-					int begin = html.indexOf(prefix) + prefix.length();
-					int end = html.indexOf(suffix, begin);
-
-					if (begin != -1 && end != -1) {
-						date = html.substring(begin, end);
-						date = date.replaceAll("\n", "");
-					}
-				}
+				date = "--";
 			//Podbean
 			} else if (urlStr.startsWith(PODBEAN_PREFIX) || urlStr.contains(PODBEAN_TOKEN)) {
 				String prefix = "class=\"episode-date\">";
@@ -901,43 +908,48 @@ public class MetadataObtainer {
 		String content = null;
 		HttpURLConnection connection = null;
 		
-		try {
-			//Daily Motion has a public API for getting title, date, and channel. The DOM of the actual web page only renders these in JavaScript.
-			if (url.startsWith(DAILYMOTION_PREFIX) || url.startsWith(DAILYMOTION_PREFIX_MOB) || url.startsWith(DAILYMOTION_PREFIX_W)) {
-				if (url.contains("?")) {
-					url = url.substring(0, url.indexOf("?"));
-				} else if (url.contains("&")) {
-					url = url.substring(0, url.indexOf("&"));
+		//Rumble now uses Cloudflare, so the best we can do is extract the title from the URL now... 11/14/25
+		if (url.startsWith(RUMBLE_PREFIX)) {
+			content = url.substring(url.indexOf("-") + 1, url.lastIndexOf(".html"));
+		} else {
+			try {
+				//Daily Motion has a public API for getting title, date, and channel. The DOM of the actual web page only renders these in JavaScript.
+				if (url.startsWith(DAILYMOTION_PREFIX) || url.startsWith(DAILYMOTION_PREFIX_MOB) || url.startsWith(DAILYMOTION_PREFIX_W)) {
+					if (url.contains("?")) {
+						url = url.substring(0, url.indexOf("?"));
+					} else if (url.contains("&")) {
+						url = url.substring(0, url.indexOf("&"));
+					}
+					
+					url = "https://api.dailymotion.com/" + url.substring(url.indexOf("video")) + "?fields=title,created_time,channel,duration";
 				}
 				
-				url = "https://api.dailymotion.com/" + url.substring(url.indexOf("video")) + "?fields=title,created_time,channel,duration";
-			}
-			
-			connection =  (HttpURLConnection) new URL(url).openConnection();
-			
-			//This user agent screws up YouTube for some reason.
-			if (!url.startsWith(YOUTUBE_PREFIX) && !url.startsWith(YOUTUBE_PREFIX_ABBR) && !url.startsWith(YOUTUBE_PREFIX_W)
-					&& !url.contains(YOUTUBE_PLAYLIST_TOKEN) && !url.contains(YOUTUBE_SHORT_TOKEN)) {
-				connection.setRequestProperty("User-Agent", "Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10.4; en-US; rv:1.9.2.2) Gecko/20100316 Firefox/3.6.2");
-//				connection.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36");
-			} 
-			
-			Scanner scanner = new Scanner(connection.getInputStream());
-			scanner.useDelimiter("\\Z");
-			content = scanner.next();
-			scanner.close();
-			
-			if (connection.getResponseCode() != 200) {
-				System.out.println("HTTP Response for " + url + ": " + connection.getResponseCode() + " " + connection.getResponseMessage());
-			}
-		} catch (Exception e) {
-			String message = "";
-			
-			if(e.getMessage() != null){
-				message = " -- " + e.getMessage();
-			}
+				connection =  (HttpURLConnection) new URL(url).openConnection();
 				
-		    content = FETCH_ERROR_PREFIX + e.toString() + message;
+				//This user agent screws up YouTube for some reason.
+				if (!url.startsWith(YOUTUBE_PREFIX) && !url.startsWith(YOUTUBE_PREFIX_ABBR) && !url.startsWith(YOUTUBE_PREFIX_W)
+						&& !url.contains(YOUTUBE_PLAYLIST_TOKEN) && !url.contains(YOUTUBE_SHORT_TOKEN)) {
+					connection.setRequestProperty("User-Agent", "Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10.4; en-US; rv:1.9.2.2) Gecko/20100316 Firefox/3.6.2");
+//					connection.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36");
+				} 
+				
+				Scanner scanner = new Scanner(connection.getInputStream());
+				scanner.useDelimiter("\\Z");
+				content = scanner.next();
+				scanner.close();
+				
+				if (connection.getResponseCode() != 200) {
+					System.out.println("HTTP Response for " + url + ": " + connection.getResponseCode() + " " + connection.getResponseMessage());
+				}
+			} catch (Exception e) {
+				String message = "";
+				
+				if(e.getMessage() != null){
+					message = " -- " + e.getMessage();
+				}
+					
+			    content = FETCH_ERROR_PREFIX + e.toString() + message;
+			}
 		}
 		
 		return content;
