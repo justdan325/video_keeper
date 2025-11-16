@@ -81,6 +81,13 @@ public class Test {
 	private static final String CHNL_OD_NORMAL	 	= "@MeekerExtreme on Odysee";
 	private static final String TIME_OD_NORMAL 		= "07:20";
 	
+	private static final String URL_OD_CHANNEL		= "https://odysee.com/@Djelpablo1:a";
+	private static final String TYPE_OD_CHANNEL 	= "Odysee Channel";
+	private static final String TTL_OD_CHANNEL 		= "UNITED TALKS PODCAST";
+	private static final String DATE_OD_CHANNEL 	= "channel";
+	private static final String CHNL_OD_CHANNEL	 	= "@Djelpablo1 on Odysee";
+	private static final String TIME_OD_CHANNEL 	= "";
+	
 	//Vimeo
 	private static final int	VMO_GROUP_NO		= 3;
 	
@@ -187,6 +194,7 @@ public class Test {
 		
 		//Odysee
 		runTest(testLink(URL_OD_NORMAL, TYPE_OD_NORMAL, TTL_OD_NORMAL, DATE_OD_NORMAL, CHNL_OD_NORMAL, TIME_OD_NORMAL), TYPE_OD_NORMAL, OD_GROUP_NO);
+		runTest(testLink(URL_OD_CHANNEL, TYPE_OD_CHANNEL, TTL_OD_CHANNEL, DATE_OD_CHANNEL, CHNL_OD_CHANNEL, TIME_OD_CHANNEL), TYPE_OD_CHANNEL, OD_GROUP_NO);
 				
 		if (failureOccured) {
 			System.err.println("\nFailure(s) occured while testing!");

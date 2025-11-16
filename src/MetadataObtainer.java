@@ -7,6 +7,7 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.time.format.FormatStyle;
 
 public class MetadataObtainer {
@@ -58,7 +59,7 @@ public class MetadataObtainer {
 	
 	public static void main(String[] args) {
 //		System.out.println(fetchHtml("https://odysee.com/win11:6d73df3083e0f634b18f54521763184b47980d8a"));
-		final String URL = "https://www.youtube.com/@daviddifranco";
+		final String URL = "https://odysee.com/@Djelpablo1:a";
 		
 		MetadataObtainer o = new MetadataObtainer(URL);
 		System.out.println("URL provided: [" + URL + "]");
@@ -598,12 +599,18 @@ public class MetadataObtainer {
 				
 				if (begin != -1 && end != -1) {
 					date = html.substring(begin, end);
-				}
 				
-				date = Instant.parse(date).atZone(ZoneId.of("America/Montreal"))
-						.format(DateTimeFormatter.ofLocalizedDateTime(FormatStyle.FULL).withLocale(Locale.US));
-				date = date.replaceAll("Eastern Daylight Time", "EDT");
-				date = date.replaceAll("Eastern Standard Time", "EST");
+					//Will happen if parsing a channel instead of a video.
+					try {
+						date = Instant.parse(date).atZone(ZoneId.of("America/Montreal")).format(DateTimeFormatter.ofLocalizedDateTime(FormatStyle.FULL).withLocale(Locale.US));
+						date = date.replaceAll("Eastern Daylight Time", "EDT");
+						date = date.replaceAll("Eastern Standard Time", "EST");
+					} catch (DateTimeParseException e) {
+						date = "channel";
+					}
+				} else {
+					date = "--";
+				}
 			//Dailymotion
 			} else if (urlStr.startsWith(DAILYMOTION_PREFIX) || urlStr.startsWith(DAILYMOTION_PREFIX_W)
 					|| urlStr.startsWith(DAILYMOTION_PREFIX_MOB)) {
