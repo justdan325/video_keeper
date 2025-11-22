@@ -152,6 +152,15 @@ public class Test {
 	private static final String CHNL_PDBN_NORMAL2	= "htmlallthethings on PodBean";
 	private static final String TIME_PDBN_NORMAL2 	= "1:05:07";
 	
+	//Peer Tube
+	private static final int	PRTB_GROUP_NO		= 9;
+	private static final String URL_PRTB_NORMAL		= "https://videos.lukesmith.xyz/w/jHJygCZrJPDrTSq52D3Fz1";
+	private static final String TYPE_PRTB_NORMAL 	= "PeerTube";
+	private static final String TTL_PRTB_NORMAL 	= "Nostalgia Destroys Souls. - Luke's Videos";
+	private static final String DATE_PRTB_NORMAL 	= "2025-04-14";
+	private static final String CHNL_PRTB_NORMAL	= "Luke's Videos Peertube Instance";
+	private static final String TIME_PRTB_NORMAL 	= "07:49";
+	
 	private int prevGroupNo;
 	private boolean failureOccured;
 	
@@ -167,6 +176,9 @@ public class Test {
 
 		//Rumble
 		runTest(testLink(URL_RUM_NORMAL, TYPE_RUM_NORMAL, TTL_RUM_NORMAL, DATE_RUM_NORMAL, CHNL_RUM_NORMAL, TIME_RUM_NORMAL), TYPE_RUM_NORMAL, RUM_GROUP_NO);
+
+		//PeerTube
+		runTest(testLink(URL_PRTB_NORMAL, TYPE_PRTB_NORMAL, TTL_PRTB_NORMAL, DATE_PRTB_NORMAL, CHNL_PRTB_NORMAL, TIME_PRTB_NORMAL), TYPE_PRTB_NORMAL, PRTB_GROUP_NO);
 
 		//Vimeo
 		runTest(testLink(URL_VMO_NORMAL, TYPE_VMO_NORMAL, TTL_VMO_NORMAL, DATE_VMO_NORMAL, CHNL_VMO_NORMAL, TIME_VMO_NORMAL), TYPE_VMO_NORMAL, VMO_GROUP_NO);
@@ -195,7 +207,7 @@ public class Test {
 		//Odysee
 		runTest(testLink(URL_OD_NORMAL, TYPE_OD_NORMAL, TTL_OD_NORMAL, DATE_OD_NORMAL, CHNL_OD_NORMAL, TIME_OD_NORMAL), TYPE_OD_NORMAL, OD_GROUP_NO);
 		runTest(testLink(URL_OD_CHANNEL, TYPE_OD_CHANNEL, TTL_OD_CHANNEL, DATE_OD_CHANNEL, CHNL_OD_CHANNEL, TIME_OD_CHANNEL), TYPE_OD_CHANNEL, OD_GROUP_NO);
-				
+		
 		if (failureOccured) {
 			System.err.println("\nFailure(s) occured while testing!");
 		} else {

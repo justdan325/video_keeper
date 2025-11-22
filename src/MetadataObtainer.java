@@ -59,7 +59,7 @@ public class MetadataObtainer {
 	
 	public static void main(String[] args) {
 //		System.out.println(fetchHtml("https://odysee.com/win11:6d73df3083e0f634b18f54521763184b47980d8a"));
-		final String URL = "https://odysee.com/@Djelpablo1:a";
+		final String URL = "https://videos.lukesmith.xyz/w/jHJygCZrJPDrTSq52D3Fz1";
 		
 		MetadataObtainer o = new MetadataObtainer(URL);
 		System.out.println("URL provided: [" + URL + "]");
