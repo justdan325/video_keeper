@@ -59,7 +59,7 @@ public class MetadataObtainer {
 	
 	public static void main(String[] args) {
 //		System.out.println(fetchHtml("https://odysee.com/win11:6d73df3083e0f634b18f54521763184b47980d8a"));
-		final String URL = "https://videos.lukesmith.xyz/w/jHJygCZrJPDrTSq52D3Fz1";
+		final String URL = "https://www.twitch.tv/videos/2623822840";
 		
 		MetadataObtainer o = new MetadataObtainer(URL);
 		System.out.println("URL provided: [" + URL + "]");
@@ -176,12 +176,12 @@ public class MetadataObtainer {
 				}
 			//Twitch
 			} else if(urlStr.startsWith(TWITCH_PREFIX_MOB)) {
-				String prefix = "\"/><meta property=\"og:title\" content=\"";
+				String prefix = "><meta property=\"og:title\" content=\"";
 				String suffix = " on Twitch\"/><meta ";
 				int begin = html.indexOf(prefix) + prefix.length();
 				int end = html.indexOf(suffix, begin);
 				
-				if (begin != -1 && end != -1) {
+				if (begin != prefix.length() - 1 && end != -1) {
 					title = html.substring(begin, end);
 					//using lastIndexOf doesn't work because reasons...
 					end -= 2;
