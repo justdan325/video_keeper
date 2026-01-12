@@ -59,8 +59,8 @@ public class MetadataObtainer {
 	}
 	
 	public static void main(String[] args) {
-//		System.out.println(fetchHtml("https://odysee.com/win11:6d73df3083e0f634b18f54521763184b47980d8a"));
-		final String URL = "https://vimeo.com/showcase/10841475?video=1153235237";
+//		System.out.println(fetchHtml("https://vimeo.com/1153335296"));
+		final String URL = "https://vimeo.com/showcase/10841475?video=1153335296";
 		
 		MetadataObtainer o = new MetadataObtainer(URL);
 		System.out.println("URL provided: [" + URL + "]");
@@ -398,7 +398,21 @@ public class MetadataObtainer {
 				channel += " on Twitch";
 			//Vimeo
 			} else if (urlStr.startsWith(VIMEO_PREFIX)) {
-				channel += "On Vimeo"; //Channel/user name is rendered via JavaScript
+				channel += "On Vimeo"; //in case channel/user name is rendered via JavaScript
+				
+				if (html.contains("<meta property=\"og:description")) {
+					String prefix = "&amp;quot; by ";
+					String suffix = " on Vimeo,";
+					int begin = html.indexOf(prefix) + prefix.length();
+					int end = html.indexOf(suffix, begin);
+
+					if (begin != -1 && end != -1) {
+						channel = html.substring(begin, end);
+						channel = filterEscapeChars(channel);
+						
+						channel += " on Vimeo";
+					}
+				}
 			//Odysee
 			} else if (urlStr.startsWith(ODYSEE_PREFIX)) {
 				if (urlStr.contains("@")) {
