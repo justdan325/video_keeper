@@ -25,6 +25,7 @@ public class MetadataObtainer {
 	private static final String TWITCH_PREFIX_W			= "https://www.twitch.tv/videos/";
 	private static final String TWITCH_PREFIX_MOB		= "https://m.twitch.tv/videos/";
 	private static final String VIMEO_PREFIX			= "https://vimeo.com/";
+	private static final String VIMEO_QP_TOKEN			= "?video=";
 	private static final String ODYSEE_PREFIX			= "https://odysee.com/";
 	private static final String DAILYMOTION_PREFIX_W 	= "https://www.dailymotion.com/video/";
 	private static final String DAILYMOTION_PREFIX		= "https://dailymotion.com/video/";
@@ -45,7 +46,7 @@ public class MetadataObtainer {
 	
 	public MetadataObtainer(String urlStr) {
 		this.atTime = Optional.empty();
-		this.urlStr = sanitize(urlStr);
+		this.urlStr = sanitizeUrl(urlStr);
 		this.isSupported = isSupported(urlStr, true);
 	
 		if (isSupported) {
@@ -59,7 +60,7 @@ public class MetadataObtainer {
 	
 	public static void main(String[] args) {
 //		System.out.println(fetchHtml("https://odysee.com/win11:6d73df3083e0f634b18f54521763184b47980d8a"));
-		final String URL = "https://www.youtube.com/@daviddifranco";
+		final String URL = "https://vimeo.com/showcase/10841475?video=1153235237";
 		
 		MetadataObtainer o = new MetadataObtainer(URL);
 		System.out.println("URL provided: [" + URL + "]");
@@ -1009,7 +1010,7 @@ public class MetadataObtainer {
 		}
 	}
 	
-	private String sanitize(String urlStr) {
+	private String sanitizeUrl(String urlStr) {
 		String sanitized = urlStr;
 		
 		//https fix
@@ -1025,10 +1026,12 @@ public class MetadataObtainer {
 				|| sanitized.contains(YOUTUBE_LIVE_TOKEN) || sanitized.contains(YOUTUBE_LIVE_TOKEN_W)
 				|| sanitized.contains(YOUTUBE_CHAN_TOKEN_W_1) || sanitized.contains(YOUTUBE_CHAN_TOKEN_W_2)) {
 
-			sanitized = sanitizeYoutube(sanitized, false);
+			sanitized = sanitizeYoutubeUrl(sanitized, false);
 		//Twitch
 		} else if (sanitized.startsWith(TWITCH_PREFIX_W) || sanitized.startsWith(TWITCH_PREFIX_MOB) || sanitized.startsWith(ODYSEE_PREFIX)) {
-			sanitized = sanitizeTwitchAndOdysee(sanitized);
+			sanitized = sanitizeTwitchAndOdyseeUrl(sanitized);
+		} else if (sanitized.startsWith(VIMEO_PREFIX)) {
+			sanitized = sanitizeVimeoUrl(urlStr);
 		}
 		
 		return sanitized;
@@ -1042,7 +1045,7 @@ public class MetadataObtainer {
 		
 		//YouTube
 		if (url.startsWith(YOUTUBE_PREFIX) || url.startsWith(YOUTUBE_PREFIX_W) || url.startsWith(YOUTUBE_PREFIX_ABBR) || url.contains(YOUTUBE_PLAYLIST_TOKEN)) {
-			sanitized = Optional.of(sanitizeYoutube(url, true));
+			sanitized = Optional.of(sanitizeYoutubeUrl(url, true));
 		}
 		
 		return sanitized;
@@ -1085,7 +1088,7 @@ public class MetadataObtainer {
 	/*
 	 * boolean keepCritialData : useful for wanting to keep time param, but get rid of preview & list data, for example
 	 */
-	private String sanitizeYoutube(String urlStr, boolean keepCritialData) {
+	private String sanitizeYoutubeUrl(String urlStr, boolean keepCritialData) {
 		final String TIME_PARAM_1 = "&t=";
 		final String TIME_PARAM_2 = "?t=";
 		final String LIST_PARAM_1 = "&list=";
@@ -1227,8 +1230,29 @@ public class MetadataObtainer {
 		
 		return sanitized;
 	}
+	
+	private String sanitizeVimeoUrl(String urlStr) {
+		String sanitized = urlStr;
+		String temp = "";
+		int i = 0;
+		
+		//In cases where the video ID is does not immediately follow the TLD, but instead is in a query parameter.
+		if (urlStr.contains(VIMEO_QP_TOKEN)) {
+			sanitized = sanitized.substring(sanitized.indexOf(VIMEO_QP_TOKEN) + VIMEO_QP_TOKEN.length());
+			
+			do {
+				temp += sanitized.charAt(i);
+				
+				i++;
+			} while (i < sanitized.length() && sanitized.charAt(i) != '/' && sanitized.charAt(i) != '?' && sanitized.charAt(i) != '&' && sanitized.charAt(i) != ' ');
+			
+			sanitized = VIMEO_PREFIX + temp;
+		}
+		
+		return sanitized;
+	}
 
-	private String sanitizeTwitchAndOdysee(String urlStr) {
+	private String sanitizeTwitchAndOdyseeUrl(String urlStr) {
 		final String TIME_Q_PARAM = "?t=";
 		String sanitized = urlStr;
 		
