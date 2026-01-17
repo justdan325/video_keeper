@@ -11,6 +11,7 @@ public class DataModel {
 	private int currIndex;
 	private boolean autoSaveOnExit;
 	private boolean checkForDupl;
+	private boolean autoPopUpEditorCheckbox;
 	private boolean requestSaveButtonEn;
 	private boolean caseSensitive;
 	private boolean searchThruTitles;
@@ -28,6 +29,7 @@ public class DataModel {
 		this.currIndex = 0;
 		this.autoSaveOnExit = true;
 		this.checkForDupl = true;
+		this.autoPopUpEditorCheckbox = false;
 		this.requestSaveButtonEn = false;
 		this.caseSensitive = false;
 		this.searchThruTitles = true;
@@ -107,6 +109,14 @@ public class DataModel {
 
 	public synchronized void setCheckForDupl(boolean checkForDupl) {
 		this.checkForDupl = checkForDupl;
+	}
+
+	public boolean isAutoPopUpEditorCheckbox() {
+		return autoPopUpEditorCheckbox;
+	}
+
+	public void setAutoPopUpEditorCheckbox(boolean autoPopUpEditorCheckbox) {
+		this.autoPopUpEditorCheckbox = autoPopUpEditorCheckbox;
 	}
 
 	public boolean isRequestSaveButtonEn() {

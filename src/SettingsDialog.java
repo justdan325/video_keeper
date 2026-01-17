@@ -26,6 +26,7 @@ public class SettingsDialog extends JDialog implements WindowListener {
 	private static final String BROWSE_BTN_TITLE 	= "Browse";
 	private static final String AUTO_SAVE_TITLE		= "Auto Save upon Exit";
 	private static final String CHECK_DUPL_TITLE	= "Check for Duplicate Videos";
+	private static final String AUTO_EDIT_TITLE		= "Auto Pop up Editor";
 //	private static final String SAVE_TITLE			= "Save";
 	private static final String EXPORT_TITLE		= "Export";
 	private static final String REFRESH_TITLE		= "Refresh All";
@@ -34,7 +35,7 @@ public class SettingsDialog extends JDialog implements WindowListener {
 	private static final String TOOLTIP_EXPORT		= "Export watch list to text file of URLs.";
 	private static final String TOOLTIP_REFRESH		= "Reload the watch list and re-fetch video metadata.";
 	private static final String TOOLTIP_OPEN_OP		= "Select the operation for how to open video links.";
-	private static final int 	WIN_X 				= 500;
+	private static final int 	WIN_X 				= 575;
 	private static final int 	WIN_Y 				= 325;
 	private static final int	BTN_X				= 120;
 	private static final int	BTN_Y				= 30;
@@ -48,6 +49,7 @@ public class SettingsDialog extends JDialog implements WindowListener {
 	private JButton openOpButton;
 	private JCheckBox autoSaveCheckbox;
 	private JCheckBox checkDuplCheckbox;
+	private JCheckBox autoPopUpEditorCheckbox;
 	private MainGui parent;
 	private DataModel model;
 	private boolean locked;
@@ -66,6 +68,7 @@ public class SettingsDialog extends JDialog implements WindowListener {
 		this.openOpButton = new JButton(OPEN_OP_TITLE);
 		this.autoSaveCheckbox = new JCheckBox(AUTO_SAVE_TITLE);
 		this.checkDuplCheckbox = new JCheckBox(CHECK_DUPL_TITLE);
+		this.autoPopUpEditorCheckbox = new JCheckBox(AUTO_EDIT_TITLE);
 		this.mainPanel = new JPanel(new GridLayout(4, 1));
 		this.parent = parent;
 		this.model = model;
@@ -143,6 +146,9 @@ public class SettingsDialog extends JDialog implements WindowListener {
 		checkDuplCheckbox.setHorizontalAlignment(JCheckBox.CENTER);
 		checkDuplCheckbox.setBackground(MainGui.PROG_COLOR_BKRND);
 		checkDuplCheckbox.setForeground(MainGui.PROG_COLOR_TXT_LT);
+		autoPopUpEditorCheckbox.setHorizontalAlignment(JCheckBox.CENTER);
+		autoPopUpEditorCheckbox.setBackground(MainGui.PROG_COLOR_BKRND);
+		autoPopUpEditorCheckbox.setForeground(MainGui.PROG_COLOR_TXT_LT);
 		
 		if (model.isAutoSaveOnExit()) {
 			autoSaveCheckbox.setSelected(true);
@@ -156,8 +162,15 @@ public class SettingsDialog extends JDialog implements WindowListener {
 			checkDuplCheckbox.setSelected(false);
 		}
 		
+		if (model.isAutoPopUpEditorCheckbox()) {
+			autoPopUpEditorCheckbox.setSelected(true);
+		} else {
+			autoPopUpEditorCheckbox.setSelected(false);
+		}
+		
 		checkboxPanel.add(autoSaveCheckbox);
 		checkboxPanel.add(checkDuplCheckbox);
+		checkboxPanel.add(autoPopUpEditorCheckbox);
 		
 		return checkboxPanel;
 	}
@@ -242,6 +255,17 @@ public class SettingsDialog extends JDialog implements WindowListener {
 					model.setCheckForDupl(true);
 				} else if (arg0.getStateChange() == ItemEvent.DESELECTED) {
 					model.setCheckForDupl(false);
+				}
+			}
+		});
+		
+		autoPopUpEditorCheckbox.addItemListener(new ItemListener() {
+			@Override
+			public void itemStateChanged(ItemEvent arg0) {
+				if (arg0.getStateChange() == ItemEvent.SELECTED) {
+					model.setAutoPopUpEditorCheckbox(true);
+				} else if (arg0.getStateChange() == ItemEvent.DESELECTED) {
+					model.setAutoPopUpEditorCheckbox(false);
 				}
 			}
 		});
@@ -447,6 +471,10 @@ public class SettingsDialog extends JDialog implements WindowListener {
 						checkDuplCheckbox.setSelected(model.isCheckForDupl());
 					}
 					
+					if (autoPopUpEditorCheckbox.isSelected() != model.isAutoPopUpEditorCheckbox()) {
+						autoPopUpEditorCheckbox.setSelected(model.isAutoPopUpEditorCheckbox());
+					}
+					
 					try {
 						Thread.sleep(10);
 					} catch (InterruptedException e) {
@@ -473,6 +501,7 @@ public class SettingsDialog extends JDialog implements WindowListener {
 		this.openOpButton.setBackground(locked ? MainGui.PROG_COLOR_BTN_DIS : MainGui.PROG_COLOR_BTN_EN);
 		this.autoSaveCheckbox.setEnabled(!locked);
 		this.checkDuplCheckbox.setEnabled(!locked);
+		this.autoPopUpEditorCheckbox.setEnabled(!locked);
 	}
 	
 	private void selectNewDatabaseFile() {
