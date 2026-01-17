@@ -98,6 +98,13 @@ public class Test {
 	private static final String CHNL_VMO_NORMAL	 	= "On Vimeo";
 	private static final String TIME_VMO_NORMAL 	= "";
 	
+	private static final String URL_VMO_SHOWCASE	= "https://vimeo.com/showcase/10841475?video=1153335296";
+	private static final String TYPE_VMO_SHOWCASE 	= "Vimeo Showcase";
+	private static final String TTL_VMO_SHOWCASE 	= "10 am | Sunday, January 11, 2026";
+	private static final String DATE_VMO_SHOWCASE 	= "2026-01-17";
+	private static final String CHNL_VMO_SHOWCASE	= "St. Thomas More Catholic Parish on Vimeo";
+	private static final String TIME_VMO_SHOWCASE 	= "";
+	
 	//Twitch
 	private static final int	TWI_GROUP_NO		= 4;
 	private static final String URL_TWI_MOBILE		= "https://www.twitch.tv/videos/2671128232";
@@ -182,7 +189,8 @@ public class Test {
 
 		//Vimeo
 		runTest(testLink(URL_VMO_NORMAL, TYPE_VMO_NORMAL, TTL_VMO_NORMAL, DATE_VMO_NORMAL, CHNL_VMO_NORMAL, TIME_VMO_NORMAL), TYPE_VMO_NORMAL, VMO_GROUP_NO);
-				
+		runTest(testLink(URL_VMO_SHOWCASE, TYPE_VMO_SHOWCASE, TTL_VMO_SHOWCASE, DATE_VMO_SHOWCASE, CHNL_VMO_SHOWCASE, TIME_VMO_SHOWCASE), TYPE_VMO_SHOWCASE, VMO_GROUP_NO);
+		
 		//YouTube
 		runTest(testLink(URL_YT_NORMAL, TYPE_YT_NORMAL, TTL_YT_NORMAL, DATE_YT_NORMAL, CHNL_YT_NORMAL, TIME_YT_NORMAL), TYPE_YT_NORMAL, YT_GROUP_NO);
 		runTest(testLink(URL_YT_SHORT, TYPE_YT_SHORT, TTL_YT_SHORT, DATE_YT_SHORT, CHNL_YT_SHORT, TIME_YT_SHORT), TYPE_YT_SHORT, YT_GROUP_NO);
