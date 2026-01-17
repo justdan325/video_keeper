@@ -9,14 +9,15 @@ public class Main {
 	public static final String 		DEFAULT_HNDL_LNKS 		= "DEFAULT";
 	public static final boolean 	OS_MAC					= System.getProperty("os.name").contains("Mac");
 	
-	private static final String PROP_KEY_DATABASE		= "database";
-	private static final String PROP_KEY_AUTO_SAVE		= "autoSave";
-	private static final String PROP_KEY_CHECK_DUPL		= "checkDuplicates";
-	private static final String PROP_KEY_HNDL_LNKS		= "handleLinks";
-	private static final String PROP_KEY_PREV_HNDL_LNKS	= "prevHandleLinks";
-	private static final String PROP_KEY_SRCH_OPTS		= "searchOptions";
-	private static final String PROP_KEY_CURR_INDX		= "currentIndex";
-	private static final String PROP_FILE				= "videokeeper.properties";
+	private static final String PROP_KEY_DATABASE			= "database";
+	private static final String PROP_KEY_AUTO_SAVE			= "autoSave";
+	private static final String PROP_KEY_CHECK_DUPL			= "checkDuplicates";
+	private static final String PROP_KEY_AUTO_POPUP_EDTR	= "autoPopUpEditor";
+	private static final String PROP_KEY_HNDL_LNKS			= "handleLinks";
+	private static final String PROP_KEY_PREV_HNDL_LNKS		= "prevHandleLinks";
+	private static final String PROP_KEY_SRCH_OPTS			= "searchOptions";
+	private static final String PROP_KEY_CURR_INDX			= "currentIndex";
+	private static final String PROP_FILE					= "videokeeper.properties";
 	
 	private PropsFileUtil props;
 	private DataModel model;
@@ -27,6 +28,7 @@ public class Main {
 	private int currentIndex;
 	private boolean autoSave;
 	private boolean checkDuplicates;
+	private boolean autoPopUpEditor;
 	
 	public static void main(String[] args) {
 		new Main();
@@ -79,6 +81,7 @@ public class Main {
 		this.database = DEFAULT_DATABASE;
 		this.autoSave = true;
 		this.checkDuplicates = true;
+		this.autoPopUpEditor = false;
 		this.handleLinks = DEFAULT_HNDL_LNKS;
 		this.prevHandleLinks = "";
 		this.searchOptions = "";
@@ -114,6 +117,19 @@ public class Main {
 				model.setCheckForDupl(true);
 			} else {
 				model.setCheckForDupl(false);
+			}
+		}
+		
+		//get auto pop-up editor
+		if (!props.containsProp(PROP_KEY_AUTO_POPUP_EDTR)) {
+			props.set(PROP_KEY_AUTO_POPUP_EDTR, boolToStr(autoPopUpEditor));
+		} else {
+			this.autoPopUpEditor = strToBool(props.get(PROP_KEY_AUTO_POPUP_EDTR));
+
+			if (autoPopUpEditor) {
+				model.setAutoPopUpEditorCheckbox(true);
+			} else {
+				model.setAutoPopUpEditorCheckbox(false);
 			}
 		}
 		
@@ -215,7 +231,12 @@ public class Main {
 			this.checkDuplicates = model.isCheckForDupl();
 			props.set(PROP_KEY_CHECK_DUPL, boolToStr(model.isCheckForDupl()));
 		}
-
+		
+		if (autoPopUpEditor != model.isAutoPopUpEditorCheckbox()) {
+			this.autoPopUpEditor = model.isAutoPopUpEditorCheckbox();
+			props.set(PROP_KEY_AUTO_POPUP_EDTR, boolToStr(model.isAutoPopUpEditorCheckbox()));
+		}
+		
 		if (!database.trim().equals(model.getDatabaseFile().trim())) {
 			this.database = model.getDatabaseFile().trim();
 			props.set(PROP_KEY_DATABASE, model.getDatabaseFile().trim());
