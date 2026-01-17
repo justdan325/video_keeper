@@ -7,15 +7,19 @@ import java.awt.*;
 
 import javax.swing.JDialog;
 import javax.swing.JOptionPane;
+import javax.swing.plaf.metal.MetalDesktopIconUI;
+
 import java.net.URL;
 import java.awt.datatransfer.StringSelection;
 
 
 public class VideoKeeper {
-	public static final String LNK_HNDL_DEFAULT 	= Main.DEFAULT_HNDL_LNKS;
-	public static final String LNK_HNDL_COPY 		= "COPY";
-	public static final String LNK_HNDL_CUST 		= "CUSTOM<";
-	public static final String LNK_HNDL_LNK_VAR 	= "%VIDEOLINK%";
+	public static final String 	LNK_HNDL_DEFAULT 	= Main.DEFAULT_HNDL_LNKS;
+	public static final String 	LNK_HNDL_COPY 		= "COPY";
+	public static final String 	LNK_HNDL_CUST 		= "CUSTOM<";
+	public static final String 	LNK_HNDL_LNK_VAR 	= "%VIDEOLINK%";
+	public static final byte 	SUCCESS				= 0;
+	public static final byte 	SITE_UNSUPPORTED 	= 1;
 	
 	private DataModel		model;
 	private VideoList		vidNodeList;
@@ -62,7 +66,8 @@ public class VideoKeeper {
 		vidNodeList.resetIndex();
 	}
 	
-	public void add(VideoDataNode item) {
+	public byte add(VideoDataNode item) {
+		byte status = SUCCESS;
 		boolean addItem = true;
 		
 		if (model.isCheckForDupl() && vidNodeList.contains(item.getUrl())) {
@@ -83,46 +88,52 @@ public class VideoKeeper {
 		}
 
 		if (addItem) {
-			Thread thread = new Thread(new Runnable() {
-				@Override
-				public void run() {
-					if (item.getTitle().length() < 1 || item.getDate().length() < 1 || item.getChannel().length() < 1) {
-
-						MetadataObtainer obtainer = new MetadataObtainer(item.getUrl());
-						Optional<String> sanitizedUrl = obtainer.sanitizeForStorage(item.getUrl());
-
-						//insert sanitized URL if supported
-						if (sanitizedUrl.isPresent()) {
-							item.setUrl(sanitizedUrl.get());
-						}
-
-						if (item.getTitle().length() < 1) {
-							item.setTitle(obtainer.getTitle());
-						}
-
-						if (item.getDate().length() < 1) {
-							item.setDate(obtainer.getDate());
-						}
-
-						if (item.getChannel().length() < 1) {
-							item.setChannel(obtainer.getChannel());
-						}
-
-						if (item.getTime().length() < 1) {
-							item.setTime(obtainer.getTime());
+			if (MetadataObtainer.isSupported(item.getUrl(), true)) {
+				Thread thread = new Thread(new Runnable() {
+					@Override
+					public void run() {
+						if (item.getTitle().length() < 1 || item.getDate().length() < 1 || item.getChannel().length() < 1) {
+	
+							MetadataObtainer obtainer = new MetadataObtainer(item.getUrl());
+							Optional<String> sanitizedUrl = obtainer.sanitizeForStorage(item.getUrl());
+	
+							//insert sanitized URL if supported
+							if (sanitizedUrl.isPresent()) {
+								item.setUrl(sanitizedUrl.get());
+							}
+	
+							if (item.getTitle().length() < 1) {
+								item.setTitle(obtainer.getTitle());
+							}
+	
+							if (item.getDate().length() < 1) {
+								item.setDate(obtainer.getDate());
+							}
+	
+							if (item.getChannel().length() < 1) {
+								item.setChannel(obtainer.getChannel());
+							}
+	
+							if (item.getTime().length() < 1) {
+								item.setTime(obtainer.getTime());
+							}
+							
+							obtainer = null;
 						}
 						
-						obtainer = null;
+						System.gc();
 					}
-					
-					System.gc();
-				}
-			});
-			
-			thread.start();
+				});
+				
+				thread.start();
+			} else { //if site is not supported
+				status = SITE_UNSUPPORTED;
+			}
 			
 			vidNodeList.append(item);
 		}
+		
+		return status;
 	}
 		
 	public void openPrev() {

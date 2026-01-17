@@ -448,10 +448,18 @@ public class MainGui extends JFrame implements WindowListener {
 	}
 	
 	private void add() {
+		VideoDataNode node;
 		String toAdd = urlField.getText();
+		byte status;
 
 		if (toAdd != null && !toAdd.equals(PASTE_MESS)) {
-			keeper.add(new VideoDataNode(toAdd));
+			node = new VideoDataNode(toAdd);
+			status = keeper.add(node);
+			
+			if (status == VideoKeeper.SITE_UNSUPPORTED) {
+				editor.editNode(node);
+			}
+			
 			urlField.selectAll();
 			urlField.setText(PASTE_MESS);
 			urlField.selectAll();
