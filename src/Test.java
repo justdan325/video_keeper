@@ -53,7 +53,7 @@ public class Test {
 	private static final String URL_YT_CHANNEL		= "https://www.youtube.com/@daviddifranco";
 	private static final String TYPE_YT_CHANNEL 	= "YouTube Channels using \"@\"";
 	private static final String TTL_YT_CHANNEL 		= "daviddifranco";
-	private static final String DATE_YT_CHANNEL 	= "217K Subscribers ~ 3.4K Videos";
+	private static final String DATE_YT_CHANNEL 	= "218K Subscribers ~ 3.4K Videos";
 	private static final String CHNL_YT_CHANNEL 	= "daviddifranco on YouTube";
 	private static final String TIME_YT_CHANNEL 	= "";
 	
@@ -100,12 +100,12 @@ public class Test {
 	
 	//Twitch
 	private static final int	TWI_GROUP_NO		= 4;
-	private static final String URL_TWI_MOBILE		= "https://www.twitch.tv/videos/2616952037";
+	private static final String URL_TWI_MOBILE		= "https://www.twitch.tv/videos/2671128232";
 	private static final String TYPE_TWI_MOBILE 	= "Twitch Mobile (and normal since normal gets converted to mobile)";
-	private static final String TTL_TWI_MOBILE 		= "Back at GoF 3.0";
+	private static final String TTL_TWI_MOBILE 		= "everyone loves gleba";
 	private static final String DATE_TWI_MOBILE 	= "";
 	private static final String CHNL_TWI_MOBILE	 	= "ptony on Twitch";
-	private static final String TIME_TWI_MOBILE 	= "1:52:12";
+	private static final String TIME_TWI_MOBILE 	= "1:58:09";
 	
 	//DailyMotion
 	private static final int	DLYMTN_GROUP_NO		= 5;

@@ -60,7 +60,7 @@ public class MetadataObtainer {
 	
 	public static void main(String[] args) {
 //		System.out.println(fetchHtml("https://vimeo.com/1153335296"));
-		final String URL = "https://vimeo.com/showcase/10841475?video=1153335296";
+		final String URL = "https://www.twitch.tv/videos/2671128232";
 		
 		MetadataObtainer o = new MetadataObtainer(URL);
 		System.out.println("URL provided: [" + URL + "]");
