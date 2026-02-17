@@ -1111,6 +1111,7 @@ public class MetadataObtainer {
 		final String INDX_PARAM_2 = "&index=";
 		final String DIS_POLY_PARAM = "&disable_polymer=1";
 		final String PIC_PREVIEW_PARAM = "&pp=";
+		final String START_RADIO_PARAM = "&start_radio=1";
 		final String VID_ENDPNT = "/videos";
 		String temp = "";
 		String sanitized = urlStr;
@@ -1188,6 +1189,12 @@ public class MetadataObtainer {
 			
 			//add video endpoint
 			sanitized += VID_ENDPNT;
+		}
+		
+		//remove start_radio param
+		if (sanitized.contains(START_RADIO_PARAM)) {
+			//chop out the param along with its value (1 or 0)
+			sanitized = sanitized.substring(0, sanitized.indexOf(START_RADIO_PARAM)) + sanitized.substring(sanitized.indexOf(START_RADIO_PARAM) + START_RADIO_PARAM.length());
 		}
 		
 		//remove polymer disable
