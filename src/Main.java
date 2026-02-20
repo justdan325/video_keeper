@@ -1,5 +1,7 @@
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.util.List;
 
 import javax.swing.JOptionPane;
 import javax.swing.UIManager;
@@ -8,6 +10,7 @@ public class Main {
 	public static final String 		DEFAULT_DATABASE 		= "database.txt";
 	public static final String 		DEFAULT_HNDL_LNKS 		= "DEFAULT";
 	public static final String		DEFAULT_YTDLP_LOC		= "yt-dlp";
+	public static final String		YTDLP_LOC_FILE_REP		= "~YTDLP";
 	public static final boolean 	OS_MAC					= System.getProperty("os.name").contains("Mac");
 	
 	private static final String PROP_KEY_DATABASE			= "database";
@@ -159,6 +162,8 @@ public class Main {
 			props.set(PROP_KEY_YTDLP_LOC, ytdlpLoc);
 		} else {
 			this.ytdlpLoc = props.get(PROP_KEY_YTDLP_LOC);
+			
+			decipherYtdlpLoc();
 		}
 		
 		//get search options
@@ -184,18 +189,11 @@ public class Main {
 			props.set(PROP_KEY_USE_YTDLP, boolToStr(useYtdlp));
 		} else {
 			this.useYtdlp = strToBool(props.get(PROP_KEY_USE_YTDLP));
-
-			if (useYtdlp) {
-				model.setUseYtdlp(true);
-			} else {
-				model.setUseYtdlp(false);
-			}
 		}
 		
 		model.setDatabaseFile(database);
 		model.setHandleLinks(handleLinks);
 		model.setPreviousHandleLinks(prevHandleLinks);
-		model.setYtdlpLoc(ytdlpLoc);
 		model.setSearchOptions(searchOptions);
 		model.setUseYtdlp(useYtdlp);
 		model.setCurrIndex(currentIndex);
@@ -281,7 +279,8 @@ public class Main {
 			props.set(PROP_KEY_PREV_HNDL_LNKS, model.getPreviousHandleLinks().trim());
 		}
 		
-		if (!ytdlpLoc.trim().equals(model.getYtdlpLoc().trim())) {
+		//N.B. We don't want to overwrite the symbolic YTDLP_LOC_FILE_REP with the actual file location!
+		if (!ytdlpLoc.trim().equals(model.getYtdlpLoc().trim()) && !ytdlpLoc.trim().equals(YTDLP_LOC_FILE_REP)) {
 			this.ytdlpLoc = model.getYtdlpLoc().trim();
 			props.set(PROP_KEY_YTDLP_LOC, model.getYtdlpLoc().trim());
 		}
@@ -299,6 +298,54 @@ public class Main {
 		if (currentIndex != model.getCurrIndex()) {
 			this.currentIndex = model.getCurrIndex();
 			props.set(PROP_KEY_CURR_INDX, (model.getCurrIndex() + ""));
+		}
+	}
+	
+	/*
+	 * If yt-dlp location equals YTDLP_LOC_FILE_REP, then set location to such file in user's home dir.
+	 */
+	private void decipherYtdlpLoc() {
+		File ytdlpLocFile;
+		List<String> fileContents;
+		boolean set = false;
+		
+		if (ytdlpLoc.trim().equals(YTDLP_LOC_FILE_REP)) {
+			ytdlpLocFile = new File(System.getProperty("user.home") + File.separatorChar + YTDLP_LOC_FILE_REP.replace("~", ""));
+			
+			try {
+				if (ytdlpLocFile.exists()) {
+					fileContents = Files.readAllLines(ytdlpLocFile.toPath());
+
+					for (String line : fileContents) {
+						if (line.trim().length() > 0) {
+							this.ytdlpLoc = line;
+							set = true;
+							break;
+						}
+					}
+
+					if (set && new File(ytdlpLoc).exists()) {
+						model.setYtdlpLoc(ytdlpLoc);
+					} else {
+						if (set) {
+							System.err.println("Not a valid path to yt-dlp: " + ytdlpLoc);
+						} else {
+							System.err.println("yt-dlp location file is blank...");
+						}
+
+						model.setYtdlpLoc(DEFAULT_YTDLP_LOC);
+					}
+				} else {
+					System.err.println("yt-dlp location file is missing: " + ytdlpLocFile);
+				}
+			} catch (IOException e) {
+				System.err.println("Could not parse yt-dlp location file...");
+				e.printStackTrace();
+			}
+		} else if (new File(ytdlpLoc.trim()).exists() == false) {
+			System.err.println("yt-dlp location file does not exist: " + ytdlpLoc.trim());
+			
+			model.setYtdlpLoc(DEFAULT_YTDLP_LOC);
 		}
 	}
 	
