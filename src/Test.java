@@ -4,7 +4,7 @@
  */
 public class Test {
 	private static final boolean EXIT_UPON_FAILURE = false; //if true, will exit testing when a link fails. Setting false can be handy when testing wonky sites.
-	private static final boolean USE_YTDLP = true;
+	private static final boolean USE_YTDLP = false;
 	
 	//YouTube
 	private static final int	YT_GROUP_NO			= 1;
@@ -251,10 +251,12 @@ public class Test {
 	
 	private boolean testLink(String url, String linkType, String title, String date, String channel, String time) {
 		DataModel model = new DataModel();
-		MetadataObtainer obtainer = new MetadataObtainer(model, url);
+		MetadataObtainer obtainer;
 		boolean success = false;
 		
 		model.setUseYtdlp(USE_YTDLP);
+		
+		obtainer = new MetadataObtainer(model, url);
 
 		if (obtainer.isSupported()) {
 			if (obtainer.isUrlError()) {
