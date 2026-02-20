@@ -1039,6 +1039,80 @@ public class MetadataObtainer {
 		return time;
 	}
 	
+	public String getDescription() {
+		String description = "";
+		
+		if (description.length() == 0 && model.isUseYtdlp()) {
+			if (ytdlp.isRun() == false) {
+				ytdlp.run();
+			}
+
+			if (ytdlp.getDescription().isPresent()) {
+				description = ytdlp.getDescription().get();
+			}
+		}
+		
+		return description;
+	}
+	
+	public String getThumbnailUrl() {
+		String thumbnailUrl = "";
+		
+		if (thumbnailUrl.length() == 0 && model.isUseYtdlp()) {
+			if (ytdlp.isRun() == false) {
+				ytdlp.run();
+			}
+
+			if (ytdlp.getThumbnailUrl().isPresent()) {
+				thumbnailUrl = ytdlp.getThumbnailUrl().get();
+			}
+		}
+		
+		return thumbnailUrl;
+	}
+	
+	public boolean isVerified() {
+		boolean verified = false;
+
+		if (model.isUseYtdlp()) {
+			if (ytdlp.isRun() == false) {
+				ytdlp.run();
+			}
+
+			verified = ytdlp.isVerified();
+		}
+
+		return verified;
+	}
+	
+	public boolean isLive() {
+		boolean isLive = false;
+
+		if (model.isUseYtdlp()) {
+			if (ytdlp.isRun() == false) {
+				ytdlp.run();
+			}
+
+			isLive = ytdlp.isLive();
+		}
+
+		return isLive;
+	}
+	
+	public boolean wasLive() {
+		boolean wasLive = false;
+
+		if (model.isUseYtdlp()) {
+			if (ytdlp.isRun() == false) {
+				ytdlp.run();
+			}
+
+			wasLive = ytdlp.wasLive();
+		}
+
+		return wasLive;
+	}
+	
 	public static String convertSecondsToTimeStr(int seconds) {
 		String time = "";
 		int minutes = 0;
