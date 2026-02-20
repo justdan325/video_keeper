@@ -47,7 +47,7 @@ public class MetadataObtainerYtdlp {
 	
 	public static void main(String[] args) throws IOException {
 		DataModel testModel = new DataModel();
-		String url = "https://www.twitch.tv/videos/2671128232";
+		String url = "https://www.bitchute.com/video/B2m6kfJ_3gs";
 		
 		testModel.setYtdlpLoc("/home/dan/.local/share/pipx/venvs/yt-dlp/bin/yt-dlp");
 		
@@ -99,8 +99,6 @@ public class MetadataObtainerYtdlp {
 		
 		if (URL.startsWith(MetadataObtainer.TWITCH_PREFIX_MOB) == false && URL.startsWith(MetadataObtainer.TWITCH_PREFIX_W) == false) {
 			this.description = extractJsonKvp(KEY_DESC, json, false);
-		} else {
-			this.description = Optional.of("");
 		}
 		
 		if (URL.startsWith(MetadataObtainer.TWITCH_PREFIX_MOB) == false && URL.startsWith(MetadataObtainer.TWITCH_PREFIX_W) == false) {
@@ -137,7 +135,7 @@ public class MetadataObtainerYtdlp {
 			this.isLive = Boolean.parseBoolean(temp.get());
 		}
 		
-		if (URL.startsWith(MetadataObtainer.BITCHUTE_PREFIX) == false && URL.startsWith(MetadataObtainer.BITCHUTE_PREFIX_W) == false
+		if (URL.startsWith(MetadataObtainer.BITCHUTE_PREFIX) == false && URL.startsWith(MetadataObtainer.BITCHUTE_PREFIX_W) == false 
 				&& URL.startsWith(MetadataObtainer.ODYSEE_PREFIX) == false) {
 			temp = extractJsonKvp(KEY_WAS_LIVE, json, true);
 					
