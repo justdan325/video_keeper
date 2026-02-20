@@ -39,12 +39,15 @@ public class MetadataObtainer {
 	private static final String PEERTUBE_TOKEN			= "<meta property=\"og:platform\" content=\"PeerTube\">";
 	private static final int	MAX_LEN_TITLE			= 200;
 	
+	private MetadataObtainerYtdlp ytdlp;
 	private Optional<String> atTime;
 	private String urlStr;
 	private String html;
 	private boolean isSupported;
+	private boolean useYtdlp = true; //not a constant as this will be set by decided by end user in the future
 	
 	public MetadataObtainer(String urlStr) {
+		this.ytdlp = new MetadataObtainerYtdlp(urlStr);
 		this.atTime = Optional.empty();
 		this.urlStr = sanitizeUrl(urlStr);
 		this.isSupported = isSupported(urlStr, true);
@@ -60,7 +63,7 @@ public class MetadataObtainer {
 	
 	public static void main(String[] args) {
 //		System.out.println(fetchHtml("https://vimeo.com/1153335296"));
-		final String URL = "https://vimeo.com/showcase/10841475?video=1153335296";
+		final String URL = "https://odysee.com/@Djelpablo1:a";
 		
 		MetadataObtainer o = new MetadataObtainer(URL);
 		System.out.println("URL provided: [" + URL + "]");
@@ -309,6 +312,16 @@ public class MetadataObtainer {
 			title = urlStr;
 		}
 		
+		if ((title.length() == 0 || title.equals(urlStr)) && useYtdlp) {
+			if (ytdlp.isRun() == false) {
+				ytdlp.run();
+			}
+
+			if (ytdlp.getTitle().isPresent()) {
+				title = ytdlp.getTitle().get();
+			}
+		}
+		
 		return title;
 	}
 	
@@ -342,6 +355,16 @@ public class MetadataObtainer {
 
 				channel = html.substring(begin, end);
 				channel = filterEscapeChars(channel);
+				
+				if (channel.length() == 0 && useYtdlp) {
+					if (ytdlp.isRun() == false) {
+						ytdlp.run();
+					}
+
+					if (ytdlp.getChannel().isPresent()) {
+						channel = ytdlp.getChannel().get();
+					}
+				}
 
 				channel += " on YouTube";
 			} else if (urlStr.contains(YOUTUBE_PLAYLIST_TOKEN)) {
@@ -395,6 +418,16 @@ public class MetadataObtainer {
 					}
 				}
 				
+				if (channel.length() == 0 && useYtdlp) {
+					if (ytdlp.isRun() == false) {
+						ytdlp.run();
+					}
+
+					if (ytdlp.getChannel().isPresent()) {
+						channel = ytdlp.getChannel().get();
+					}
+				}
+				
 				channel += " on Twitch";
 			//Vimeo
 			} else if (urlStr.startsWith(VIMEO_PREFIX)) {
@@ -411,6 +444,16 @@ public class MetadataObtainer {
 						channel = filterEscapeChars(channel);
 						
 						channel += " on Vimeo";
+					}
+				}
+				
+				if (channel.equals("On Vimeo") && useYtdlp) {
+					if (ytdlp.isRun() == false) {
+						ytdlp.run();
+					}
+
+					if (ytdlp.getChannel().isPresent()) {
+						channel = ytdlp.getChannel().get() + " on Vimeo";
 					}
 				}
 			//Odysee
@@ -440,6 +483,16 @@ public class MetadataObtainer {
 						channel = "Anonymous";
 					}
 				}
+				
+				if ((channel.length() == 0 || channel.equals("Anonymous")) && useYtdlp) {
+					if (ytdlp.isRun() == false) {
+						ytdlp.run();
+					}
+
+					if (ytdlp.getChannel().isPresent()) {
+						channel = ytdlp.getChannel().get();
+					}
+				}
 
 				channel += " on Odysee";
 			//Dailymotion
@@ -455,10 +508,31 @@ public class MetadataObtainer {
 					channel = html.substring(begin, end);
 				}
 				
+				if (channel.length() == 0 && useYtdlp) {
+					if (ytdlp.isRun() == false) {
+						ytdlp.run();
+					}
+
+					if (ytdlp.getChannel().isPresent()) {
+						channel = ytdlp.getChannel().get();
+					}
+				}
+				
 				channel += " on Dailymotion";
 			//Bitchute
 			} else if (urlStr.startsWith(BITCHUTE_PREFIX) || urlStr.startsWith(BITCHUTE_PREFIX_W)) {
-				channel = "On BITCHUTE";
+				if (useYtdlp) {
+					if (ytdlp.isRun() == false) {
+						ytdlp.run();
+					}
+
+					if (ytdlp.getChannel().isPresent()) {
+						channel = ytdlp.getChannel().get();
+						channel += " on BITCHUTE";
+					}
+				} else {
+					channel = "On BITCHUTE";
+				}
 			//Rumble
 			} else if (urlStr.startsWith(RUMBLE_PREFIX)) {
 //				String prefix = "data-title=\"";
@@ -485,6 +559,16 @@ public class MetadataObtainer {
 					channel = urlStr.substring(begin, end);
 				}
 				
+				if (channel.length() == 0 && useYtdlp) {
+					if (ytdlp.isRun() == false) {
+						ytdlp.run();
+					}
+
+					if (ytdlp.getChannel().isPresent()) {
+						channel = ytdlp.getChannel().get();
+					}
+				}
+				
 				channel += " on PodBean";
 			} else if (urlStr.startsWith(PODBEAN_PREFIX)) {
 				String prefix = "://podcast.";
@@ -494,6 +578,16 @@ public class MetadataObtainer {
 				
 				if (begin != -1 && end != -1) {
 					channel = urlStr.substring(begin, end);
+				}
+				
+				if (channel.length() == 0 && useYtdlp) {
+					if (ytdlp.isRun() == false) {
+						ytdlp.run();
+					}
+
+					if (ytdlp.getChannel().isPresent()) {
+						channel = ytdlp.getChannel().get();
+					}
 				}
 				
 				channel += " on PodBean";
@@ -507,6 +601,16 @@ public class MetadataObtainer {
 				if (begin != -1 && end != -1) {
 					channel = html.substring(begin, end);
 					channel = filterEscapeChars(channel);
+				}
+				
+				if (channel.length() == 0 && useYtdlp) {
+					if (ytdlp.isRun() == false) {
+						ytdlp.run();
+					}
+
+					if (ytdlp.getChannel().isPresent()) {
+						channel = ytdlp.getChannel().get();
+					}
 				}
 				
 				channel += " Peertube Instance";
@@ -726,6 +830,14 @@ public class MetadataObtainer {
 		
 		if (date.length() > 100) {
 			date = "";
+		} else if ((date.length() == 0 || date.equals("--")) && useYtdlp) {
+			if (ytdlp.isRun() == false) {
+				ytdlp.run();
+			}
+
+			if (ytdlp.getDate().isPresent()) {
+				date = ytdlp.getDate().get();
+			}
 		}
 		
 		return date;
@@ -904,6 +1016,16 @@ public class MetadataObtainer {
 						time = convertSecondsToTimeStr(seconds);
 					}
 				}
+			}
+		}
+		
+		if (time.length() == 0 && useYtdlp) {
+			if (ytdlp.isRun() == false) {
+				ytdlp.run();
+			}
+
+			if (ytdlp.getTime().isPresent()) {
+				time = ytdlp.getTime().get();
 			}
 		}
 		
