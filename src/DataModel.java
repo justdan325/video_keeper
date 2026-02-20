@@ -19,6 +19,7 @@ public class DataModel {
 	private boolean searchThruChannels;
 	private boolean playAndDelete;
 	private boolean programClosing;
+	private boolean useYtdlp;
 	
 	public DataModel() {
 		this.videoList = Optional.empty();
@@ -37,6 +38,7 @@ public class DataModel {
 		this.searchThruChannels = true;
 		this.playAndDelete = true;
 		this.programClosing = false;
+		this.useYtdlp = true;
 	}
 	
 	public synchronized Optional<VideoList> getVideoList() {
@@ -173,5 +175,13 @@ public class DataModel {
 
 	public void setProgramClosing(boolean programClosing) {
 		this.programClosing = programClosing;
+	}
+
+	public boolean isUseYtdlp() {
+		return useYtdlp;
+	}
+
+	public void setUseYtdlp(boolean useYtdlp) {
+		this.useYtdlp = useYtdlp;
 	}
 }

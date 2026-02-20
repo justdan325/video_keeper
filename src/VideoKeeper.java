@@ -7,7 +7,6 @@ import java.awt.*;
 
 import javax.swing.JDialog;
 import javax.swing.JOptionPane;
-import javax.swing.plaf.metal.MetalDesktopIconUI;
 
 import java.net.URL;
 import java.awt.datatransfer.StringSelection;
@@ -94,7 +93,7 @@ public class VideoKeeper {
 					public void run() {
 						if (item.getTitle().length() < 1 || item.getDate().length() < 1 || item.getChannel().length() < 1) {
 	
-							MetadataObtainer obtainer = new MetadataObtainer(item.getUrl());
+							MetadataObtainer obtainer = new MetadataObtainer(model, item.getUrl());
 							Optional<String> sanitizedUrl = obtainer.sanitizeForStorage(item.getUrl());
 	
 							//insert sanitized URL if supported
@@ -297,7 +296,7 @@ public class VideoKeeper {
 				VideoDataNode temp = opt.get();
 				
 				if (abortIfNotEmpty == false || temp.getTitle().length() < 1 || temp.getDate().length() < 1 || temp.getChannel().length() < 1) {
-					MetadataObtainer obtainer = new MetadataObtainer(temp.getUrl());
+					MetadataObtainer obtainer = new MetadataObtainer(model, temp.getUrl());
 
 					if (abortIfNotEmpty == false || temp.getTitle().length() < 1) {
 						temp.setTitle(obtainer.getTitle());
@@ -338,7 +337,7 @@ public class VideoKeeper {
 				VideoDataNode temp = opt.get();
 				
 				if(temp.getTitle().length() < 1 || temp.getDate().length() < 1 || temp.getChannel().length() < 1) {
-					MetadataObtainer obtainer = new MetadataObtainer(temp.getUrl());
+					MetadataObtainer obtainer = new MetadataObtainer(model, temp.getUrl());
 
 					if(temp.getTitle().length() < 1) {
 						temp.setTitle(obtainer.getTitle());
@@ -379,7 +378,7 @@ public class VideoKeeper {
 				VideoDataNode temp = vidNodeList.popCurr().get();
 
 				if (temp.isEmpty() == false) {
-					MetadataObtainer obtainer = new MetadataObtainer(temp.getUrl());
+					MetadataObtainer obtainer = new MetadataObtainer(model, temp.getUrl());
 
 					temp.setTitle(obtainer.getTitle());
 					temp.setDate(obtainer.getDate());

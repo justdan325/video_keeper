@@ -45,15 +45,7 @@ public class MetadataObtainerYtdlp {
 	}
 	
 	public static void main(String[] args) throws IOException {
-//		String url = "https://www.youtube.com/watch?v=AjQNDCYL5Rg";
 		String url = "https://www.twitch.tv/videos/2671128232";
-//		Optional<String> value = extractJsonKvp("is_live", TEST_JSON, true);
-//		
-//		if (value.isPresent()) {
-//			System.out.println(value.get());
-//		} else {
-//			System.out.println("Nothing returned.");
-//		}
 		
 		MetadataObtainerYtdlp o = new MetadataObtainerYtdlp(url);
 		

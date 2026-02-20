@@ -40,13 +40,14 @@ public class MetadataObtainer {
 	private static final int	MAX_LEN_TITLE			= 200;
 	
 	private MetadataObtainerYtdlp ytdlp;
+	private DataModel model;
 	private Optional<String> atTime;
 	private String urlStr;
 	private String html;
 	private boolean isSupported;
-	private boolean useYtdlp = true; //not a constant as this will be set by decided by end user in the future
 	
-	public MetadataObtainer(String urlStr) {
+	public MetadataObtainer(DataModel model, String urlStr) {
+		this.model = model;
 		this.ytdlp = new MetadataObtainerYtdlp(urlStr);
 		this.atTime = Optional.empty();
 		this.urlStr = sanitizeUrl(urlStr);
@@ -64,8 +65,11 @@ public class MetadataObtainer {
 	public static void main(String[] args) {
 //		System.out.println(fetchHtml("https://vimeo.com/1153335296"));
 		final String URL = "https://odysee.com/@Djelpablo1:a";
+		DataModel model = new DataModel();
 		
-		MetadataObtainer o = new MetadataObtainer(URL);
+		model.setUseYtdlp(true);
+		
+		MetadataObtainer o = new MetadataObtainer(model, URL);
 		System.out.println("URL provided: [" + URL + "]");
 		System.out.println("Is supported: [" + isSupported(URL, true) + "]");
 		System.out.println("Title       : [" + o.getTitle() + "]");
@@ -312,7 +316,7 @@ public class MetadataObtainer {
 			title = urlStr;
 		}
 		
-		if ((title.length() == 0 || title.equals(urlStr)) && useYtdlp) {
+		if ((title.length() == 0 || title.equals(urlStr)) && model.isUseYtdlp()) {
 			if (ytdlp.isRun() == false) {
 				ytdlp.run();
 			}
@@ -356,7 +360,7 @@ public class MetadataObtainer {
 				channel = html.substring(begin, end);
 				channel = filterEscapeChars(channel);
 				
-				if (channel.length() == 0 && useYtdlp) {
+				if (channel.length() == 0 && model.isUseYtdlp()) {
 					if (ytdlp.isRun() == false) {
 						ytdlp.run();
 					}
@@ -418,7 +422,7 @@ public class MetadataObtainer {
 					}
 				}
 				
-				if (channel.length() == 0 && useYtdlp) {
+				if (channel.length() == 0 && model.isUseYtdlp()) {
 					if (ytdlp.isRun() == false) {
 						ytdlp.run();
 					}
@@ -447,7 +451,7 @@ public class MetadataObtainer {
 					}
 				}
 				
-				if (channel.equals("On Vimeo") && useYtdlp) {
+				if (channel.equals("On Vimeo") && model.isUseYtdlp()) {
 					if (ytdlp.isRun() == false) {
 						ytdlp.run();
 					}
@@ -484,7 +488,7 @@ public class MetadataObtainer {
 					}
 				}
 				
-				if ((channel.length() == 0 || channel.equals("Anonymous")) && useYtdlp) {
+				if ((channel.length() == 0 || channel.equals("Anonymous")) && model.isUseYtdlp()) {
 					if (ytdlp.isRun() == false) {
 						ytdlp.run();
 					}
@@ -508,7 +512,7 @@ public class MetadataObtainer {
 					channel = html.substring(begin, end);
 				}
 				
-				if (channel.length() == 0 && useYtdlp) {
+				if (channel.length() == 0 && model.isUseYtdlp()) {
 					if (ytdlp.isRun() == false) {
 						ytdlp.run();
 					}
@@ -521,7 +525,7 @@ public class MetadataObtainer {
 				channel += " on Dailymotion";
 			//Bitchute
 			} else if (urlStr.startsWith(BITCHUTE_PREFIX) || urlStr.startsWith(BITCHUTE_PREFIX_W)) {
-				if (useYtdlp) {
+				if (model.isUseYtdlp()) {
 					if (ytdlp.isRun() == false) {
 						ytdlp.run();
 					}
@@ -559,7 +563,7 @@ public class MetadataObtainer {
 					channel = urlStr.substring(begin, end);
 				}
 				
-				if (channel.length() == 0 && useYtdlp) {
+				if (channel.length() == 0 && model.isUseYtdlp()) {
 					if (ytdlp.isRun() == false) {
 						ytdlp.run();
 					}
@@ -580,7 +584,7 @@ public class MetadataObtainer {
 					channel = urlStr.substring(begin, end);
 				}
 				
-				if (channel.length() == 0 && useYtdlp) {
+				if (channel.length() == 0 && model.isUseYtdlp()) {
 					if (ytdlp.isRun() == false) {
 						ytdlp.run();
 					}
@@ -603,7 +607,7 @@ public class MetadataObtainer {
 					channel = filterEscapeChars(channel);
 				}
 				
-				if (channel.length() == 0 && useYtdlp) {
+				if (channel.length() == 0 && model.isUseYtdlp()) {
 					if (ytdlp.isRun() == false) {
 						ytdlp.run();
 					}
@@ -830,7 +834,7 @@ public class MetadataObtainer {
 		
 		if (date.length() > 100) {
 			date = "";
-		} else if ((date.length() == 0 || date.equals("--")) && useYtdlp) {
+		} else if ((date.length() == 0 || date.equals("--")) && model.isUseYtdlp()) {
 			if (ytdlp.isRun() == false) {
 				ytdlp.run();
 			}
@@ -1019,7 +1023,7 @@ public class MetadataObtainer {
 			}
 		}
 		
-		if (time.length() == 0 && useYtdlp) {
+		if (time.length() == 0 && model.isUseYtdlp()) {
 			if (ytdlp.isRun() == false) {
 				ytdlp.run();
 			}

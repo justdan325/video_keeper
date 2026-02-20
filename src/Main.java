@@ -17,6 +17,7 @@ public class Main {
 	private static final String PROP_KEY_PREV_HNDL_LNKS		= "prevHandleLinks";
 	private static final String PROP_KEY_SRCH_OPTS			= "searchOptions";
 	private static final String PROP_KEY_CURR_INDX			= "currentIndex";
+	private static final String PROP_KEY_USE_YTDLP			= "useYtdlp";
 	private static final String PROP_FILE					= "videokeeper.properties";
 	
 	private PropsFileUtil props;
@@ -29,6 +30,7 @@ public class Main {
 	private boolean autoSave;
 	private boolean checkDuplicates;
 	private boolean autoPopUpEditor;
+	private boolean useYtdlp;
 	
 	public static void main(String[] args) {
 		new Main();
@@ -82,6 +84,7 @@ public class Main {
 		this.autoSave = true;
 		this.checkDuplicates = true;
 		this.autoPopUpEditor = false;
+		this.useYtdlp = true;
 		this.handleLinks = DEFAULT_HNDL_LNKS;
 		this.prevHandleLinks = "";
 		this.searchOptions = "";
@@ -165,10 +168,24 @@ public class Main {
 			}
 		}
 		
+		//get use yt-dlp
+		if (!props.containsProp(PROP_KEY_USE_YTDLP)) {
+			props.set(PROP_KEY_USE_YTDLP, boolToStr(useYtdlp));
+		} else {
+			this.useYtdlp = strToBool(props.get(PROP_KEY_USE_YTDLP));
+
+			if (useYtdlp) {
+				model.setUseYtdlp(true);
+			} else {
+				model.setUseYtdlp(false);
+			}
+		}
+		
 		model.setDatabaseFile(database);
 		model.setHandleLinks(handleLinks);
 		model.setPreviousHandleLinks(prevHandleLinks);
 		model.setSearchOptions(searchOptions);
+		model.setUseYtdlp(useYtdlp);
 		model.setCurrIndex(currentIndex);
 
 		monitorProperties();
@@ -255,6 +272,11 @@ public class Main {
 		if (!searchOptions.trim().equals(model.getSearchOptions().trim())) {
 			this.searchOptions = model.getSearchOptions().trim();
 			props.set(PROP_KEY_SRCH_OPTS, model.getSearchOptions().trim());
+		}
+		
+		if (useYtdlp != model.isUseYtdlp()) {
+			this.useYtdlp = model.isUseYtdlp();
+			props.set(PROP_KEY_USE_YTDLP, boolToStr(model.isUseYtdlp()));
 		}
 		
 		if (currentIndex != model.getCurrIndex()) {
