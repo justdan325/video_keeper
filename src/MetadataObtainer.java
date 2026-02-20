@@ -11,32 +11,33 @@ import java.time.format.DateTimeParseException;
 import java.time.format.FormatStyle;
 
 public class MetadataObtainer {
-	private static final String FETCH_ERROR_PREFIX 		= "ERROR FETCHING HTML: ";
-	private static final String YOUTUBE_PREFIX 			= "https://youtube.com/watch?v=";
-	private static final String YOUTUBE_PREFIX_W 		= "https://www.youtube.com/watch?v=";
-	private static final String YOUTUBE_PREFIX_ABBR 	= "https://youtu.be/";
-	private static final String YOUTUBE_PLAYLIST_TOKEN	= "youtube.com/playlist?list=";
-	private static final String YOUTUBE_SHORT_TOKEN		= "youtube.com/shorts";
-	private static final String YOUTUBE_LIVE_TOKEN		= "https://youtube.com/live/";
-	private static final String YOUTUBE_LIVE_TOKEN_W	= "https://www.youtube.com/live/";
-	private static final String YOUTUBE_CHAN_TOKEN_W_1	= "https://www.youtube.com/@";
-	private static final String YOUTUBE_CHAN_TOKEN_W_2	= "https://www.youtube.com/c/";
-	private static final String YOUTUBE_CHAN_TOKEN_W_3	= "https://www.youtube.com/channel/";
-	private static final String TWITCH_PREFIX_W			= "https://www.twitch.tv/videos/";
-	private static final String TWITCH_PREFIX_MOB		= "https://m.twitch.tv/videos/";
-	private static final String VIMEO_PREFIX			= "https://vimeo.com/";
-	private static final String VIMEO_QP_TOKEN			= "?video=";
-	private static final String ODYSEE_PREFIX			= "https://odysee.com/";
-	private static final String DAILYMOTION_PREFIX_W 	= "https://www.dailymotion.com/video/";
-	private static final String DAILYMOTION_PREFIX		= "https://dailymotion.com/video/";
-	private static final String DAILYMOTION_PREFIX_MOB 	= "https://m.dailymotion.com/video/";
-	private static final String BITCHUTE_PREFIX_W		= "https://www.bitchute.com/video/";
-	private static final String BITCHUTE_PREFIX			= "https://bitchute.com/video/";
-	private static final String RUMBLE_PREFIX			= "https://rumble.com/";
-	private static final String PODBEAN_PREFIX			= "https://podcast.";
-	private static final String PODBEAN_TOKEN			= "podbean.com/e/";
-	private static final String PEERTUBE_PREFIX			= "https://peertube";
-	private static final String PEERTUBE_TOKEN			= "<meta property=\"og:platform\" content=\"PeerTube\">";
+	public static final String FETCH_ERROR_PREFIX 		= "ERROR FETCHING HTML: ";
+	public static final String YOUTUBE_PREFIX 			= "https://youtube.com/watch?v=";
+	public static final String YOUTUBE_PREFIX_W 		= "https://www.youtube.com/watch?v=";
+	public static final String YOUTUBE_PREFIX_ABBR 		= "https://youtu.be/";
+	public static final String YOUTUBE_PLAYLIST_TOKEN	= "youtube.com/playlist?list=";
+	public static final String YOUTUBE_SHORT_TOKEN		= "youtube.com/shorts";
+	public static final String YOUTUBE_LIVE_TOKEN		= "https://youtube.com/live/";
+	public static final String YOUTUBE_LIVE_TOKEN_W		= "https://www.youtube.com/live/";
+	public static final String YOUTUBE_CHAN_TOKEN_W_1	= "https://www.youtube.com/@";
+	public static final String YOUTUBE_CHAN_TOKEN_W_2	= "https://www.youtube.com/c/";
+	public static final String YOUTUBE_CHAN_TOKEN_W_3	= "https://www.youtube.com/channel/";
+	public static final String TWITCH_PREFIX_W			= "https://www.twitch.tv/videos/";
+	public static final String TWITCH_PREFIX_MOB		= "https://m.twitch.tv/videos/";
+	public static final String VIMEO_PREFIX				= "https://vimeo.com/";
+	public static final String VIMEO_QP_TOKEN			= "?video=";
+	public static final String ODYSEE_PREFIX			= "https://odysee.com/";
+	public static final String DAILYMOTION_PREFIX_W 	= "https://www.dailymotion.com/video/";
+	public static final String DAILYMOTION_PREFIX		= "https://dailymotion.com/video/";
+	public static final String DAILYMOTION_PREFIX_MOB 	= "https://m.dailymotion.com/video/";
+	public static final String BITCHUTE_PREFIX_W		= "https://www.bitchute.com/video/";
+	public static final String BITCHUTE_PREFIX			= "https://bitchute.com/video/";
+	public static final String RUMBLE_PREFIX			= "https://rumble.com/";
+	public static final String PODBEAN_PREFIX			= "https://podcast.";
+	public static final String PODBEAN_TOKEN			= "podbean.com/e/";
+	public static final String PEERTUBE_PREFIX			= "https://peertube";
+	public static final String PEERTUBE_TOKEN			= "<meta property=\"og:platform\" content=\"PeerTube\">";
+	
 	private static final int	MAX_LEN_TITLE			= 200;
 	
 	private MetadataObtainerYtdlp ytdlp;
@@ -48,7 +49,7 @@ public class MetadataObtainer {
 	
 	public MetadataObtainer(DataModel model, String urlStr) {
 		this.model = model;
-		this.ytdlp = new MetadataObtainerYtdlp(urlStr);
+		this.ytdlp = new MetadataObtainerYtdlp(model, urlStr);
 		this.atTime = Optional.empty();
 		this.urlStr = sanitizeUrl(urlStr);
 		this.isSupported = isSupported(urlStr, true);
@@ -533,6 +534,8 @@ public class MetadataObtainer {
 					if (ytdlp.getChannel().isPresent()) {
 						channel = ytdlp.getChannel().get();
 						channel += " on BITCHUTE";
+					} else {
+						channel = "On BITCHUTE";
 					}
 				} else {
 					channel = "On BITCHUTE";

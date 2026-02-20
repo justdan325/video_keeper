@@ -5,7 +5,6 @@ import java.util.Optional;
 
 public class MetadataObtainerYtdlp {
 //	private static final String TEST_JSON = "\"id\": \"AjQNDCYL5Rg\", \"is_live\": false, \"description\": \"This is a \\\"descript\\\" description.\", \"title\": \"Bad Bot Problem - Computerphile\"}";
-	private static final String YT_DLP_LOC = "/home/dan/.local/share/pipx/venvs/yt-dlp/bin/yt-dlp";
 	
 	private final String URL;
 	private final String KEY_TITLE 		= "title";
@@ -19,6 +18,7 @@ public class MetadataObtainerYtdlp {
 	private final String KEY_IS_LIVE 	= "is_live";
 	private final String KEY_WAS_LIVE 	= "was_live";
 	
+	private DataModel model;
 	private Optional<String> title;
 	private Optional<String> date;
 	private Optional<String> channel;
@@ -30,8 +30,9 @@ public class MetadataObtainerYtdlp {
 	private boolean wasLive;
 	private boolean isRun; //whether or not the run() method has been called
 	
-	public MetadataObtainerYtdlp(String url) {
+	public MetadataObtainerYtdlp(DataModel model, String url) {
 		this.URL = url;
+		this.model = model;
 		this.title = Optional.empty();
 		this.date = Optional.empty();
 		this.channel = Optional.empty();
@@ -45,9 +46,12 @@ public class MetadataObtainerYtdlp {
 	}
 	
 	public static void main(String[] args) throws IOException {
+		DataModel testModel = new DataModel();
 		String url = "https://www.twitch.tv/videos/2671128232";
 		
-		MetadataObtainerYtdlp o = new MetadataObtainerYtdlp(url);
+		testModel.setYtdlpLoc("/home/dan/.local/share/pipx/venvs/yt-dlp/bin/yt-dlp");
+		
+		MetadataObtainerYtdlp o = new MetadataObtainerYtdlp(testModel, url);
 		
 		o.run();
 		
@@ -72,9 +76,8 @@ public class MetadataObtainerYtdlp {
 			success = false;
 		}
 		
-		if (success) {
-			this.isRun = true;
-		}
+		//intentionally marking as "run" even if the run failed to prevent multiple successive queries 
+		this.isRun = true;
 		
 		return success;
 	}
@@ -87,10 +90,22 @@ public class MetadataObtainerYtdlp {
 		
 		this.title = extractJsonKvp(KEY_TITLE, json, false);
 		this.date = extractJsonKvp(KEY_DATE, json, false);
-		this.channel = extractJsonKvp(KEY_UPLOADER, json, false);
+		
+		if (URL.startsWith(MetadataObtainer.ODYSEE_PREFIX) == false) {
+			this.channel = extractJsonKvp(KEY_UPLOADER, json, false);
+		}
+		
 		this.time = extractJsonKvp(KEY_TIME, json, false);
-		this.description = extractJsonKvp(KEY_DESC, json, false);
-		this.thumbnailUrl = extractJsonKvp(KEY_THUMB, json, false);
+		
+		if (URL.startsWith(MetadataObtainer.TWITCH_PREFIX_MOB) == false && URL.startsWith(MetadataObtainer.TWITCH_PREFIX_W) == false) {
+			this.description = extractJsonKvp(KEY_DESC, json, false);
+		} else {
+			this.description = Optional.of("");
+		}
+		
+		if (URL.startsWith(MetadataObtainer.TWITCH_PREFIX_MOB) == false && URL.startsWith(MetadataObtainer.TWITCH_PREFIX_W) == false) {
+			this.thumbnailUrl = extractJsonKvp(KEY_THUMB, json, false);
+		}
 		
 		//format the date human readable
 		if (getDate().isPresent()) {
@@ -106,10 +121,14 @@ public class MetadataObtainerYtdlp {
 		}
 		
 		//parse all boolean values
-		temp = extractJsonKvp(KEY_VERIFIED, json, true);
-		
-		if (temp.isPresent()) {
-			this.verified = Boolean.parseBoolean(temp.get());
+		if (URL.startsWith(MetadataObtainer.BITCHUTE_PREFIX) == false && URL.startsWith(MetadataObtainer.BITCHUTE_PREFIX_W) == false
+				&& URL.startsWith(MetadataObtainer.ODYSEE_PREFIX) == false && URL.startsWith(MetadataObtainer.TWITCH_PREFIX_MOB) == false
+				&& URL.startsWith(MetadataObtainer.TWITCH_PREFIX_W) == false) {
+			temp = extractJsonKvp(KEY_VERIFIED, json, true);
+
+			if (temp.isPresent()) {
+				this.verified = Boolean.parseBoolean(temp.get());
+			}
 		}
 		
 		temp = extractJsonKvp(KEY_IS_LIVE, json, true);
@@ -118,19 +137,22 @@ public class MetadataObtainerYtdlp {
 			this.isLive = Boolean.parseBoolean(temp.get());
 		}
 		
-		temp = extractJsonKvp(KEY_WAS_LIVE, json, true);
-				
-		if (temp.isPresent()) {
-			this.wasLive = Boolean.parseBoolean(temp.get());
+		if (URL.startsWith(MetadataObtainer.BITCHUTE_PREFIX) == false && URL.startsWith(MetadataObtainer.BITCHUTE_PREFIX_W) == false
+				&& URL.startsWith(MetadataObtainer.ODYSEE_PREFIX) == false) {
+			temp = extractJsonKvp(KEY_WAS_LIVE, json, true);
+					
+			if (temp.isPresent()) {
+				this.wasLive = Boolean.parseBoolean(temp.get());
+			}
 		}
 		
 		return success;
 	}
 	
-	private static Optional<String> requestJson(String url) {
+	private Optional<String> requestJson(String url) {
 		Optional<String> jsonOpt = Optional.empty();
 		String json = "";
-		final String COMMAND = YT_DLP_LOC + " -j " + url.trim() + " --skip-download";
+		final String COMMAND = model.getYtdlpLoc() + " -j " + url.trim() + " --skip-download";
 		Process proc;
 		BufferedReader stdInput;
 		BufferedReader stdError;
@@ -182,9 +204,8 @@ public class MetadataObtainerYtdlp {
 				begin = json.indexOf("\"", begin) + 1; //plus one to get past opening quotation mark
 				end = json.indexOf("\",", begin);
 				
-				//ensure that the quotation mark is not an escaped mark
+				//ensure that the quotation mark is not escaped via backslash, lest it not be the closing one
 				while (end != -1 && json.charAt(end - 1) == '\\') {
-					System.out.print("");
 					end = json.indexOf("\",", end + 1);
 				}
 				

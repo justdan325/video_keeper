@@ -7,6 +7,7 @@ import javax.swing.UIManager;
 public class Main {
 	public static final String 		DEFAULT_DATABASE 		= "database.txt";
 	public static final String 		DEFAULT_HNDL_LNKS 		= "DEFAULT";
+	public static final String		DEFAULT_YTDLP_LOC		= "yt-dlp";
 	public static final boolean 	OS_MAC					= System.getProperty("os.name").contains("Mac");
 	
 	private static final String PROP_KEY_DATABASE			= "database";
@@ -18,6 +19,7 @@ public class Main {
 	private static final String PROP_KEY_SRCH_OPTS			= "searchOptions";
 	private static final String PROP_KEY_CURR_INDX			= "currentIndex";
 	private static final String PROP_KEY_USE_YTDLP			= "useYtdlp";
+	private static final String PROP_KEY_YTDLP_LOC			= "ytdlpLoc";
 	private static final String PROP_FILE					= "videokeeper.properties";
 	
 	private PropsFileUtil props;
@@ -26,6 +28,7 @@ public class Main {
 	private String searchOptions;
 	private String handleLinks;
 	private String prevHandleLinks;
+	private String ytdlpLoc;
 	private int currentIndex;
 	private boolean autoSave;
 	private boolean checkDuplicates;
@@ -87,6 +90,7 @@ public class Main {
 		this.useYtdlp = true;
 		this.handleLinks = DEFAULT_HNDL_LNKS;
 		this.prevHandleLinks = "";
+		this.ytdlpLoc = DEFAULT_YTDLP_LOC;
 		this.searchOptions = "";
 		this.currentIndex = 0;
 		
@@ -150,6 +154,13 @@ public class Main {
 			this.prevHandleLinks = props.get(PROP_KEY_PREV_HNDL_LNKS);
 		}
 		
+		//get yt-dlp location
+		if (!props.containsProp(PROP_KEY_YTDLP_LOC)) {
+			props.set(PROP_KEY_YTDLP_LOC, ytdlpLoc);
+		} else {
+			this.ytdlpLoc = props.get(PROP_KEY_YTDLP_LOC);
+		}
+		
 		//get search options
 		if (!props.containsProp(PROP_KEY_SRCH_OPTS)) {
 			props.set(PROP_KEY_SRCH_OPTS, searchOptions);
@@ -184,6 +195,7 @@ public class Main {
 		model.setDatabaseFile(database);
 		model.setHandleLinks(handleLinks);
 		model.setPreviousHandleLinks(prevHandleLinks);
+		model.setYtdlpLoc(ytdlpLoc);
 		model.setSearchOptions(searchOptions);
 		model.setUseYtdlp(useYtdlp);
 		model.setCurrIndex(currentIndex);
@@ -267,6 +279,11 @@ public class Main {
 		if (!prevHandleLinks.trim().equals(model.getPreviousHandleLinks().trim())) {
 			this.prevHandleLinks = model.getPreviousHandleLinks().trim();
 			props.set(PROP_KEY_PREV_HNDL_LNKS, model.getPreviousHandleLinks().trim());
+		}
+		
+		if (!ytdlpLoc.trim().equals(model.getYtdlpLoc().trim())) {
+			this.ytdlpLoc = model.getYtdlpLoc().trim();
+			props.set(PROP_KEY_YTDLP_LOC, model.getYtdlpLoc().trim());
 		}
 		
 		if (!searchOptions.trim().equals(model.getSearchOptions().trim())) {

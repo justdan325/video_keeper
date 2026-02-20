@@ -8,6 +8,7 @@ public class DataModel {
 	private String handleLinks;
 	private String previousHandleLinks;
 	private String searchOptions;
+	private String ytdlpLoc;
 	private int currIndex;
 	private boolean autoSaveOnExit;
 	private boolean checkForDupl;
@@ -27,6 +28,7 @@ public class DataModel {
 		this.databaseFile = Main.DEFAULT_DATABASE;
 		this.handleLinks = Main.DEFAULT_HNDL_LNKS;
 		this.searchOptions = "";
+		this.ytdlpLoc = Main.DEFAULT_YTDLP_LOC;
 		this.currIndex = 0;
 		this.autoSaveOnExit = true;
 		this.checkForDupl = true;
@@ -183,5 +185,13 @@ public class DataModel {
 
 	public void setUseYtdlp(boolean useYtdlp) {
 		this.useYtdlp = useYtdlp;
+	}
+
+	public String getYtdlpLoc() {
+		return ytdlpLoc;
+	}
+
+	public void setYtdlpLoc(String ytdlpLoc) {
+		this.ytdlpLoc = ytdlpLoc;
 	}
 }
