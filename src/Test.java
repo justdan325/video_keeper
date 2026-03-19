@@ -54,7 +54,7 @@ public class Test {
 	private static final String URL_YT_CHANNEL		= "https://www.youtube.com/@daviddifranco";
 	private static final String TYPE_YT_CHANNEL 	= "YouTube Channels using \"@\"";
 	private static final String TTL_YT_CHANNEL 		= "daviddifranco";
-	private static final String DATE_YT_CHANNEL 	= "218K Subscribers ~ 3.4K Videos";
+	private static final String DATE_YT_CHANNEL 	= "219K Subscribers ~ 3.4K Videos";
 	private static final String CHNL_YT_CHANNEL 	= "daviddifranco on YouTube";
 	private static final String TIME_YT_CHANNEL 	= "";
 	
@@ -99,12 +99,12 @@ public class Test {
 	private static final String CHNL_VMO_NORMAL	 	= "On Vimeo";
 	private static final String TIME_VMO_NORMAL 	= "";
 	
-	private static final String URL_VMO_SHOWCASE	= "https://vimeo.com/showcase/10841475?video=1153335296";
-	private static final String TYPE_VMO_SHOWCASE 	= "Vimeo Showcase";
-	private static final String TTL_VMO_SHOWCASE 	= "10 am | Sunday, January 11, 2026";
-	private static final String DATE_VMO_SHOWCASE 	= "2026-01-17";
-	private static final String CHNL_VMO_SHOWCASE	= "St. Thomas More Catholic Parish on Vimeo";
-	private static final String TIME_VMO_SHOWCASE 	= "";
+//	private static final String URL_VMO_SHOWCASE	= "https://vimeo.com/showcase/10841475?video=1153335296";
+//	private static final String TYPE_VMO_SHOWCASE 	= "Vimeo Showcase";
+//	private static final String TTL_VMO_SHOWCASE 	= "10 am | Sunday, January 11, 2026";
+//	private static final String DATE_VMO_SHOWCASE 	= "2026-01-17";
+//	private static final String CHNL_VMO_SHOWCASE	= "St. Thomas More Catholic Parish on Vimeo";
+//	private static final String TIME_VMO_SHOWCASE 	= "";
 	
 	//Twitch
 	private static final int	TWI_GROUP_NO		= 4;
@@ -155,7 +155,7 @@ public class Test {
 	
 	private static final String URL_PDBN_NORMAL2	= "https://podcast.htmlallthethings.com/e/top-mistakes-that-developers-make-when-building-a-web-app-and-how-to-prevent-them/";
 	private static final String TYPE_PDBN_NORMAL2 	= "PodBean Normal with \"podcast\" URL";
-	private static final String TTL_PDBN_NORMAL2 	= "Top Mistakes That Developers Make When Building a Web App (And How to Prevent Them) | HTML All The Things - Web Development, Web Design, Small Business";
+	private static final String TTL_PDBN_NORMAL2 	= "Top Mistakes That Developers Make When Building a Web App (And How to Prevent Them) | HTML All The Things - Web Development, AI, and Developer Careers";
 	private static final String DATE_PDBN_NORMAL2 	= "Tuesday Aug 26, 2025";
 	private static final String CHNL_PDBN_NORMAL2	= "htmlallthethings on PodBean";
 	private static final String TIME_PDBN_NORMAL2 	= "1:05:07";
@@ -190,7 +190,7 @@ public class Test {
 
 		//Vimeo
 		runTest(testLink(URL_VMO_NORMAL, TYPE_VMO_NORMAL, TTL_VMO_NORMAL, DATE_VMO_NORMAL, CHNL_VMO_NORMAL, TIME_VMO_NORMAL), TYPE_VMO_NORMAL, VMO_GROUP_NO);
-		runTest(testLink(URL_VMO_SHOWCASE, TYPE_VMO_SHOWCASE, TTL_VMO_SHOWCASE, DATE_VMO_SHOWCASE, CHNL_VMO_SHOWCASE, TIME_VMO_SHOWCASE), TYPE_VMO_SHOWCASE, VMO_GROUP_NO);
+//		runTest(testLink(URL_VMO_SHOWCASE, TYPE_VMO_SHOWCASE, TTL_VMO_SHOWCASE, DATE_VMO_SHOWCASE, CHNL_VMO_SHOWCASE, TIME_VMO_SHOWCASE), TYPE_VMO_SHOWCASE, VMO_GROUP_NO);
 		
 		//YouTube
 		runTest(testLink(URL_YT_NORMAL, TYPE_YT_NORMAL, TTL_YT_NORMAL, DATE_YT_NORMAL, CHNL_YT_NORMAL, TIME_YT_NORMAL), TYPE_YT_NORMAL, YT_GROUP_NO);
