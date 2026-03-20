@@ -108,12 +108,12 @@ public class Test {
 	
 	//Twitch
 	private static final int	TWI_GROUP_NO		= 4;
-	private static final String URL_TWI_MOBILE		= "https://www.twitch.tv/videos/2671128232";
+	private static final String URL_TWI_MOBILE		= "https://www.twitch.tv/videos/2722611692";
 	private static final String TYPE_TWI_MOBILE 	= "Twitch Mobile (and normal since normal gets converted to mobile)";
-	private static final String TTL_TWI_MOBILE 		= "everyone loves gleba";
+	private static final String TTL_TWI_MOBILE 		= "we're back! and it's pi day!";
 	private static final String DATE_TWI_MOBILE 	= "";
 	private static final String CHNL_TWI_MOBILE	 	= "ptony on Twitch";
-	private static final String TIME_TWI_MOBILE 	= "1:58:09";
+	private static final String TIME_TWI_MOBILE 	= "1:46:43";
 	
 	//DailyMotion
 	private static final int	DLYMTN_GROUP_NO		= 5;
