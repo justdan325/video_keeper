@@ -65,7 +65,7 @@ public class MetadataObtainer {
 	
 	public static void main(String[] args) {
 //		System.out.println(fetchHtml("https://vimeo.com/1153335296"));
-		final String URL = "https://www.twitch.tv/videos/2722611692";
+		final String URL = "https://www.youtube.com/@daviddifranco";
 		DataModel model = new DataModel();
 		
 		model.setUseYtdlp(true);

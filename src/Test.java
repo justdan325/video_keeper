@@ -54,7 +54,7 @@ public class Test {
 	private static final String URL_YT_CHANNEL		= "https://www.youtube.com/@daviddifranco";
 	private static final String TYPE_YT_CHANNEL 	= "YouTube Channels using \"@\"";
 	private static final String TTL_YT_CHANNEL 		= "daviddifranco";
-	private static final String DATE_YT_CHANNEL 	= "219K Subscribers ~ 3.4K Videos";
+	private static final String DATE_YT_CHANNEL 	= "219K Subscribers ~ 3.5K Videos";
 	private static final String CHNL_YT_CHANNEL 	= "daviddifranco on YouTube";
 	private static final String TIME_YT_CHANNEL 	= "";
 	
