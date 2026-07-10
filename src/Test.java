@@ -54,7 +54,7 @@ public class Test {
 	private static final String URL_YT_CHANNEL		= "https://www.youtube.com/@daviddifranco";
 	private static final String TYPE_YT_CHANNEL 	= "YouTube Channels using \"@\"";
 	private static final String TTL_YT_CHANNEL 		= "daviddifranco";
-	private static final String DATE_YT_CHANNEL 	= "219K Subscribers ~ 3.5K Videos";
+	private static final String DATE_YT_CHANNEL 	= "221K Subscribers ~ 3.6K Videos";
 	private static final String CHNL_YT_CHANNEL 	= "daviddifranco on YouTube";
 	private static final String TIME_YT_CHANNEL 	= "";
 	
@@ -108,22 +108,22 @@ public class Test {
 	
 	//Twitch
 	private static final int	TWI_GROUP_NO		= 4;
-	private static final String URL_TWI_MOBILE		= "https://www.twitch.tv/videos/2722611692";
+	private static final String URL_TWI_MOBILE		= "https://www.twitch.tv/videos/2816261678";
 	private static final String TYPE_TWI_MOBILE 	= "Twitch Mobile (and normal since normal gets converted to mobile)";
-	private static final String TTL_TWI_MOBILE 		= "we're back! and it's pi day!";
+	private static final String TTL_TWI_MOBILE 		= "Lowlands Away";
 	private static final String DATE_TWI_MOBILE 	= "";
-	private static final String CHNL_TWI_MOBILE	 	= "ptony on Twitch";
-	private static final String TIME_TWI_MOBILE 	= "1:46:43";
+	private static final String CHNL_TWI_MOBILE	 	= "tc_904 on Twitch";
+	private static final String TIME_TWI_MOBILE 	= "3:14:09";
 	
 	//DailyMotion
 	private static final int	DLYMTN_GROUP_NO		= 5;
 	
-	private static final String URL_DLYMTN_NORMAL	= "https://www.dailymotion.com/video/x9ppy20";
+	private static final String URL_DLYMTN_NORMAL	= "https://www.dailymotion.com/video/xanqxai";
 	private static final String TYPE_DLYMTN_NORMAL 	= "Daily Motion Normal";
-	private static final String TTL_DLYMTN_NORMAL 	= "Top 10 Superhero Movie Storylines That Got KILLED (And Where They Were Headed)";
-	private static final String DATE_DLYMTN_NORMAL 	= "08-30-2025";
-	private static final String CHNL_DLYMTN_NORMAL	= "shortfilms on Dailymotion";
-	private static final String TIME_DLYMTN_NORMAL 	= "10:50";
+	private static final String TTL_DLYMTN_NORMAL 	= "Which Animals Will Survive Climate Change";
+	private static final String DATE_DLYMTN_NORMAL 	= "07-09-2026";
+	private static final String CHNL_DLYMTN_NORMAL	= "tech on Dailymotion";
+	private static final String TIME_DLYMTN_NORMAL 	= "04:15";
 	
 	//Rumble
 	private static final int	RUM_GROUP_NO		= 6;
