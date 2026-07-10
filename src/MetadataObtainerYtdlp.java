@@ -47,7 +47,7 @@ public class MetadataObtainerYtdlp {
 	
 	public static void main(String[] args) throws IOException {
 		DataModel testModel = new DataModel();
-		String url = "https://www.youtube.com/@daviddifranco";
+		String url = "https://www.youtube.com/playlist?list=PLT515qV87IFIcL1LvgMVy_IpbWWkiQaXo";
 		
 		testModel.setYtdlpLoc("/home/dan/.local/share/pipx/venvs/yt-dlp/bin/yt-dlp");
 		

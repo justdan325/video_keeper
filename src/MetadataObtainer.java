@@ -65,7 +65,7 @@ public class MetadataObtainer {
 	
 	public static void main(String[] args) {
 //		System.out.println(fetchHtml("https://vimeo.com/1153335296"));
-		final String URL = "https://www.youtube.com/@daviddifranco";
+		final String URL = "https://www.youtube.com/playlist?list=PLD5aIDn0HlltOYDtQRGAx9YfpqDyXup7v";
 		DataModel model = new DataModel();
 		
 		model.setUseYtdlp(true);
@@ -373,7 +373,8 @@ public class MetadataObtainer {
 
 				channel += " on YouTube";
 			} else if (urlStr.contains(YOUTUBE_PLAYLIST_TOKEN)) {
-				String prefix = "\"shortBylineText\":{\"runs\":[{\"text\":\"";
+				String targetPrefixToken = "Go to channel ";
+				String prefix = "\"a11yLabel\":\"";
 				String suffix = "\",";
 				int begin = html.indexOf(prefix) + prefix.length();
 				int end = html.indexOf(suffix, begin);
@@ -381,6 +382,10 @@ public class MetadataObtainer {
 				if (begin != -1 && end != -1) {
 					channel = html.substring(begin, end);
 					channel = filterEscapeChars(channel);
+					
+					if (channel.startsWith(targetPrefixToken)) {
+						channel = channel.replace(targetPrefixToken, "");
+					}
 				}
 				
 				channel += " on YouTube";
