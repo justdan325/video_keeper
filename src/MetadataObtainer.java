@@ -38,7 +38,7 @@ public class MetadataObtainer {
 	public static final String PEERTUBE_PREFIX			= "https://peertube";
 	public static final String PEERTUBE_TOKEN			= "<meta property=\"og:platform\" content=\"PeerTube\">";
 	
-	private static final int	MAX_LEN_TITLE			= 200;
+	private static final int MAX_LEN_TITLE				= 200;
 	
 	private MetadataObtainerYtdlp ytdlp;
 	private DataModel model;
@@ -65,10 +65,10 @@ public class MetadataObtainer {
 	
 	public static void main(String[] args) {
 //		System.out.println(fetchHtml("https://vimeo.com/1153335296"));
-		final String URL = "https://www.youtube.com/playlist?list=PLD5aIDn0HlltOYDtQRGAx9YfpqDyXup7v";
+		final String URL = "https://www.twitch.tv/videos/2851118302";
 		DataModel model = new DataModel();
 		
-		model.setUseYtdlp(true);
+		model.setUseYtdlp(false);
 		
 		MetadataObtainer o = new MetadataObtainer(model, URL);
 		System.out.println("URL provided: [" + URL + "]");

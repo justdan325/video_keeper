@@ -3,7 +3,7 @@
  * Regression test to ensure that supported URL metadata still gets obtained. Useful for detecting changes in site DOM as well as program bugs.
  */
 public class Test {
-	private static final boolean EXIT_UPON_FAILURE = false; //if true, will exit testing when a link fails. Setting false can be handy when testing wonky sites.
+	private static final boolean EXIT_UPON_FAILURE = true; //if true, will exit testing when a link fails. Setting false can be handy when testing wonky sites.
 	private static final boolean USE_YTDLP = false;
 	
 	//YouTube
@@ -108,12 +108,12 @@ public class Test {
 	
 	//Twitch
 	private static final int	TWI_GROUP_NO		= 4;
-	private static final String URL_TWI_MOBILE		= "https://www.twitch.tv/videos/2816261678";
+	private static final String URL_TWI_MOBILE		= "https://www.twitch.tv/videos/2851118302";
 	private static final String TYPE_TWI_MOBILE 	= "Twitch Mobile (and normal since normal gets converted to mobile)";
-	private static final String TTL_TWI_MOBILE 		= "Lowlands Away";
+	private static final String TTL_TWI_MOBILE 		= "git gud?";
 	private static final String DATE_TWI_MOBILE 	= "";
-	private static final String CHNL_TWI_MOBILE	 	= "tc_904 on Twitch";
-	private static final String TIME_TWI_MOBILE 	= "3:14:09";
+	private static final String CHNL_TWI_MOBILE	 	= "ptony on Twitch";
+	private static final String TIME_TWI_MOBILE 	= "14:27";
 	
 	//DailyMotion
 	private static final int	DLYMTN_GROUP_NO		= 5;
@@ -149,14 +149,14 @@ public class Test {
 	private static final String URL_PDBN_NORMAL		= "https://geruhmyuh.podbean.com/e/god-s-sovereignty/";
 	private static final String TYPE_PDBN_NORMAL 	= "PodBean Normal";
 	private static final String TTL_PDBN_NORMAL 	= "God’s Sovereignty | Jeremiah Williamson Preaching";
-	private static final String DATE_PDBN_NORMAL 	= "Sunday Jul 13, 2025";
+	private static final String DATE_PDBN_NORMAL 	= "Jul 13, 2025";
 	private static final String CHNL_PDBN_NORMAL	= "geruhmyuh on PodBean";
 	private static final String TIME_PDBN_NORMAL 	= "32:25";
 	
 	private static final String URL_PDBN_NORMAL2	= "https://podcast.htmlallthethings.com/e/top-mistakes-that-developers-make-when-building-a-web-app-and-how-to-prevent-them/";
 	private static final String TYPE_PDBN_NORMAL2 	= "PodBean Normal with \"podcast\" URL";
 	private static final String TTL_PDBN_NORMAL2 	= "Top Mistakes That Developers Make When Building a Web App (And How to Prevent Them) | HTML All The Things - Web Development, AI, and Developer Careers";
-	private static final String DATE_PDBN_NORMAL2 	= "Tuesday Aug 26, 2025";
+	private static final String DATE_PDBN_NORMAL2 	= "Aug 26, 2025";
 	private static final String CHNL_PDBN_NORMAL2	= "htmlallthethings on PodBean";
 	private static final String TIME_PDBN_NORMAL2 	= "1:05:07";
 	
