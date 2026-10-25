@@ -176,88 +176,95 @@ public class SearchDialog extends JDialog implements WindowListener {
 			}
 		});
 		
-		moveUpButton.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				new Thread(new Runnable() {
-					@Override
-					public void run() {
-						Optional<VideoList> videoList = model.getVideoList();
-						int indexOfToMove = getCorrespondingIndex();
-						
-						if (videoList.isPresent() && videoList.get().size() > 0 && indexOfToMove > 0) {
-							int newIndex = indexOfToMove - 1;
-							Optional<VideoDataNode> toMove = videoList.get().pop(indexOfToMove);
-
-							if (toMove.isPresent()) {
-								videoList.get().insert(newIndex, toMove.get());
-								
-								populateList(model.getVideoList(), false);
-								mainTable.setRowSelectionInterval(newIndex, newIndex);
-								
-								model.setRequestSaveButtonEn(true);
-							}
-							
-						}
-					}
-				}).start();
+		moveUpButton.addActionListener(e -> {
+			final int indexOfToMove = getCorrespondingIndex();
+			
+			if (indexOfToMove <= 0) {
+				return;
 			}
+
+			new Thread(() -> {
+				Optional<VideoList> videoListOpt = model.getVideoList();
+				
+				if (!videoListOpt.isPresent() || videoListOpt.get().size() == 0) {
+					return;
+				}
+
+				VideoList videoList = videoListOpt.get();
+				int newIndex = indexOfToMove - 1;
+				Optional<VideoDataNode> toMove = videoList.pop(indexOfToMove);
+
+				if (toMove.isPresent()) {
+					videoList.insert(newIndex, toMove.get());
+					model.setRequestSaveButtonEn(true);
+
+					SwingUtilities.invokeLater(() -> {
+						populateList(model.getVideoList(), false);
+						selectRowSafely(newIndex);
+					});
+				}
+			}, "MoveUp").start();
 		});
 		
-		moveDownButton.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				new Thread(new Runnable() {
-					@Override
-					public void run() {
-						Optional<VideoList> videoList = model.getVideoList();
-						int indexOfToMove = getCorrespondingIndex();
+		moveDownButton.addActionListener(e -> {
+		    final int indexOfToMove = getCorrespondingIndex();
+		    
+		    if (indexOfToMove < 0) {
+		        return;
+		    }
+
+		    new Thread(() -> {
+		        Optional<VideoList> videoListOpt = model.getVideoList();
+		        
+				if (videoListOpt.isPresent()) {
+					VideoList videoList = videoListOpt.get();
+					
+					//Must re-check size after capturing index. List could theoretically change.
+					if (indexOfToMove < videoList.size() - 1) {
 						int newIndex = indexOfToMove + 1;
-						
-						if (videoList.isPresent() && videoList.get().size() > 0 && indexOfToMove < videoList.get().size()-1) {
-							Optional<VideoDataNode> toMove = videoList.get().pop(indexOfToMove);
+						Optional<VideoDataNode> toMove = videoList.pop(indexOfToMove);
 
-							if (toMove.isPresent()) {
-								videoList.get().insert(newIndex, toMove.get());
-								
-								populateList(model.getVideoList(), false);
-								mainTable.setRowSelectionInterval(newIndex, newIndex);
-							}
-							
+						if (toMove.isPresent()) {
+							//After pop, everything after indexOfToMove shifted left, so the original "next" slot is now at indexOfToMove.
+							videoList.insert(newIndex, toMove.get());
 							model.setRequestSaveButtonEn(true);
+
+							SwingUtilities.invokeLater(() -> {
+								populateList(model.getVideoList(), false);
+								selectRowSafely(newIndex);
+							});
 						}
 					}
-				}).start();
-			}
+				}
+		    }, "MoveDown").start();
 		});
 		
-		moveToHeadButton.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				new Thread(new Runnable() {
-					@Override
-					public void run() {
-						Optional<VideoList> videoList = model.getVideoList();
-						
-						if (videoList.isPresent() && videoList.get().size() > 0) {
-							Optional<VideoDataNode> currInList = videoList.get().peekCurr();
-							Optional<VideoDataNode> toMove = videoList.get().pop(getCorrespondingIndex());
-							int indexOfCurr = model.getVideoKeeper().getIndexOfNode(currInList);
+		moveToHeadButton.addActionListener(e -> {
+			final int index = getCorrespondingIndex();
+			int scrollY;
+			
+			if (index >= 0) {
+				scrollY = captureScrollY();
+				 
+				new Thread(() -> {
+					Optional<VideoList> opt = model.getVideoList();
 
-							if (toMove.isPresent()) {
-								videoList.get().prepend(toMove.get());
-								
-								if(currInList.isPresent()) {
-									videoList.get().setIndex(indexOfCurr);
-								}
-								
-								populateList(model.getVideoList(), false);
-							}
-							
+					if (opt.isPresent() && opt.get().size() != 0) {
+						VideoList list = opt.get();
+						Optional<VideoDataNode> toMove = list.pop(index);
+
+						if (toMove.isPresent()) {
+							list.prepend(toMove.get());
 							model.setRequestSaveButtonEn(true);
+
+							SwingUtilities.invokeLater(() -> {
+								populateList(model.getVideoList(), false);
+								selectRowWithoutScrolling(0);
+					            restoreScrollY(scrollY);
+							});
 						}
 					}
-				}).start();
+				}, "MoveToHead").start();
 			}
 		});
 		
@@ -346,33 +353,32 @@ public class SearchDialog extends JDialog implements WindowListener {
 			}
 		});
 		
-		moveToTailButton.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				new Thread(new Runnable() {
-					@Override
-					public void run() {
-						Optional<VideoList> videoList = model.getVideoList();
-						
-						if (videoList.isPresent() && videoList.get().size() > 0) {
-							Optional<VideoDataNode> currInList = videoList.get().peekCurr();
-							Optional<VideoDataNode> toMove = videoList.get().pop(getCorrespondingIndex());
-							int indexOfCurr = model.getVideoKeeper().getIndexOfNode(currInList);
+		moveToTailButton.addActionListener(e -> {
+			final int index = getCorrespondingIndex();
+			int scrollY;
+			
+			if (index >= 0) {
+				scrollY = captureScrollY(); 
+				
+				new Thread(() -> {
+					Optional<VideoList> opt = model.getVideoList();
+					
+					if (opt.isPresent() && opt.get().size() != 0) {
+						VideoList list = opt.get();
+						Optional<VideoDataNode> toMove = list.pop(index);
 
-							if (toMove.isPresent()) {
-								videoList.get().append(toMove.get());
-								
-								if(currInList.isPresent()) {
-									videoList.get().setIndex(indexOfCurr);
-								}
-								
-								populateList(model.getVideoList(), false);
-							}
-							
+						if (toMove.isPresent()) {
+							list.append(toMove.get());
 							model.setRequestSaveButtonEn(true);
+
+							SwingUtilities.invokeLater(() -> {
+								populateList(model.getVideoList(), false);
+								selectRowWithoutScrolling(mainTable.getRowCount() - 1);
+								restoreScrollY(scrollY);
+							});
 						}
 					}
-				}).start();
+				}, "MoveToTail").start();
 			}
 		});
 		
@@ -635,18 +641,53 @@ public class SearchDialog extends JDialog implements WindowListener {
 		return node;
 	}
 	
-	private int getCorrespondingIndex() {
-		int index = 0;
+	private int getSelectedTableRow() {
+		int row = mainTable.getSelectedRow();
 		
-		if (mainTable.getSelectedRow() >= 0) {
-			Object valueAt = ((DefaultTableModel) mainTable.getModel()).getValueAt(mainTable.getSelectedRow(), 0);
-			
-			if (model.getVideoList().isPresent()) {
-				index = Integer.parseInt(((String) valueAt).trim()) - 1;
+		if ((row >= 0 && row < mainTable.getRowCount()) == false) {
+			row = -1;
+		}
+		
+		return row;
+	}
+
+	private int getCorrespondingIndex() {
+		int correspondingIndex = -1;
+		int row = getSelectedTableRow();
+		int index;
+		Optional<VideoList> list;
+		
+		if (row >= 0) {
+			Object value = mainTable.getModel().getValueAt(row, 0);
+
+			if (value != null) {
+				try {
+					index = Integer.parseInt(value.toString().trim()) - 1;
+					list = model.getVideoList();
+
+					if (list.isPresent() && index >= 0 && index < list.get().size()) {
+						correspondingIndex = index;
+					}
+				} catch (NumberFormatException e) {
+				}
 			}
 		}
 		
-		return index;
+		return correspondingIndex;
+	}
+
+	private void selectRowSafely(int row) {
+		int count = mainTable.getRowCount();
+		
+		if (count == 0) {
+			mainTable.clearSelection();
+			return;
+		}
+		
+		row = Math.max(0, Math.min(row, count - 1));
+		
+		mainTable.setRowSelectionInterval(row, row);
+		mainTable.scrollRectToVisible(mainTable.getCellRect(row, 0, true));
 	}
 	
 	private int getIndexOfNodeFromMainList(Optional<VideoDataNode> node) {
@@ -659,16 +700,51 @@ public class SearchDialog extends JDialog implements WindowListener {
 					break;
 				}
 			}
-		} /*else {
-			for (int i = 0; i < model.getVideoList().get().size(); i++) {
-				if (model.getVideoList().get().peek(i).equals(getCorrespondingNodeFromSelectedCell(false))) {
-					index = i;
-					break;
-				}
-			}
-		}*/
+		}
 		
 		return index;
+	}
+	
+	private JScrollPane getTableScrollPane() {
+	    Container parent = mainTable.getParent();
+	    
+	    while (parent != null && !(parent instanceof JScrollPane)) {
+	        parent = parent.getParent();
+	    }
+	    
+	    return (parent instanceof JScrollPane) ? (JScrollPane) parent : null;
+	}
+
+	private int captureScrollY() {
+	    JScrollPane scroolPane = getTableScrollPane();
+	    
+	    return (scroolPane != null) ? scroolPane.getVerticalScrollBar().getValue() : 0;
+	}
+
+	private void restoreScrollY(int y) {
+		JScrollPane sp = getTableScrollPane();
+		JScrollBar bar;
+		int max;
+
+		if (sp == null) {
+			return;
+		}
+
+		bar = sp.getVerticalScrollBar();
+		max = Math.max(0, bar.getMaximum() - bar.getVisibleAmount());
+
+		bar.setValue(Math.max(0, Math.min(y, max)));
+	}
+
+	private void selectRowWithoutScrolling(int row) {
+	    int count = mainTable.getRowCount();
+	    
+		if (count == 0) {
+			mainTable.clearSelection();
+		} else {
+			row = Math.max(0, Math.min(row, count - 1));
+			mainTable.setRowSelectionInterval(row, row);
+		}
 	}
 	
 	private void setOptionsLocked(boolean locked, boolean displayingSearchRes) {

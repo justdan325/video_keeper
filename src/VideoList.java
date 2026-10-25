@@ -38,11 +38,11 @@ public class VideoList {
 	public synchronized void prepend(VideoDataNode node) {
 		list.add(0, node);
 
-		if (index != 0) {
-			incrementIndex();
-		} else {
-			resetIndex();
-		}
+		if (index >= 0) {
+	        index++;
+	    } else {
+	        index = 0;
+	    }
 	}
 
 	public synchronized boolean insert(int index, VideoDataNode node) {
@@ -79,16 +79,22 @@ public class VideoList {
 	public synchronized Optional<VideoDataNode> pop(int index) {
 		Optional<VideoDataNode> curr = Optional.empty();
 
-		if (index >= 0 && index <= list.size()) {
-			curr = Optional.of(list.remove(index));
+	    if (index >= 0 && index < list.size()) {
+	        curr = Optional.of(list.remove(index));
 
-			//reset index to head if it walks off of end of list or if list is empty
-			if (index > list.size() - 1) {
-				resetIndex();
-			}
-		}
+	        if (list.isEmpty()) {
+	            this.index = -1;
+	        } else if (index < this.index) {
+	            this.index--;
+	        } else if (index == this.index) {
+	            //Wrap to 0 if walked off of the end.
+	            if (this.index >= list.size()) {
+	                this.index = 0;
+	            }
+	        }
+	    }
 
-		return curr;
+	    return curr;
 	}
 
 	public synchronized Optional<VideoDataNode> peekCurr() {
@@ -118,7 +124,7 @@ public class VideoList {
 	public synchronized Optional<VideoDataNode> peek(int index) {
 		Optional<VideoDataNode> curr = Optional.empty();
 
-		if (index >= 0 && index <= list.size()) {
+		if (index >= 0 && index < list.size()) {
 			curr = Optional.of(list.get(index));
 		}
 
